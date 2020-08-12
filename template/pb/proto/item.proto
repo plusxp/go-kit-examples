@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb;
+
+// 注意填写项目的pb目录路径，可以划分子目录
+option go_package = "go-kit-examples/template/pb/gen-go/pb;pb";
+
+import "common_pb/common.proto";
+
+service ItemSvc {
+  rpc GetItemName (GetItemNameReq) returns (GetItemNameRsp) {}
+}
+
+message GetItemNameReq {
+  BaseReq base_req = 1;
+  uint32 item_id=2;
+}
+
+message GetItemNameRsp {
+  string name = 1;
+}

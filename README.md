@@ -71,5 +71,3 @@ go-kit有相应的pkg支持Consul, etcd, ZooKeeper, and DNS SRV
 ## 监控
 
 go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐使用它来建立go-kit服务
-
-
