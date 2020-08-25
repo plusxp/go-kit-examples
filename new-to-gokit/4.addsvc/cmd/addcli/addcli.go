@@ -114,7 +114,7 @@ func main() {
 	} else if *jsonRPCAddr != "" {
 		svc, err = addtransport.NewJSONRPCClient(*jsonRPCAddr, otTracer, log.NewNopLogger())
 	} else if *thriftAddr != "" {
-		// It's necessary to do all of this construction in the func _main,
+		// It's necessary to do all of this construction in the func main,
 		// because (among other reasons) we need to control the lifecycle of the
 		// Thrift transport, i.e. close it eventually.
 		var protocolFactory thrift.TProtocolFactory
