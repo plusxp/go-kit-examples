@@ -156,7 +156,7 @@ func main() {
 		jsonrpcHandler = addtransport.NewJSONRPCHandler(endpoints, logger)
 	)
 
-	// Now we're to the part of the func _main where we want to start actually
+	// Now we're to the part of the func main where we want to start actually
 	// running things, like servers bound to listeners to receive connections.
 	//
 	// The method is the same for each component: add a new actor to the group
