@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"go-kit-examples/template/internal"
 	"log"
 )
 
@@ -12,7 +11,5 @@ pkg目录：存放可以被重用的代码
 */
 
 func PublicFunc() {
-	internal.Func()
-
 	log.Println("pkg/pkg_example.go: this is a publicFunc")
 }
