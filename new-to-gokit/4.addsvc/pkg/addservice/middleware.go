@@ -18,6 +18,10 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 	}
 }
 
+func InstallMW() {
+
+}
+
 type loggingMiddleware struct {
 	logger log.Logger
 	next   Service

@@ -1,12 +1,13 @@
 # go-kit-examples
 
-[gokit.io](https://gokit.io)
+[![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
+![](https://badgen.net/github/stars/go-kit/kit)
+![](https://badgen.net/github/release/go-kit/kit)
 
 ## 官方介绍
 Go-kit是使用Go语言构建微服务的一个工具箱，它可以解决分布式系统架构中的常见问题；
 能够让我们专注于业务代码。
 
--   Github stars 17.7k
 
 ## 特点
 
@@ -71,3 +72,11 @@ go-kit有相应的pkg支持Consul, etcd, ZooKeeper, and DNS SRV
 ## 监控
 
 go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐使用它来建立go-kit服务
+
+# 微服务下的常规开发规范
+
+规范的Go项目目录结构，参考[golang-standards/project-layout](https://github.com/golang-standards/project-layout/blob/master/README_zh.md)
+    
+请参考template/目录，开发新的app时，可直接复制该模板初始化app目录结构，不需要的目录可删除
+
+按照Go项目规范组织代码结构，可以极大地减少沟通成本，提高团队开发效率。

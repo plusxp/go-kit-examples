@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics"
+	"runtime/debug"
 )
 
 // Service describes a service that adds things together.
@@ -19,7 +20,8 @@ func New(logger log.Logger, ints, chars metrics.Counter) Service {
 	// 使用洋葱模式封装svc
 	{
 		svc = NewBasicService()
-		svc = LoggingMiddleware(logger)(svc)
+		// install_middleware(svc, logger)
+		//svc = LoggingMiddleware(logger)(svc)
 		svc = InstrumentingMiddleware(ints, chars)(svc)
 	}
 	return svc
@@ -53,6 +55,7 @@ const (
 )
 
 func (s basicService) Sum(_ context.Context, a, b int) (int, error) {
+	debug.PrintStack()
 	if a == 0 && b == 0 {
 		return 0, ErrTwoZeroes
 	}
