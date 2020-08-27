@@ -1,4 +1,4 @@
-package profilesvc
+package __profilesvc
 
 // The profilesvc is just over HTTP, so we just have a single transport.go.
 
@@ -26,6 +26,7 @@ var (
 
 // MakeHTTPHandler mounts all of the service endpoints into an http.Handler.
 // Useful in a profilesvc server.
+// 把endpoint挂到httphandler
 func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	r := mux.NewRouter()
 	e := MakeServerEndpoints(s)
@@ -216,6 +217,11 @@ func decodeDeleteAddressRequest(_ context.Context, r *http.Request) (request int
 	}, nil
 }
 
+// =---------------------------------
+
+// encode...Request是给client.endpoint使用, 并且指定路由
+// 这样client调用endpoint.API时，就包含了指定path和序列化body的操作
+// json(req) ==> send req
 func encodePostProfileRequest(ctx context.Context, req *http.Request, request interface{}) error {
 	// r.Methods("POST").Path("/profiles/")
 	req.URL.Path = "/profiles/"
@@ -288,6 +294,13 @@ func encodeDeleteAddressRequest(ctx context.Context, req *http.Request, request 
 	return encodeRequest(ctx, req, request)
 }
 
+// ----------------------------------
+
+// decode...Response是给client.endpoint使用, 完成body==>endpoint.resp-struct的转换
+// 这一切都是为了client 无感调用
+// 也许会感到多写不少代码，这是正常的；因为以往多用的是grpc，这部分代码时生成的，不需要我们写，而现在是用的http
+// 要实现像grpc方式的调用，这部分代码就需要手写
+// respon-body == > resp-struct
 func decodePostProfileResponse(_ context.Context, resp *http.Response) (interface{}, error) {
 	var response postProfileResponse
 	err := json.NewDecoder(resp.Body).Decode(&response)

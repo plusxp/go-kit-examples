@@ -1,4 +1,4 @@
-package profilesvc
+package __profilesvc
 
 import (
 	"context"
@@ -26,7 +26,7 @@ type loggingMiddleware struct {
 
 func (mw loggingMiddleware) PostProfile(ctx context.Context, p Profile) (err error) {
 	defer func(begin time.Time) {
-		mw.logger.Log("method", "PostProfile", "id", p.ID, "took", time.Since(begin), "err", err)
+		mw.logger.Log("method", "PostProfile", "id", p.ID, "name", p.Name, "took", time.Since(begin), "err", err)
 	}(time.Now())
 	return mw.next.PostProfile(ctx, p)
 }

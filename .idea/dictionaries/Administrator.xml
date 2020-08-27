@@ -7,6 +7,8 @@
       <w>httptransport</w>
       <w>kitprometheus</w>
       <w>protoc</w>
+      <w>resultcode</w>
+      <w>retcode</w>
       <w>stdprometheus</w>
     </words>
   </dictionary>

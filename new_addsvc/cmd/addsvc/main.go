@@ -3,16 +3,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	__profilesvc "go-kit-examples/new-to-gokit/6.profilesvc"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 
-	"github.com/go-kit/kit/examples/profilesvc"
 	"github.com/go-kit/kit/log"
 )
 
 func main() {
+	// todo 还需要注册到consul
 	var (
 		httpAddr = flag.String("http.addr", ":8080", "HTTP listen address")
 	)
@@ -25,15 +26,15 @@ func main() {
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
 
-	var s profilesvc.Service
+	var s __profilesvc.Service
 	{
-		s = profilesvc.NewInmemService()
-		s = profilesvc.LoggingMiddleware(logger)(s)
+		s = __profilesvc.NewInmemService()
+		s = __profilesvc.LoggingMiddleware(logger)(s)
 	}
 
 	var h http.Handler
 	{
-		h = profilesvc.MakeHTTPHandler(s, log.With(logger, "component", "HTTP"))
+		h = __profilesvc.MakeHTTPHandler(s, log.With(logger, "component", "HTTP"))
 	}
 
 	errs := make(chan error)

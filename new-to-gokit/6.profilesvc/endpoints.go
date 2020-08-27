@@ -1,4 +1,4 @@
-package profilesvc
+package __profilesvc
 
 import (
 	"context"
@@ -23,6 +23,9 @@ import (
 // single type that implements the Service interface. For example, you might
 // construct individual endpoints using transport/http.NewClient, combine them
 // into an Endpoints, and return it to the caller as a Service.
+
+// Endpoints 需要实现Servcie的所有接口，到时候client也是直接调Endpoints
+// ！不能只实现部分接口！
 type Endpoints struct {
 	PostProfileEndpoint   endpoint.Endpoint
 	GetProfileEndpoint    endpoint.Endpoint
@@ -38,6 +41,7 @@ type Endpoints struct {
 // MakeServerEndpoints returns an Endpoints struct where each endpoint invokes
 // the corresponding method on the provided service. Useful in a profilesvc
 // server.
+// 将一个Service对象转为Endpoints对象
 func MakeServerEndpoints(s Service) Endpoints {
 	return Endpoints{
 		PostProfileEndpoint:   MakePostProfileEndpoint(s),
@@ -185,6 +189,7 @@ func (e Endpoints) DeleteAddress(ctx context.Context, profileID string, addressI
 
 // MakePostProfileEndpoint returns an endpoint via the passed service.
 // Primarily useful in a server.
+// make...endpoint()目的是生成一个ep，里面完成 req ==》service.process(req.args) ==> rsp
 func MakePostProfileEndpoint(s Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
 		req := request.(postProfileRequest)

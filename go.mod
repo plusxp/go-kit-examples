@@ -11,9 +11,10 @@ require (
 	github.com/gogo/protobuf v1.3.1 // indirect
 	github.com/golang/protobuf v1.4.0
 	github.com/google/go-cmp v0.5.1 // indirect
+	github.com/gorilla/mux v1.7.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.1
+	github.com/hashicorp/consul/api v1.6.0
 	github.com/hashicorp/go-version v1.2.0 // indirect
-	github.com/hashicorp/logutils v1.0.0 // indirect
 	github.com/lightstep/lightstep-tracer-go v0.18.1
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.1 // indirect
@@ -25,6 +26,7 @@ require (
 	github.com/openzipkin-contrib/zipkin-go-opentracing v0.4.5
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/pact-foundation/pact-go v1.0.4
+	github.com/pborman/uuid v1.2.1
 	github.com/prometheus/client_golang v1.3.0
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect

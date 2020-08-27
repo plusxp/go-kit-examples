@@ -20,9 +20,7 @@ func_init_cmd_map() {
         # 关于proto命令，若后续在pb/proto/下增加文件夹，就需要适当添加相应目录到命令中，仅添加proto文件则无需修改命令
         [$FLAG_CMD_GEN_PROTO]="protoc
         -I=../pb/proto
-        -I=../pb/proto/common_pb
         ../pb/proto/*.proto
-        ../pb/proto/common_pb/*.proto
         --go_out=plugins=grpc:$PROTO_OUTPUT_DIR"
         [$FLAG_CMD_GOFMT]="gofmt -l -s -w $PROJECT_DIR" # 格式化代码(注意：会直接修改代码)
         [$FLAG_CMD_GOVET]="go vet $PROJECT_DIR/..." # 检测代码中可能的错误（目录必须是项目根目录，包含go.mod文件，否则报错）

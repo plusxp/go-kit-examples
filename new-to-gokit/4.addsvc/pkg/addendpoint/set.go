@@ -39,6 +39,10 @@ func New(svc addservice.Service, logger log.Logger, duration metrics.Histogram, 
 		// Sum is limited to 1 request per second with burst of 1 request.
 		// Note, rate is defined as a time interval between requests.
 		sumEndpoint = ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 1))(sumEndpoint)
+
+		//  断路器（circuit breaker）其实应该安装在client代码中，而不是server，当下游接口持续不通时，client保证短时间不再发起实际调用
+		// 安装在server没有意义，这个写法是官方示例，未做修改
+
 		sumEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{}))(sumEndpoint)
 		sumEndpoint = opentracing.TraceServer(otTracer, "Sum")(sumEndpoint)
 		if zipkinTracer != nil {

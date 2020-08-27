@@ -1,4 +1,4 @@
-package profilesvc
+package __profilesvc
 
 import (
 	"context"

@@ -1,14 +1,12 @@
-package addservice
+package service
 
 import (
 	"context"
 	"errors"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics"
-	"runtime/debug"
 )
 
-// Service describes a service that adds things together.
 type Service interface {
 	Sum(ctx context.Context, a, b int) (int, error)
 	Concat(ctx context.Context, a, b string) (string, error)
@@ -54,7 +52,6 @@ const (
 )
 
 func (s basicService) Sum(_ context.Context, a, b int) (int, error) {
-	debug.PrintStack()
 	if a == 0 && b == 0 {
 		return 0, ErrTwoZeroes
 	}
