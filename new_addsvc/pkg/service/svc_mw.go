@@ -8,9 +8,8 @@ import (
 
 type Middleware func(Service) Service
 
-// LoggingMiddleware takes a loggermw as a dependency
-// and returns a service Middleware.
-func LoggingMiddleware(loggermw log.Logger, ints, chars metrics.Counter) Middleware {
+// mw
+func UnifyMiddleware(loggermw log.Logger, ints, chars metrics.Counter) Middleware {
 	return func(next Service) Service {
 		instrumw := instrumentingMiddleware{
 			ints:  ints,
@@ -21,12 +20,14 @@ func LoggingMiddleware(loggermw log.Logger, ints, chars metrics.Counter) Middlew
 	}
 }
 
+// 监控mw
 type instrumentingMiddleware struct {
 	ints  metrics.Counter
 	chars metrics.Counter
 	next  Service
 }
 
+// mw实体
 type unifyMiddleware struct {
 	// 通过命名规范代码， 不同功能的对象通过嵌套struct添加
 	loggermw log.Logger

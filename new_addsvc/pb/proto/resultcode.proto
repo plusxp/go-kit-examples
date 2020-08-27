@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package resultcode;
-option go_package = "new_addsvc/pb/gen-go/resultcode;resultcode";
+option go_package = "go-kit-examples/new_addsvc/pb/gen-go/resultcode;resultcode";
 
 enum RESULT_CODE {
   // 0-100 保留

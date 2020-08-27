@@ -3,9 +3,9 @@ package endpoint
 import "go-kit-examples/new_addsvc/pb/gen-go/resultcode"
 
 /*
-endpoint层需要定义专门的req和rsp struct, 可称之为ep层的protocol
+首先在endpoint层需要定义专门的req和rsp struct, 可称之为ep层的protocol
 
-它们会完成与transport层和service层的数据转换，所以你在server的transport层会看到很多
+它们与transport层和service层的数据做相互转换，所以你在server的transport层会看到很多
 	decode...request
 	encode...response
 说明：decode负责 rpc-request --> endpoint-request, 得到结果后，

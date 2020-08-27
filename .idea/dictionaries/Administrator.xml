@@ -4,12 +4,15 @@
       <w>endpointer</w>
       <w>govet</w>
       <w>grpc</w>
+      <w>grpctransport</w>
       <w>httptransport</w>
       <w>kitprometheus</w>
       <w>protoc</w>
       <w>resultcode</w>
       <w>retcode</w>
+      <w>stdopentracing</w>
       <w>stdprometheus</w>
+      <w>stdzipkin</w>
     </words>
   </dictionary>
 </component>

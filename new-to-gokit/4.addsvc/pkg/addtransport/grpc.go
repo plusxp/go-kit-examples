@@ -82,7 +82,7 @@ func (s *grpcServer) Concat(ctx context.Context, req *pb.ConcatRequest) (*pb.Con
 	return rep.(*pb.ConcatReply), nil
 }
 
-// NewGRPCClient returns an AddService backed by a gRPC server at the other end
+// newGRPCClient returns an AddService backed by a gRPC server at the other end
 // of the conn. The caller is responsible for constructing the conn, and
 // eventually closing the underlying transport. We bake-in certain middlewares,
 // implementing the client library pattern.
