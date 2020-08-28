@@ -17,6 +17,7 @@ import (
 	"go-kit-examples/new_addsvc/pkg/service"
 	"go-kit-examples/new_addsvc/pkg/transport"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 	"os"
 )
@@ -73,13 +74,18 @@ func main() {
 	onSignalTask := _util.ListenSignalTask(ctx, cancel, logger, onClose)
 	ak.AddTask(onSignalTask)
 
-	svcRegTask := internal.SvcRegisterTask(ctx, config.ServiceName, svrHost, *port, baseServer)
+	svcRegTask := internal.SvcRegisterTask(ctx, config.ServiceName, svrHost, *port)
 	// 添加后台任务：service discovery
-	ak.AddTask(svcRegTask...)
+	ak.AddTask(svcRegTask)
 
 	startGrpcSvrTask := func(_ context.Context, setter _go.Setter) {
 		logger.Log("transport", "gRPC", "addr", addr)
+		// 这里注册了AddSvr以及healthSvr
 		addsvcpb.RegisterAddServer(baseServer, grpcServer)
+
+		s := gokit_foundation.NewHealthCheckSvr()
+		grpc_health_v1.RegisterHealthServer(baseServer, s)
+
 		err := baseServer.Serve(grpcListener)
 		setter.SetErr(err)
 		// 调用SetErr后，若err!=nil，会使得所有task立即退出

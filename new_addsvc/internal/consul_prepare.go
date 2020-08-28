@@ -6,7 +6,6 @@ import (
 	stdconsul "github.com/hashicorp/consul/api"
 	"go-kit-examples/go-util/_go"
 	"go-kit-examples/gokit_foundation"
-	"google.golang.org/grpc"
 )
 
 /*
@@ -40,9 +39,6 @@ func regTask(_ context.Context, svcName, svcHost string, port int) _go.AsyncTask
 	}
 }
 
-func SvcRegisterTask(ctx context.Context, svcName, svcHost string, port int, grpcSvr *grpc.Server) []_go.AsyncTask {
-	var tks []_go.AsyncTask
-	tks = append(tks, healthCheckTask(grpcSvr))
-	tks = append(tks, regTask(ctx, svcName, svcHost, port))
-	return tks
+func SvcRegisterTask(ctx context.Context, svcName, svcHost string, port int) _go.AsyncTask {
+	return regTask(ctx, svcName, svcHost, port)
 }
