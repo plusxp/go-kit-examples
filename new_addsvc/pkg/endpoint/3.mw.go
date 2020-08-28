@@ -21,7 +21,6 @@ func InstrumentingMiddleware(duration metrics.Histogram) endpoint.Middleware {
 				duration.With("success", fmt.Sprint(err == nil)).Observe(time.Since(begin).Seconds())
 			}(time.Now())
 			return next(ctx, request)
-
 		}
 	}
 }

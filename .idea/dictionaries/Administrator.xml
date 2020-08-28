@@ -2,6 +2,7 @@
   <dictionary name="Administrator">
     <words>
       <w>endpointer</w>
+      <w>gokit</w>
       <w>govet</w>
       <w>grpc</w>
       <w>grpctransport</w>

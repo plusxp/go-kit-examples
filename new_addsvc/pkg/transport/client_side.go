@@ -7,14 +7,12 @@ import (
 	"github.com/go-kit/kit/circuitbreaker"
 	stdendpoint "github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
-	"github.com/go-kit/kit/ratelimit"
 	"github.com/go-kit/kit/tracing/opentracing"
 	grpctransport "github.com/go-kit/kit/transport/grpc"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/sony/gobreaker"
-	pb "go-kit-examples/new_addsvc/pb/gen-go/addsvcpb"
+	"go-kit-examples/new_addsvc/pb/gen-go/addsvcpb"
 	"go-kit-examples/new_addsvc/pkg/endpoint"
-	"golang.org/x/time/rate"
 	"google.golang.org/grpc"
 	"os"
 	"time"
@@ -25,6 +23,10 @@ RPC-client侧
 	每个接口都会按序安装跟踪、限速、断路器中间件
 	go-kit的写法不是同一给所有接口安装，而是手动的给每一个接口安装，粒度细了，也多了一点代码量
 */
+
+// 不是随便定，是由proto文件中的package名和service名组合得到
+// 在这里定义这个全局变量也许不是最终方案，待定~
+var gRPCSvrName = "addsvcpb.Add"
 
 // client调用, 这个方法接收一个实例地址，以及中间件，然后创建出endpoint
 func MakeClientEndpoints(instance string, otTracer stdopentracing.Tracer, logger log.Logger) (endpoint.AddSvcEndpoints, error) {
@@ -47,7 +49,7 @@ func MakeClientEndpoints(instance string, otTracer stdopentracing.Tracer, logger
 // eventually closing the underlying transport. We bake-in certain middlewares,
 // implementing the client library pattern.
 func newGRPCClient(conn *grpc.ClientConn, otTracer stdopentracing.Tracer, logger log.Logger) endpoint.AddSvcEndpoints {
-	limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 100))
+	//limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 100))
 
 	// global client middlewares
 	var options []grpctransport.ClientOption
@@ -60,18 +62,19 @@ func newGRPCClient(conn *grpc.ClientConn, otTracer stdopentracing.Tracer, logger
 	{
 		sumEndpoint = grpctransport.NewClient(
 			conn,
-			"pb.Add",
+			gRPCSvrName,
 			"Sum",
 			encodeGRPCSumRequest,
 			decodeGRPCSumResponse,
-			pb.SumReply{},
+			addsvcpb.SumReply{},
 			append(options, grpctransport.ClientBefore(opentracing.ContextToGRPC(otTracer, logger)))...,
 		).Endpoint()
 		sumEndpoint = opentracing.TraceClient(otTracer, "Sum")(sumEndpoint)
-		sumEndpoint = limiter(sumEndpoint)
+		// client侧没必要做限速，server侧已经做了
+		//sumEndpoint = limiter(sumEndpoint)
 		sumEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
 			Name:    "Sum",
-			Timeout: 30 * time.Second,
+			Timeout: 10 * time.Second,
 		}))(sumEndpoint)
 	}
 
@@ -81,15 +84,15 @@ func newGRPCClient(conn *grpc.ClientConn, otTracer stdopentracing.Tracer, logger
 	{
 		concatEndpoint = grpctransport.NewClient(
 			conn,
-			"pb.Add",
+			gRPCSvrName,
 			"Concat",
 			encodeGRPCConcatRequest,
 			decodeGRPCConcatResponse,
-			pb.ConcatReply{},
+			addsvcpb.ConcatReply{},
 			append(options, grpctransport.ClientBefore(opentracing.ContextToGRPC(otTracer, logger)))...,
 		).Endpoint()
 		concatEndpoint = opentracing.TraceClient(otTracer, "Concat")(concatEndpoint)
-		concatEndpoint = limiter(concatEndpoint)
+		//concatEndpoint = limiter(concatEndpoint)
 		concatEndpoint = circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
 			Name:    "Concat",
 			Timeout: 10 * time.Second,
@@ -106,30 +109,30 @@ func newGRPCClient(conn *grpc.ClientConn, otTracer stdopentracing.Tracer, logger
 // gRPC sum reply to a user-domain sum response. Primarily useful in a client.
 // 负责：endpointReq ==> grpcReq, client使用
 func decodeGRPCSumResponse(_ context.Context, grpcReply interface{}) (interface{}, error) {
-	reply := grpcReply.(*pb.SumReply)
-	return endpoint.SumResponse{V: int(reply.V), RetCode: reply.Retcode}, nil
+	reply := grpcReply.(*addsvcpb.SumReply)
+	return &endpoint.SumResponse{V: int(reply.V), RetCode: reply.Retcode}, nil
 }
 
 // decodeGRPCConcatResponse is a transport/grpc.DecodeResponseFunc that converts
 // a gRPC concat reply to a user-domain concat response. Primarily useful in a
 // client.
 func decodeGRPCConcatResponse(_ context.Context, grpcReply interface{}) (interface{}, error) {
-	reply := grpcReply.(*pb.ConcatReply)
-	return endpoint.ConcatResponse{V: reply.V, RetCode: reply.Retcode}, nil
+	reply := grpcReply.(*addsvcpb.ConcatReply)
+	return &endpoint.ConcatResponse{V: reply.V, RetCode: reply.Retcode}, nil
 }
 
 // encodeGRPCSumRequest is a transport/grpc.EncodeRequestFunc that converts a
 // user-domain sum request to a gRPC sum request. Primarily useful in a client.
 // 负责：endpointReq ==> grpcReq, client使用
 func encodeGRPCSumRequest(_ context.Context, request interface{}) (interface{}, error) {
-	req := request.(endpoint.SumRequest)
-	return &pb.SumRequest{A: int64(req.A), B: int64(req.B)}, nil
+	req := request.(*endpoint.SumRequest)
+	return &addsvcpb.SumRequest{A: int64(req.A), B: int64(req.B)}, nil
 }
 
 // encodeGRPCConcatRequest is a transport/grpc.EncodeRequestFunc that converts a
 // user-domain concat request to a gRPC concat request. Primarily useful in a
 // client.
 func encodeGRPCConcatRequest(_ context.Context, request interface{}) (interface{}, error) {
-	req := request.(endpoint.ConcatRequest)
-	return &pb.ConcatRequest{A: req.A, B: req.B}, nil
+	req := request.(*endpoint.ConcatRequest)
+	return &addsvcpb.ConcatRequest{A: req.A, B: req.B}, nil
 }

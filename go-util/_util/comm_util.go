@@ -1,7 +1,9 @@
 package _util
 
 import (
-	"log"
+	"context"
+	"github.com/go-kit/kit/log"
+	"go-kit-examples/go-util/_go"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -12,51 +14,23 @@ import (
 	"time"
 )
 
-/*
-这是一种优雅的进程退出时的资源清理模式。首先进程退出的方式有三种：
-1. init时某些操作返回err(主协程内的操作)，需要退出
-2. 运行时的panic
-3. ctrl+C或其他外部信号
-=========================
-对于第一种情况，在函数返回err时可直接panic，main函数会捕捉并通知OnProcessExit处理
-对于第二种，只要不是子协程内发生的panic，main的defer可以捕捉并处理;如果是子协程panic(预期内的),最后通过某种方式通知主协程，而不是直接panic
-对于第三种情况就很简单，信号监听和资源清理都在OnProcessExit内部完成
-*/
-// 监听[进程退出信号]的协程，完成资源释放工作
-func OnProcessExit(doWhenClose func()) <-chan struct{} {
-	done := make(chan struct{})
-	go func() {
-		// 监听进程外部信号
+func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log.Logger, onClose func()) _go.AsyncTask {
+	return func(context.Context, _go.Setter) {
 		sc := make(chan os.Signal)
 		signal.Notify(sc,
-			syscall.SIGINT, // 键盘中断
-			//syscall.SIGKILL, // kill信号无法捕捉
+			syscall.SIGINT,  // 键盘中断
 			syscall.SIGTERM, // 软件终止
 		)
 		select {
 		case s := <-sc:
-			log.Printf("recv signal: %s\n", s)
+			logger.Log("recv-signal", s, "Task", "done!")
+		case <-ctx.Done():
+			logger.Log("ctx.Done", "OK", "Task", "done!")
 		}
-		signal.Stop(sc)
-		close(sc)
-
-		onClose := func() {
-			defer func() {
-				if err := recover(); err != nil {
-					log.Printf("****** doWhenClose paniced:%v ******", err)
-				}
-			}()
-			doWhenClose()
-		}
-
 		onClose()
-
-		log.Println("OnProcessExit complete!")
-
-		close(done)
-		os.Exit(1)
-	}()
-	return done
+		signal.Stop(sc)
+		cancel()
+	}
 }
 
 func InCollection(elem interface{}, coll []interface{}) bool {

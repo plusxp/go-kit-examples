@@ -6,6 +6,7 @@ package client
 import (
 	stdendpoint "github.com/go-kit/kit/endpoint"
 	stdopentracing "github.com/opentracing/opentracing-go"
+	"go-kit-examples/new_addsvc/config"
 	"go-kit-examples/new_addsvc/pkg/service"
 	"go-kit-examples/new_addsvc/pkg/transport"
 	"io"
@@ -25,7 +26,7 @@ import (
 // instances in Consul is hard-coded into thient.
 // client从consul获取实例地址
 func New(consulAddr string, logger log.Logger) (service.Service, error) {
-	apiclient, err := consulapi.NewClient(&consulapi.Config{
+	apiClient, err := consulapi.NewClient(&consulapi.Config{
 		Address: consulAddr,
 	})
 	if err != nil {
@@ -35,18 +36,18 @@ func New(consulAddr string, logger log.Logger) (service.Service, error) {
 	// As the implementer of profilesvc, we declare and enforce these
 	// parameters for all of the profilesvc consumers.
 	var (
-		consulService = "addsvc"
-		consulTags    = []string{"prod"}
+		consulService = config.ServiceName
+		consulTags    = []string{"gokit_svc"}
 		passingOnly   = true
 		retryMax      = 3
 		retryTimeout  = 500 * time.Millisecond
 	)
 
 	var (
-		sdclient  = consul.NewClient(apiclient)
+		sdclient  = consul.NewClient(apiClient)
 		instancer = consul.NewInstancer(sdclient, logger, consulService, consulTags, passingOnly)
 		/*
-			client得到的对象还是endpoint，
+			client得到的对象还是endpoint
 		*/
 		endpoints endpoint.AddSvcEndpoints
 	)

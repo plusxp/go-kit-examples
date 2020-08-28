@@ -1,9 +1,10 @@
 syntax = "proto3";
 
-package pb;
+package addsvcpb;
 option go_package = "go-kit-examples/new_addsvc/pb/gen-go/addsvcpb;addsvcpb";
 
 import "resultcode.proto";
+
 
 // The Add service definition.
 service Add {

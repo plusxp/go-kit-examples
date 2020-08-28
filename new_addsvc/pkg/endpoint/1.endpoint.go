@@ -45,15 +45,15 @@ func New(svc service.Service, logger log.Logger, duration metrics.Histogram, otT
 		concatEndpoint = InstrumentingMiddleware(duration.With("method", "Concat"))(concatEndpoint)
 	}
 	return AddSvcEndpoints{
-		SumEndpoint:    MakeSumEndpoint(svc),
-		ConcatEndpoint: MakeConcatEndpoint(svc),
+		SumEndpoint:    sumEndpoint,
+		ConcatEndpoint: concatEndpoint,
 	}
 }
 
 // 针对接口：Sum 的转换方法
 func MakeSumEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(SumRequest)
+		req := request.(*SumRequest)
 		v, err := s.Sum(ctx, req.A, req.B)
 		// err 在logger mw打印出来 以debug
 		// 谨慎处理endpoint层返回的err，这个err会被各种中间件捕获，可能会产生一些影响
@@ -61,16 +61,16 @@ func MakeSumEndpoint(s service.Service) endpoint.Endpoint {
 		// 所以，业务err应该封装在SumResponse内，如果是你在service层能够读取到接口调用的系统压力过大
 		// 这个时候可以通过endpoint层返出去
 		// 一般情况，这里都返回err
-		return SumResponse{RetCode: errToRetCode(err), V: v}, nil
+		return &SumResponse{RetCode: errToRetCode(err), V: v}, nil
 	}
 }
 
 // 针对接口：Concat 的转换方法
 func MakeConcatEndpoint(s service.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (response interface{}, err error) {
-		req := request.(ConcatRequest)
+		req := request.(*ConcatRequest)
 		p, err := s.Concat(ctx, req.A, req.B)
-		return ConcatResponse{RetCode: errToRetCode(err), V: p}, nil
+		return &ConcatResponse{RetCode: errToRetCode(err), V: p}, nil
 	}
 }
 

@@ -18,6 +18,7 @@ type grpcServer struct {
 }
 
 // NewGRPCServer makes a set of endpoints available as a gRPC AddServer.
+// 这里也可以返回一个httpSvr
 func NewGRPCServer(endpoints endpoint.AddSvcEndpoints, otTracer stdopentracing.Tracer, logger log.Logger) pb.AddServer {
 	options := []grpctransport.ServerOption{
 		grpctransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
@@ -60,7 +61,7 @@ func (s *grpcServer) Concat(ctx context.Context, req *pb.ConcatRequest) (*pb.Con
 // 负责： grpcReq ==> endpointReq，server使用
 func decodeGRPCSumRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*pb.SumRequest)
-	return endpoint.SumRequest{A: int(req.A), B: int(req.B)}, nil
+	return &endpoint.SumRequest{A: int(req.A), B: int(req.B)}, nil
 }
 
 // decodeGRPCConcatRequest is a transport/grpc.DecodeRequestFunc that converts a
@@ -68,14 +69,14 @@ func decodeGRPCSumRequest(_ context.Context, grpcReq interface{}) (interface{}, 
 // server.
 func decodeGRPCConcatRequest(_ context.Context, grpcReq interface{}) (interface{}, error) {
 	req := grpcReq.(*pb.ConcatRequest)
-	return endpoint.ConcatRequest{A: req.A, B: req.B}, nil
+	return &endpoint.ConcatRequest{A: req.A, B: req.B}, nil
 }
 
 // encodeGRPCSumResponse is a transport/grpc.EncodeResponseFunc that converts a
 // user-domain sum response to a gRPC sum reply. Primarily useful in a server.
 // 负责：endpointRsp ==> grpcRsp, server使用
 func encodeGRPCSumResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(endpoint.SumResponse)
+	resp := response.(*endpoint.SumResponse)
 	return &pb.SumReply{V: int64(resp.V), Retcode: resp.RetCode}, nil
 }
 
@@ -83,6 +84,6 @@ func encodeGRPCSumResponse(_ context.Context, response interface{}) (interface{}
 // a user-domain concat response to a gRPC concat reply. Primarily useful in a
 // server.
 func encodeGRPCConcatResponse(_ context.Context, response interface{}) (interface{}, error) {
-	resp := response.(endpoint.ConcatResponse)
+	resp := response.(*endpoint.ConcatResponse)
 	return &pb.ConcatReply{V: resp.V, Retcode: resp.RetCode}, nil
 }

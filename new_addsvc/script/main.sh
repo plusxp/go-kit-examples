@@ -101,7 +101,7 @@ main
 # ./main.sh -h
 
 # usage example:
-# $./main.sh gen ../..  后面这个是项目目录, 如/root/go-kit-examples，注意proto文件中 "option go_package"需要设置为带有项目根目录路径的pkg名
+# $./main.sh gen ../..  后面这个是项目目录, 如/root/go-kit-examples，注意proto文件中 "option go_package"最好设置为以项目根目录名开头的pkg名
 # $./main.sh gofmt ../../   注意，为避免代码格式化的范围超出你的预期，可以用绝对路径指定，如/path/to/project_root
 # $./main.sh govet ../../   这里也可以用绝对路径指定，比如/path/to/project_root
 
