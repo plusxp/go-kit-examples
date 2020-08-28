@@ -41,10 +41,10 @@ func init() {
 
 func main() {
 	// 这个地址必须能够被你的consul-server访问，否则consul的健康检查会失败
-	host := "192.168.1.10"
+	svrHost := "192.168.1.10"
 	var port = flag.Int("grpc.port", 8080, "grpc listen address")
 
-	addr := fmt.Sprintf("%s:%d", host, *port)
+	addr := fmt.Sprintf("%s:%d", svrHost, *port)
 
 	flag.Parse()
 
@@ -73,7 +73,7 @@ func main() {
 	onSignalTask := _util.ListenSignalTask(ctx, cancel, logger, onClose)
 	ak.AddTask(onSignalTask)
 
-	svcRegTask := internal.SvcRegisterTask(ctx, config.ServiceName, host, *port, baseServer)
+	svcRegTask := internal.SvcRegisterTask(ctx, config.ServiceName, svrHost, *port, baseServer)
 	// 添加后台任务：service discovery
 	ak.AddTask(svcRegTask...)
 
