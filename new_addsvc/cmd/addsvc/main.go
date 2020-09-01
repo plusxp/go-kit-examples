@@ -23,8 +23,9 @@ import (
 )
 
 func NewSvr(logger log.Logger) addsvcpb.AddServer {
+	// todo 启动http.DefaultServeMux
 	metricsObj := internal.NewMetrics()
-
+	//http.ListenAndServe(":8080", nil)
 	var tracer stdopentracing.Tracer
 	tracer = stdopentracing.GlobalTracer()
 

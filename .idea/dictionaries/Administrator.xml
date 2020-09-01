@@ -2,6 +2,7 @@
   <dictionary name="Administrator">
     <words>
       <w>endpointer</w>
+      <w>etcd</w>
       <w>gokit</w>
       <w>govet</w>
       <w>grpc</w>
@@ -9,6 +10,7 @@
       <w>httptransport</w>
       <w>kitprometheus</w>
       <w>protoc</w>
+      <w>registrator</w>
       <w>resultcode</w>
       <w>retcode</w>
       <w>stdopentracing</w>

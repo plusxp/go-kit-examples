@@ -8,6 +8,7 @@ import (
 
 type Setter interface {
 	SetErr(err error)
+	ClearErr()
 	Err() error
 }
 
@@ -26,6 +27,12 @@ func (t *setter) SetErr(err error) {
 	}
 }
 
+func (t *setter) ClearErr() {
+	t.mutex.RLock()
+	defer t.mutex.RUnlock()
+	t.err = nil
+}
+
 func (t *setter) Err() error {
 	t.mutex.RLock()
 	defer t.mutex.RUnlock()
@@ -41,7 +48,6 @@ type SafeAsyncTask struct {
 	cancelAllTask context.CancelFunc
 	wg            sync.WaitGroup
 	isScheduled   bool
-	err           error // capture first err happened in these goroutines
 }
 
 func NewSafeAsyncTask(ctx context.Context, cancelFunc context.CancelFunc) *SafeAsyncTask {
@@ -83,6 +89,7 @@ func (a *SafeAsyncTask) schedule() {
 	}
 }
 
+// Run start all the tasks as one goroutine per task
 func (a *SafeAsyncTask) Run() {
 	if a.isScheduled {
 		panic("go-util._go: all task have been scheduled!")
@@ -91,6 +98,7 @@ func (a *SafeAsyncTask) Run() {
 	a.isScheduled = true
 }
 
+// Run start all the tasks as one goroutine per task, then return until them done
 func (a *SafeAsyncTask) RunAndWait() {
 	a.Run()
 	a.wg.Wait()
@@ -98,6 +106,8 @@ func (a *SafeAsyncTask) RunAndWait() {
 
 func (a *SafeAsyncTask) Clear() {
 	a.tasks = nil
+	a.setter.ClearErr()
+	a.isScheduled = false
 }
 
 func (a *SafeAsyncTask) Err() error {
