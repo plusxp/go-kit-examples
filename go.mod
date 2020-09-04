@@ -26,7 +26,6 @@ require (
 	github.com/openzipkin-contrib/zipkin-go-opentracing v0.4.5
 	github.com/openzipkin/zipkin-go v0.2.2
 	github.com/pact-foundation/pact-go v1.0.4
-	github.com/pborman/uuid v1.2.1
 	github.com/prometheus/client_golang v1.3.0
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/smartystreets/goconvey v1.6.4 // indirect

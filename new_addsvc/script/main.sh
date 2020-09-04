@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+source _imported_echo_color.sh
 
 # 执行各种构建、安装、分析等操作的脚本
 
@@ -8,90 +9,118 @@ project_dir=$2
 # 默认以脚本执行目录为项目根目录
 PROJECT_DIR=$(dirname $(pwd))
 declare PROTO_OUTPUT_DIR
-declare -A flagMap
 
-FLAG_CMD_GEN_PROTO="gen"
-FLAG_CMD_GOFMT="gofmt"
-FLAG_CMD_GOVET="govet"
+fn_init_cmd() {
+	# ------------------- 所有的CMD选项 ----------------------
+	CMD_ARRAY=("gen", "gofmt", "govet")
+	# ...CMD_on_ok后缀的指令 表示 CMD指令执行成功后要继续执行的指令，类似的还有_on_fail,  _on_any
+	# 新增命令，只需在这里定义即可，无需其他操作
 
-func_init_cmd_map() {
-    # 在这里声明你要添加的脚本命令，包括FLAG, CONTENT
-    flagMap=(
-        # 关于proto命令，若后续在pb/proto/下增加文件夹，就需要适当添加相应目录到命令中，仅添加proto文件则无需修改命令
-        [$FLAG_CMD_GEN_PROTO]="protoc
-        -I=../pb/proto
-        ../pb/proto/*.proto
-        --go_out=plugins=grpc:$PROTO_OUTPUT_DIR"
-        [$FLAG_CMD_GOFMT]="gofmt -l -s -w $PROJECT_DIR" # 格式化代码(注意：会直接修改代码)
-        [$FLAG_CMD_GOVET]="go vet $PROJECT_DIR/..." # 检测代码中可能的错误（目录必须是项目根目录，包含go.mod文件，否则报错）
-    )
-    readonly flagMap
+	# gen, 关于protoc命令，若后续在pb/proto/下增加文件夹，就需要适当添加相应目录到命令中，仅添加proto文件则无需修改命令
+	gen_cmd="protoc -I=../pb/proto ../pb/proto/*.proto --go_out=plugins=grpc:$PROTO_OUTPUT_DIR"
+	gen_cmd_on_ok="echo gen proto ok"
+	gen_cmd_on_fail="echo gen proto fail"
+	# gofmt
+	gofmt_cmd="gofmt -l -s -w $PROJECT_DIR"
+	# govet
+	govet_cmd="go vet $PROJECT_DIR/..."   # go vet可能会修改go.mod文件，执行tidy来恢复
+	govet_cmd_on_ok="go mod tidy"
+
 }
 
-#echo ${!flagMap[@]} # all keys
-#echo ${#flagMap[*]} # map len
+_func_execute() {
+	local cmd=$1
+	local cmd_on_ok=$2
+	local cmd_on_fail=$3
+	local cmd_on_any=$4
 
-func_parse_flag() {
-  	if [ -z "$flag" ] || [[ $flag = "-h" ]]; then
-        func_usage
-        return
-    fi
+	echo    -e "EXECUTE> $cmd \n"
+	echo    "******** output start *********"
 
-    cmd=${flagMap[$flag]}
+	# 执行cmd对应指令
+	$cmd
+	result_code=$?
 
-    if [ -z "$cmd" ]; then
-        echo "Invalid flag: $flag"
-        return
-    fi
+	echo    -e "\n******** output end *********"
 
-    echo -e "EXECUTE> $cmd \n"
-    echo "******** output start *********"
+	# 下面执行可能需要执行的附加指令
 
-    # 执行cmd对应指令
-    ${cmd}
-    result_code=$?
+	$cmd_on_any # 任何时候都需要执行的cmd
 
-    echo -e "\n******** output end *********"
-    # go vet可能会修改go.mod文件，执行tidy来恢复
-    if [ $flag == $FLAG_CMD_GOVET ]; then
-        go mod tidy
-    fi
-
-    if [[ result_code -eq 0 ]]; then
-        echo -e "\n***EXECUTE successful.***"
-    fi
+	if    [[ $result_code -eq 0 ]]; then
+		$cmd_on_ok
+		echo       -e "\n***EXECUTE successful.***"
+	else
+		$cmd_on_fail
+	fi
 }
 
-func_usage() {
-   	echo "You need to provide flag to continue, see also below:"
-    output="[Flag] <> [Cmd]\n"
-    for cmd in ${!flagMap[*]}; do
-        output="$output $cmd <> ${flagMap[$cmd]}\n"
-    done
-    echo -e $output | column -t -s "<>"
+_func_usage() {
+	echo    "You need to provide flag to continue, see also below:"
+	output="[Flag] <> [Cmd]\n"
+	for cmd in    ${!flagMap[*]}; do
+		output="$output $cmd <> ${flagMap[$cmd]}\n"
+	done
+	echo    -e $output | column -t -s "<>"
 }
 
-func_init() {
-    # 替换PROJECT_DIR
-    if [ ! -z "$project_dir" ]; then
-        PROJECT_DIR=$project_dir
-    fi
+fn_parse_flag() {
+	if   [ -z "$flag" ] || [[ $flag == "-h" ]]; then
+		_func_usage
+		return
+	fi
 
-    PROTO_OUTPUT_DIR=$(dirname "$PROJECT_DIR")
-    readonly PROJECT_DIR
-    readonly PROTO_OUTPUT_DIR
+	local will_do_cmd
+	local will_do_cmd_on_ok
+	local will_do_cmd_on_fail # 暂未使用
+	local will_do_cmd_on_any # 暂未使用
 
-    echo "
+	will_do_cmd=$(eval echo '$'"${flag}_cmd")
+
+	if [ -z "$will_do_cmd" ]; then
+		echo   "Invalid flag:$flag"
+		return
+	fi
+
+	# 获取变量的间接引用变量值
+	will_do_cmd_on_ok=$(eval echo '$'"${flag}_cmd_on_ok")
+	will_do_cmd_on_fail=$(eval echo '$'"${flag}_cmd_on_fail")
+	will_do_cmd_on_any=$(eval echo '$'"${flag}_cmd_on_any")
+	#	echo $will_do_cmd 111
+	#	echo $will_do_cmd_on_ok 222
+	#	echo $will_do_cmd_on_fail 333
+	#	echo $will_do_cmd_on_any 444
+
+	# 调用执行方法(每个参数都含有空格，需要双引号包括)
+	_func_execute "$will_do_cmd" "$will_do_cmd_on_ok" "$will_do_cmd_on_fail" "$will_do_cmd_on_any"
+}
+
+fn_init() {
+	# 替换PROJECT_DIR
+	if    [ ! -z "$project_dir" ]; then
+		PROJECT_DIR=$project_dir
+	fi
+
+	PROTO_OUTPUT_DIR=$(   dirname "$PROJECT_DIR")
+	readonly    PROJECT_DIR
+	readonly    PROTO_OUTPUT_DIR
+
+	imported_fn_echo_color_msg "> inited vars"
+	m="
     PROJECT_DIR: $PROJECT_DIR
     PROTO_OUTPUT_DIR: $PROTO_OUTPUT_DIR
     "
+    imported_fn_echo_color_msg "$m"
 }
 
 main() {
-    echo '***main.sh started***'
-    func_init
-    func_init_cmd_map
-    func_parse_flag
+#	msg="***main.sh started***" # 问题：传入的前三个*全部丢失
+	msg="---------- main.sh started ----------"
+	imported_fn_echo_color_msg 'textcolor_red' "$msg"
+
+	fn_init
+	fn_init_cmd
+	fn_parse_flag
 }
 
 main
