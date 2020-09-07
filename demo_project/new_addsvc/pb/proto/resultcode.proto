@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package resultcode;
+option go_package = "new_addsvc/pb/gen-go/resultcode;resultcode";
+
+enum RESULT_CODE {
+  // 0-100 保留
+  RET_OK = 0;
+  RET_SYS_ERR = 1;
+  RET_MYSQL_ERR = 2;
+  RET_REDIS_ERR = 3;
+  RET_NETWORK_ERR = 4;
+  RET_UNKNOWN_ERR = 5;
+
+  // 101...
+  RET_INVALID_ARGS = 101;
+}

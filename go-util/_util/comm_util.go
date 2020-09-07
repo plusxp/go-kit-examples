@@ -3,7 +3,7 @@ package _util
 import (
 	"context"
 	"github.com/go-kit/kit/log"
-	"go-kit-examples/go-util/_go"
+	"go-util/_go"
 	"math/rand"
 	"os"
 	"os/signal"

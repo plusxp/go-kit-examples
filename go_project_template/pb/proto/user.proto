@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package pb;
+
+// 注意填写项目的pb目录路径，可以划分子目录
+option go_package = "go_pj_template/pb/gen-go/pb;pb";
+
+import "common_pb/common.proto";
+
+service UserSvc {
+  rpc GetUserName (GetUserNameReq) returns (GetUserNameRsp) {}
+  rpc UpdateUserName (UpdateUserNameReq) returns (UpdateUserNameRsp) {}
+}
+
+message GetUserNameReq {
+  BaseReq base_req = 1;
+}
+
+message GetUserNameRsp {
+  string name = 1;
+}
+
+message UpdateUserNameReq {
+  BaseReq baseReq = 1;
+  string new_name = 2;
+}
+
+message UpdateUserNameRsp {
+}

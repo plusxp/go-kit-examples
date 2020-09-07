@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+
+
+//The Hello service definition.
+service Hello {
+ rpc SayHi (SayHiRequest) returns (SayHiReply);
+}
+
+message SayHiRequest {
+ string name = 1;
+ string say  = 2;
+}
+
+message SayHiReply {
+ string reply = 1;
+}
+

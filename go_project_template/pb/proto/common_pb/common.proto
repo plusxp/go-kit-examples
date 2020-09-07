@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "go_pj_template/pb/gen-go/common_pb;common_pb";
+
+
+message BaseReq {
+  uint32 uid=1;
+}
