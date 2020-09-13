@@ -1,5 +1,5 @@
 
-# 更快的使用Go-kit开发属于你的微服务！
+# :zap: 使用第三方Go-kit代码生成工具快速开发微服务！
 
 
 ## 前言
@@ -43,7 +43,7 @@ go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继�
 ___
 -   [生成Client-side代码](##生成Client-side代码)
 -   [塑造适合你(的团队)的Client](##塑造适合你(的团队)的Client)
--   [Let's test it now!](##Let's test it now!)
+-   [Let's test it now](##Let's test it now)
 
 ___
 -   [自由尚在](##自由尚在)
@@ -493,7 +493,7 @@ func TestNew(t *testing.T) {
 }
 ```
 
-## Let's test it now!
+## Let's test it now
 ```go
 cd hello/client/grpc/
 $ go test -run=TestNew
