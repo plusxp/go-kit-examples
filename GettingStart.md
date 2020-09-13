@@ -30,24 +30,26 @@
 正在开发，或者不再维护；这个repo也是fork一个不在维护的400+star的项目而来，该作者声称自己所在团队已深度使用
 go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）
 
+[toc]
+
 ## 目录
--   [关于GrantZheng/kit](##关于GrantZheng/kit)
--   [开始](##开始)
--   [创建Project](##创建Project)
--   [生成Service模板](##生成Service模板)
--   [编辑proto文件](##编辑proto文件)
--   [实现Service接口](##实现Service接口)
--   [需要完善的工作](##需要完善的工作)
--   [启动server](##启动server)
+-   [关于GrantZheng/kit](#关于GrantZheng/kit)
+-   [开始](#开始)
+-   [创建Project](#创建Project)
+-   [生成Service模板](#生成Service模板)
+-   [编辑proto文件](#编辑proto文件)
+-   [实现Service接口](#实现Service接口)
+-   [需要完善的工作](#需要完善的工作)
+-   [启动server](#启动server)
 
 ___
--   [生成Client-side代码](##生成Client-side代码)
--   [塑造适合你(的团队)的Client](##塑造适合你(的团队)的Client)
--   [Let's test it now](##Let's-test-it-now)
+-   [生成Client-side代码](#生成Client-side代码)
+-   [塑造适合你(的团队)的Client](#塑造适合你(的团队)的Client)
+-   [Let's test it now](#Let's-test-it-now)
 
 ___
--   [自由尚在](##自由尚在)
--   [结束，新的开始](##结束，新的开始)
+-   [自由尚在](#自由尚在)
+-   [结束，新的开始](#结束，新的开始)
 
 ## 关于GrantZheng/kit
 我们需要知道它的一些功能、特点
@@ -307,7 +309,7 @@ logger.Log("exit", g.Run())
 都有自己的实践，可以进行service.go二次塑形，kit下一次执行不会再改动此文件（因为存在），当然你也可以直接用这个库，
 并没有什么不好，只是你需要搞清楚它的用法。
 
-## 生成Client-side代码
+## 生成Client side代码
 
 接下来我们使用kit生成grpc的client side代码：
 ```go
