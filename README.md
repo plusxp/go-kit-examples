@@ -94,7 +94,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 建议先拉取到本地研究/学习，跟随作者持续优化~
 
-欢迎提出优化意见！
+欢迎提出优化意见！ 
 
 ### TODO
 
@@ -102,3 +102,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 - 增加定时任务的实战示例
 - 增加api网关的实战示例
+
+## 使用第三方Go-kit代码生成工具快速开发微服务
+
+[GettingStart](https://github.com/chaseSpace/kit/blob/master/GettingStart.md)
