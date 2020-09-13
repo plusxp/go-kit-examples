@@ -33,7 +33,7 @@ go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继�
 [toc]
 
 ## 目录
--   [1. 关于kit](#1.-关于kit)
+-   [1. 关于kit](#1.关于kit)
 -   [2. 开始](#2.-开始)
 -   [3. 创建Project](#3.-创建Project)
 -   [4. 生成Service模板](#4.-生成Service模板)
@@ -52,7 +52,7 @@ ___
 -   [13. 结束，新的开始](#13.-结束，新的开始)
 
 
-## 1. 关于kit
+## 1.关于kit
 我们需要知道它的一些功能、特点
 
 -   可以生成指定名称的service模板代码，包含endpoint、transport(http/grpc)层
