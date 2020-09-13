@@ -552,6 +552,6 @@ ok      hello/client/grpc       1.118s
 
 ### Go-kit中文群组
 
-![](https://github.com/chaseSpace/kit/blob/master/qq_group_qrcode.png)
+![](https://github.com/chaseSpace/go-kit-examples/blob/master/qq_group_qrcode.png)
 
 [1]: https://github.com/golang-standards/project-layout/blob/master/README_zh.md
