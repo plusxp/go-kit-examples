@@ -105,4 +105,4 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 ## 使用第三方Go-kit代码生成工具快速开发微服务
 
-[GettingStart](https://github.com/chaseSpace/kit/blob/master/GettingStart.md)
+[GettingStart](https://github.com/chaseSpace/go-kit-examples/blob/master/GettingStart.md)
