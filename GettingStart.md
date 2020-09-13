@@ -33,26 +33,27 @@ go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继�
 [toc]
 
 ## 目录
--   [1. 关于kit](#1.关于kit)
--   [2. 开始](#2.-开始)
--   [3. 创建Project](#3.-创建Project)
--   [4. 生成Service模板](#4.-生成Service模板)
--   [5. 编辑proto文件](#5.-编辑proto文件)
--   [6. 实现Service接口](#6.-实现Service接口)
--   [7. 需要完善的工作](#7.-需要完善的工作)
--   [8. 启动server](#8.-启动server)
+-   [1. 关于kit](#1-关于kit)
+-   [2. 开始](#开始)
+-   [3. 创建Project](#创建Project)
+-   [4. 生成Service模板](#生成Service模板)
+-   [5. 编辑proto文件](#编辑proto文件)
+-   [6. 实现Service接口](#实现Service接口)
+-   [7. 需要完善的工作](#需要完善的工作)
+-   [8. 启动server](#启动server)
 
 ___
--   [9. 生成Client-side代码](#9.-生成Client-side代码)
--   [10. 塑造适合你(的团队)的Client](#10.-塑造适合你(的团队)的Client)
--   [11. Let's test it now](#11.-Let's-test-it-now)
+-   [9. 生成Client-side代码](#生成Client-side代码)
+-   [10. 塑造适合你(的团队)的Client](#塑造适合你(的团队)的Client)
+-   [11. Let's test it now](#Let's-test-it-now)
 
 ___
--   [12. 自由尚在](#12.-自由尚在)
--   [13. 结束，新的开始](#13.-结束，新的开始)
+-   [12. 自由尚在](#自由尚在)
+-   [13. 结束，新的开始](#结束，新的开始)
+___
+-   [Go-kit中文群组](#Gokit中文群组)
 
-
-## 1.关于kit
+## 1. 关于kit
 我们需要知道它的一些功能、特点
 
 -   可以生成指定名称的service模板代码，包含endpoint、transport(http/grpc)层
@@ -62,7 +63,7 @@ ___
 
 > (以下部分描述译自GrantZheng/kit README.md, 少部分改动以适配本仓库，并带有额外的说明)  
 
-## 2. 开始
+## 开始
 
 首先安装go-kit CLI工具
 ```bash
@@ -80,7 +81,7 @@ go install
 kit help
 ```
 
-## 3. 创建Project
+## 创建Project
 
 kit文档说的是创建service，但这里替换为project或许更有助于理解
 
@@ -103,7 +104,7 @@ c:\users\...\go-kit-examples\demo_project\hello
             service.go
 ```
 
-## 4. 生成Service模板
+## 生成Service模板
 
 ```bash
 kit g s hello
@@ -215,7 +216,7 @@ c:\users\...\go-kit-examples\demo_project\hello
             service.go
 ```
 
-## 5. 编辑proto文件
+## 编辑proto文件
 打开pb/hello.proto文件，按如下修改：
 ```proto
 message SayHiRequest {
@@ -236,7 +237,7 @@ compile.bat
 ./compile.sh
 ```
 
-## 6. 实现Service接口
+## 实现Service接口
 修改/pkg/service/service.go, 实现SayHi接口逻辑：
 ```go
 func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply string, err error) {
@@ -244,7 +245,7 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 }
 ```
 
-## 7. 需要完善的工作
+## 需要完善的工作
 打开/pkg/grpc/handler.go, 你看到`encode...`和`decode...`这样的函数了吗？
 这里我们还需要完成两项工作：
 - gRPC-layer的Req --decode-->> Endpoint-layer的Req
@@ -266,7 +267,7 @@ func encodeSayHiResponse(_ context.Context, r interface{}) (interface{}, error) 
 使用_,ok的方式来避免panic，出现类型错误一定是编码bug，不应该hide it。  
 （当然，为避免程序退出，我们可以使用grpc的recovery中间件）
 
-## 8. 启动server
+## 启动server
 OK，现在可以启动这个服务了
 ```go
 cd hello/cmd
@@ -310,7 +311,7 @@ logger.Log("exit", g.Run())
 都有自己的实践，可以进行service.go二次塑形，kit下一次执行不会再改动此文件（因为存在），当然你也可以直接用这个库，
 并没有什么不好，只是你需要搞清楚它的用法。
 
-## 9. 生成Client side代码
+## 生成Client side代码
 
 接下来我们使用kit生成grpc的client side代码：
 ```go
@@ -344,7 +345,7 @@ func decodeSayHiResponse(_ context.Context, reply interface{}) (interface{}, err
 }
 ```
 
-## 10. 塑造适合你(的团队)的Client
+## 塑造适合你(的团队)的Client
 
 先来看看`client/grpc/grpc.go`的New()方法：
 ```go
@@ -496,7 +497,7 @@ func TestNew(t *testing.T) {
 }
 ```
 
-## 11. Let's test it now
+## Let's test it now
 ```go
 cd hello/client/grpc/
 $ go test -run=TestNew
@@ -505,7 +506,7 @@ PASS
 ok      hello/client/grpc       1.118s
 ```
 
-## 12. 自由尚在
+## 自由尚在
 你应该注意到，不管是kit，还是本仓库下的`go_project_template` （参考[golang-standards/project-layout][1]），
 都没有涉及到数据访问层的目录规划，我想这是因为不同开发语言背景的开发团队/个人对这一层目录命名以及代码结构都有着不同的习惯，
 比如Java背景的开发者习惯创建一个`dao`目录，代表的是Data access object, 当然，DAO并不和Java绑定，它是针对数据访问层的
@@ -527,7 +528,7 @@ ok      hello/client/grpc       1.118s
 
 在model层定义直接操作底层数据的方法，然后愉快的在service层引用，解耦你的代码！
 
-## 13. 结束，新的开始
+## 结束，新的开始
 
 ### 小结
 本文档较为全面的介绍了如何使用[GrantZheng/kit](https://github.com/GrantZheng/kit) 作为go-kit框架的代码生成工具来辅助开发微服务，
@@ -553,7 +554,7 @@ ok      hello/client/grpc       1.118s
 - [阿里云-正确入门Service Mesh](https://mp.weixin.qq.com/s/KHsxiOOHjTosQcd61rPsgg)
 - [一文详解微服务架构知识](https://mp.weixin.qq.com/s/lpXkFsm01M9-27qeuo5JzA)
 
-### Go-kit中文群组
+## Gokit中文群组
 
 ![](https://github.com/chaseSpace/go-kit-examples/blob/master/qq_group_qrcode.png)
 
