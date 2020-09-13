@@ -2,9 +2,8 @@ package grpc
 
 import (
 	"context"
-	"errors"
+	pb "hello/pb"
 	endpoint "hello/pkg/endpoint"
-	pb "hello/pkg/grpc/pb"
 
 	grpc "github.com/go-kit/kit/transport/grpc"
 	context1 "golang.org/x/net/context"
@@ -17,17 +16,18 @@ func makeSayHiHandler(endpoints endpoint.Endpoints, options []grpc.ServerOption)
 
 // decodeSayHiResponse is a transport/grpc.DecodeRequestFunc that converts a
 // gRPC request to a user-domain SayHi request.
-// TODO implement the decoder
 func decodeSayHiRequest(_ context.Context, r interface{}) (interface{}, error) {
-	return nil, errors.New("'Hello' Decoder is not impelemented")
+	req := r.(*pb.SayHiRequest)
+	return &endpoint.SayHiRequest{Name: req.Name}, nil
 }
 
 // encodeSayHiResponse is a transport/grpc.EncodeResponseFunc that converts
 // a user-domain response to a gRPC reply.
-// TODO implement the encoder
 func encodeSayHiResponse(_ context.Context, r interface{}) (interface{}, error) {
-	return nil, errors.New("'Hello' Encoder is not impelemented")
+	rsp := r.(*endpoint.SayHiResponse)
+	return &pb.SayHiReply{Reply: rsp.Reply}, nil
 }
+
 func (g *grpcServer) SayHi(ctx context1.Context, req *pb.SayHiRequest) (*pb.SayHiReply, error) {
 	_, rep, err := g.sayHi.ServeGRPC(ctx, req)
 	if err != nil {

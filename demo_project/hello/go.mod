@@ -1,6 +1,6 @@
 module hello
 
-go 1.13
+go 1.12
 
 require (
 	github.com/go-kit/kit v0.10.0
@@ -9,9 +9,14 @@ require (
 	github.com/oklog/oklog v0.3.2
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/openzipkin-contrib/zipkin-go-opentracing v0.4.5
-	github.com/openzipkin/zipkin-go v0.2.3
+	github.com/openzipkin/zipkin-go v0.2.4
 	github.com/prometheus/client_golang v1.7.1
+	github.com/sony/gobreaker v0.4.1
+	go-util v0.0.0-00010101000000-000000000000
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
-	google.golang.org/grpc v1.31.1
+	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
+	google.golang.org/grpc v1.32.0
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20190731080439-ebfcffb1b5c0
 )
+
+replace go-util => ../../go-util

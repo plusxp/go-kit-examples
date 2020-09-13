@@ -107,7 +107,7 @@ func newGRPCClient(conn *grpc.ClientConn, otTracer stdopentracing.Tracer, logger
 
 // decodeGRPCSumResponse is a transport/grpc.DecodeResponseFunc that converts a
 // gRPC sum reply to a user-domain sum response. Primarily useful in a client.
-// 负责：endpointReq ==> grpcReq, client使用
+// 负责：grpcReq ==> endpointReq, client使用
 func decodeGRPCSumResponse(_ context.Context, grpcReply interface{}) (interface{}, error) {
 	reply := grpcReply.(*addsvcpb.SumReply)
 	return &endpoint2.SumResponse{V: int(reply.V), RetCode: reply.Retcode}, nil
