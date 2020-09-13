@@ -26,14 +26,14 @@
 工具，我们使用go-kit开发那就是如虎添翼，下面一起看看。
 
 我调研了[go-kit](https://github.com/go-kit/kit) 官方文档中列出的几个代码生成工具，找到了一个比较适合
-使用的repo，那就是[GrantZheng/kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
-正在开发，或者不再维护；这个repo也是fork一个不在维护的400+star的项目而来，该作者声称自己所在团队已深度使用
+使用的repo，那就是[kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
+正在开发，或者不再维护；这个repo其实也是fork一个不再维护的400+star的项目而来，该作者声称自己所在团队已深度使用
 go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）
 
 [toc]
 
 ## 目录
--   [1. 关于GrantZheng/kit](#关于GrantZheng/kit)
+-   [1. 关于kit](#关于kit)
 -   [2. 开始](#开始)
 -   [3. 创建Project](#创建Project)
 -   [4. 生成Service模板](#生成Service模板)
@@ -52,8 +52,7 @@ ___
 -   [13. 结束，新的开始](#结束，新的开始)
 
 
-## 关于GrantZheng/kit
-
+## 关于kit
 我们需要知道它的一些功能、特点
 
 -   可以生成指定名称的service模板代码，包含endpoint、transport(http/grpc)层
