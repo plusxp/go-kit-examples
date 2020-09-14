@@ -1,12 +1,21 @@
 
-# 前言(Preface)
+# :zap: 使用kit代码生成工具快速开发Go-kit微服务！
+
+
+## 前言
 本文档将试图以最简明的方式讲述如何在实际环境中使用go-kit快速编写一个新的微服务项目，
-如有逻辑纰漏，感谢指出。
+如有逻辑纰漏或表述错误，请不吝赐教，谢谢。
 
 <br/>
 
-在开始前，建议读者先查看demo_project目录下的new_addsvc，了解go-kit的设计思想，以及
-成型后的代码布局，继续阅读视为读者已经了解，不再过多解释相关。
+
+请注意，阅读此文档默认读者具备以下条件：
+
+- 一到两年以上的go语言开发经验
+- 一定的微服务理论基础
+- 阅读过`demo_project/new_addsvc`的大部分代码
+
+阅读`demo_project/new_addsvc`，是为了清楚了解go-kit的设计思想，以及成型后的代码布局。
 
 ---
 
@@ -16,18 +25,36 @@
 为什么这些层次的代码不能使用工具生成呢？是的，早已有人想到这一点，它们开发出了go-kit的CLI工具，有了这个
 工具，我们使用go-kit开发那就是如虎添翼，下面一起看看。
 
-我调研了[go-kit](https://github.com/go-kit/kit)官方文档中列出的几个代码生成工具，找到了一个比较适合
-使用的repo，那就是[GrantZheng/kit](https://github.com/GrantZheng/kit)，其他repo要么比较简陋，要么
-正在开发，或者不再维护；这个repo也是fork一个不在维护的400+star的项目而来，该作者声称自己所在团队已深度使用
+我调研了[go-kit](https://github.com/go-kit/kit) 官方文档中列出的几个代码生成工具，找到了一个比较适合
+使用的repo，那就是[kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
+正在开发，或者不再维护；这个repo其实也是fork一个不再维护的400+star的项目而来，该作者声称自己所在团队已深度使用
 go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）
 
-# 目录(Content)
--   [关于GrantZheng/kit](#关于GrantZheng/kit)
--   [开始(Getting Started)](#开始(Getting Started))
+[toc]
 
+## 目录
+-   [1. 关于kit](#1-关于kit)
+-   [2. 开始](#2-开始)
+-   [3. 创建Project](#3-创建Project)
+-   [4. 生成Service模板](#4-生成Service模板)
+-   [5. 编辑proto文件](#5-编辑proto文件)
+-   [6. 实现Service接口](#6-实现Service接口)
+-   [7. 需要完善的工作](#7-需要完善的工作)
+-   [8. 启动server](#8-启动server)
 
-# 关于GrantZheng/kit
-我们需要知道它的一些功能特点
+___
+-   [9. 生成Client-side代码](#9-生成Client-side代码)
+-   [10. 塑造适合你(的团队)的Client](#10-塑造适合你(的团队)的Client)
+-   [11. Let's test it now](#11-Let's-test-it-now)
+
+___
+-   [12. 自由尚在](#12-自由尚在)
+-   [13. 结束，新的开始](#13-结束新的开始)
+___
+-   [Go-kit中文群组](#go-kit中文群组)
+
+## 1. 关于kit
+我们需要知道它的一些功能、特点
 
 -   可以生成指定名称的service模板代码，包含endpoint、transport(http/grpc)层
 -   可以生成client代码
@@ -36,15 +63,17 @@ go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继�
 
 > (以下部分描述译自GrantZheng/kit README.md, 少部分改动以适配本仓库，并带有额外的说明)  
 
-# 开始(Getting Started)
+## 2. 开始
 
 首先安装go-kit CLI工具
 ```bash
 # 默认使用modules包管理
-# 注意：这个仓库是fork而来，go.mod的module name是原仓库名，就不能通过go get方式下载
+# 注意：这个仓库是我fork而来，go.mod的module name是原仓库名，就不能通过go get方式下载
+# 在使用过程中我发现了一些问题，一个个的去提PR修复效率太慢，所以我只能先提交到我的仓库中，再考虑合并到原仓库，
+# 后续我可能会考虑持续维护它:)
 mkdir $GOPATH/pkg/mod/git_repo -p
 cd $GOPATH/pkg/mod/git_repo
-git clone https://github.com/GrantZheng/kit.git
+git clone https://github.com/chaseSpace/kit.git
 cd kit
 go install 
 
@@ -52,7 +81,7 @@ go install
 kit help
 ```
 
-# 创建Project
+## 3. 创建Project
 
 kit文档说的是创建service，但这里替换为project或许更有助于理解
 
@@ -75,12 +104,13 @@ c:\users\...\go-kit-examples\demo_project\hello
             service.go
 ```
 
-# 生成Service模板
+## 4. 生成Service模板
 
 ```bash
 kit g s hello
 kit g s hello --dmw # 创建默认middleware
 kit g s hello -t grpc # 指定 transport (default is http)
+kit g s hello --dmw -t grpc  # 连起来使用
 ```
 
 这些命令会执行以下操作：
@@ -103,7 +133,7 @@ kit g s hello -t grpc # 指定 transport (default is http)
 // HelloService describes the service.
 type HelloService interface {
 	// Add your methods here
-	SayHi(ctx context.Context, name, say string) (reply string, err error)
+	SayHi(ctx context.Context, name string) (reply string, err error)
 }
 ```
 最后得到的目录结构如下：
@@ -140,6 +170,392 @@ c:\users\...\go-kit-examples\demo_project\hello
 ```
 
 注意，kit工具在/pkg目录生成了grpc目录，并且将pb目录也放在其中，根据`go_project_template`项目布局，/pb目录
-应该放在项目根目录，这样方便快速找到一个服务的pb文件。
+应该放在项目根目录，这样方便快速找到一个服务的pb文件；所以我给维护者提了PR以支持此功能，有兴趣[点这里](https://github.com/GrantZheng/kit/issues/11)  
 
-所以，我们需要
+
+现在，你拉取master的代码应该是支持这个功能了，使用方法：
+```go
+// 注意：先把上面生成的pb目录和grpc、endpoint目录都删除，它们都需重新生成
+
+// 查看-t grpc后面可跟的选项
+kit g s hello -t grpc --help
+// -p 指定pb/目录要放的位置，这里我放到hello/下；-i 指定代码中pb文件的import路径
+cd demo_project/
+kit g s hello --dmw -t grpc -p hello/ -i hello/pb
+// 如果要在pb/下划分子目录存放pb文件，就自己根据需要修改
+```
+现在的hello目录结构如下：
+```go
+c:\users\...\go-kit-examples\demo_project\hello
+│  go.mod
+│  go.sum
+│
+├─cmd
+│  │  main.go
+│  │
+│  └─service
+│          service.go
+│          service_gen.go
+│
+├─pb
+│      compile.bat   // windows下会生成这个文件，linux则是.sh文件，都是包含的proto命令脚本
+│      hello.pb.go
+│      hello.proto
+│
+└─pkg
+    ├─endpoint
+    │      endpoint.go
+    │      endpoint_gen.go
+    │
+    ├─grpc
+    │      handler.go
+    │      handler_gen.go
+    │
+    └─service
+            middleware.go
+            service.go
+```
+
+## 5. 编辑proto文件
+打开pb/hello.proto文件，按如下修改：
+```proto
+message SayHiRequest {
+ string what = 1;
+}
+
+message SayHiReply {
+ string reply = 1;
+}
+```
+生成pb代码：
+```bash
+# windows
+cd hello/pb
+compile.bat
+
+# unix
+./compile.sh
+```
+
+## 6. 实现Service接口
+修改/pkg/service/service.go, 实现SayHi接口逻辑：
+```go
+func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply string, err error) {
+	return "Hi," + name, err
+}
+```
+
+## 7. 需要完善的工作
+打开/pkg/grpc/handler.go, 你看到`encode...`和`decode...`这样的函数了吗？
+这里我们还需要完成两项工作：
+- gRPC-layer的Req --decode-->> Endpoint-layer的Req
+- gRPC-layer的Rsp <<--encode-- Endpoint-layer的Rsp
+
+像下面这样：
+```go
+func decodeSayHiRequest(_ context.Context, r interface{}) (interface{}, error) {
+	req := r.(*pb.SayHiRequest)
+	return &endpoint.SayHiRequest{Name: req.Name}, nil
+}
+
+func encodeSayHiResponse(_ context.Context, r interface{}) (interface{}, error) {
+	rsp := r.(*endpoint.SayHiResponse)
+	return &pb.SayHiReply{Reply: rsp.Reply}, nil
+}
+```
+:rotating_light: 注意：这是容易出错的地方，因为编码时没有任何提示帮助我们填写正确的类型，同时我们也不应该
+使用_,ok的方式来避免panic，出现类型错误一定是编码bug，不应该hide it。  
+（当然，为避免程序退出，我们可以使用grpc的recovery中间件）
+
+## 8. 启动server
+OK，现在可以启动这个服务了
+```go
+cd hello/cmd
+go run .
+/* OUTPUT
+ts=2020-09-12T12:36:00.620891Z caller=service.go:85 tracer=none
+ts=2020-09-12T12:36:00.6258776Z caller=service.go:143 transport=debug/HTTP addr=:8080
+ts=2020-09-12T12:36:00.6258776Z caller=service.go:107 transport=gRPC addr=:8082
+*/
+```
+
+然后，来简单看一下cmd目录下的代码，main.go就不用看了，它调用了cmd/service/service.go的Run()，
+所以我们直接看cmd/service/service.go, 下面是一部分代码:
+```go
+var fs = flag.NewFlagSet("hello", flag.ExitOnError)
+var debugAddr = fs.String("debug.addr", ":8080", "Debug and metrics listen address")
+var httpAddr = fs.String("http-addr", ":8081", "HTTP listen address")
+var grpcAddr = fs.String("grpc-addr", ":8082", "gRPC listen address")
+var thriftAddr = fs.String("thrift-addr", ":8083", "Thrift listen address")
+```
+
+这里提供了http,grpc,thrift三个RPC地址变量作为启动参数，但其实我们只用到了grpc，如果你用goland你会看到除了grpc
+其他几个变量都是有提示‘unused variable’，所以这里可以直接删掉这几行代码，以免扰乱视线。
+
+然后在讲一下Run()方法的最后几行代码：
+```go
+svc := service.New(getServiceMiddleware(logger))
+eps := endpoint.New(svc, getEndpointMiddleware(logger))
+g := createService(eps)
+initMetricsEndpoint(g)
+initCancelInterrupt(g)
+logger.Log("exit", g.Run())
+```
+
+这里的代码非常简洁明了，前三行就是以洋葱模式一层层的封装svc对象（各层都可应用中间件），`initMetricsEndpoint`就是
+启动指标http服务供prometheus来拉svc的监控数据，`initCancelInterrupt`就是监听信号，优雅退出服务。
+
+### github.com/oklog/oklog/pkg/group
+
+你发现了吗？生成的代码使用了这个库来完成了服务启动时需要启动多个后台goroutine的任务，每个人或者团队在这方面也许
+都有自己的实践，可以进行service.go二次塑形，kit下一次执行不会再改动此文件（因为存在），当然你也可以直接用这个库，
+并没有什么不好，只是你需要搞清楚它的用法。
+
+## 9. 生成Client side代码
+
+接下来我们使用kit生成grpc的client side代码：
+```go
+cd demo_project/
+# -i 指 --pb_import_path，如果你前面没有指定pb/的位置，这里就不需要加上-i
+kit g c hello -t grpc -i hello/pb
+```
+看一下client目录结构：
+```go
+c:\users\...\go-kit-examples\demo_project\hello
+│  go.mod
+│  go.sum
+│
+├─client
+│  └─grpc
+│          grpc.go
+```
+
+同样的，这里也需要完成req&rsp的转换工作, 打开client/grpc/grpc.go，修改如下：
+```go
+// Client-side:  endpoint-Req --encode-->> gRPC-Req
+func encodeSayHiRequest(_ context.Context, request interface{}) (interface{}, error) {
+	r := request.(*endpoint1.SayHiRequest)
+	return &pb.SayHiRequest{Name: r.Name}, nil
+}
+
+// Client-side:  endpoint-Rsp <<--decode-- gRPC-Rsp
+func decodeSayHiResponse(_ context.Context, reply interface{}) (interface{}, error) {
+	r := reply.(*pb.SayHiReply)
+	return &endpoint1.SayHiResponse{Reply: r.Reply},nil
+}
+```
+
+## 10. 塑造适合你(的团队)的Client
+
+先来看看`client/grpc/grpc.go`的New()方法：
+```go
+func New(conn *grpc.ClientConn, options map[string][]grpc1.ClientOption) (service.HelloService, error) {
+
+	var sayHiEndpoint endpoint.Endpoint
+	{
+		sayHiEndpoint = grpc1.NewClient(conn, "pb.Hello", "SayHi", encodeSayHiRequest, decodeSayHiResponse, pb.SayHiReply{}, options["SayHi"]...).Endpoint()
+		sayHiEndpoint = opentracing.TraceClient()
+	}
+
+	return endpoint1.Endpoints{
+		SayHiEndpoint: sayHiEndpoint,
+	}, nil
+}
+```
+
+这是获取Service client的主要方法，如果你有一些微服务经验，你应该可以想到在RPC接口的client处需要添加几种
+机制来使其更可靠、安全，更具有可观测性，可选的措施/机制列出如下：
+- 服务发现(consul/etcd...)
+- 负载均衡
+- 重试
+- 链路追踪埋点
+- 限速
+- 断路器
+
+同时还需注意这些措施的添加顺序，上面的措施应该更靠近底层conn对象。
+
+另外，如果你有更多措施建议想添加到此文档中，可以通过issue告知我 :)
+
+为方便快速启动client，我就不添加服务发现、负载均衡到示例代码中了，如有需要可参考
+`demo_project/new_addsvc/client/client.go`
+
+下面是添加了部分措施之后的`client/grpc/grpc.go`:
+```go
+func New(conn *grpc.ClientConn) (service.HelloService, error) {
+	/*
+		Create some security measures
+	*/
+	var otTracer stdopentracing.Tracer
+	otTracer = stdopentracing.GlobalTracer()
+	limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 100))
+	breaker := circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+		Name:    "SayHi",
+		Timeout: 30 * time.Second,
+	}))
+
+	// Create go-kit grpc hooks, e.g.
+	//      - grpctransport.ClientAfter(),
+	//      - grpctransport.ClientFinalizer()
+	// Injecting tracing ctx to grpc metadata, optionally.
+	grpcBefore := grpc1.ClientBefore(opentracing.ContextToGRPC(otTracer, log.NewNopLogger()))
+	/*
+		Install into endpoints with above measures
+	*/
+	var sayHiEndpoint endpoint.Endpoint
+	{
+		sayHiEndpoint = grpc1.NewClient(conn, "pb.Hello", "SayHi",
+			encodeSayHiRequest, decodeSayHiResponse, pb.SayHiReply{}, grpcBefore).Endpoint()
+		sayHiEndpoint = opentracing.TraceClient(otTracer, "sayHi")(sayHiEndpoint)
+		sayHiEndpoint = limiter(sayHiEndpoint)
+		sayHiEndpoint = breaker(sayHiEndpoint)
+	}
+
+	return endpoint1.Endpoints{
+		SayHiEndpoint: sayHiEndpoint,
+	}, nil
+}
+```
+
+断路器使用： https://github.com/sony/gobreaker （Sony公司写的，不过理论还是参考的[微软](https://docs.microsoft.com/en-us/previous-versions/msp-n-p/dn589784(v=pandp.10)?redirectedfrom=MSDN) ）
+
+代码非常简洁，相关插件的使用方法可参考对应仓库，这里不再表述。
+
+然后创建`hello/client/grpc/client.go`完成相关对象初始化工作以便caller service调用：
+```go
+package grpc
+
+import (
+	"context"
+	"go-util/_util"
+	"google.golang.org/grpc"
+	"hello/pkg/service"
+	"time"
+)
+
+type Client struct {
+	service.HelloService
+	conn *grpc.ClientConn
+}
+
+var svcClient *Client
+
+func newSvcClient() *Client {
+	var grpcOpts = []grpc.DialOption{
+		grpc.WithInsecure(), // 因为没有使用tls，必须加上这个，否则连接失败
+	}
+	var err error
+	var conn *grpc.ClientConn
+	var sc service.HelloService
+
+	var ctx, cancel = context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+
+	conn, err = grpc.DialContext(ctx, "localhost:8082", grpcOpts...)
+	_util.PanicIfErr(err, nil)
+
+	sc, err = New(conn)
+	_util.PanicIfErr(err, nil)
+
+	return &Client{
+		HelloService: sc,
+		conn:         conn,
+	}
+}
+
+func NewClient() *Client {
+	if svcClient == nil {
+		svcClient = newSvcClient()
+	}
+	return svcClient
+}
+
+func (c *Client) Stop() {
+	if c.conn != nil {
+		_ = c.conn.Close()
+	}
+}
+```
+
+好了，client的工作已经完成，现在我们来写一个test方法，创建`hello/client/grpc/grpc_test.go`：
+```go
+package grpc
+
+import (
+	"context"
+	"log"
+	"testing"
+)
+
+func TestNew(t *testing.T) {
+	c := NewClient()
+	defer c.Stop()
+	reply, err := c.SayHi(context.Background(), "Jack Ma")
+	if err != nil {
+		t.Error(err)
+	}
+	log.Print("rsp:", reply)
+}
+```
+
+## 11. Let's test it now
+```go
+cd hello/client/grpc/
+$ go test -run=TestNew
+2020/09/13 18:45:48 rsp:Hi,Jack Ma
+PASS
+ok      hello/client/grpc       1.118s
+```
+
+## 12. 自由尚在
+你应该注意到，不管是kit，还是本仓库下的`go_project_template` （参考[golang-standards/project-layout][1]），
+都没有涉及到数据访问层的目录规划，我想这是因为不同开发语言背景的开发团队/个人对这一层目录命名以及代码结构都有着不同的习惯，
+比如Java背景的开发者习惯创建一个`dao`目录，代表的是Data access object, 当然，DAO并不和Java绑定，它是针对数据访问层的
+一种设计模式，只是在Java Web开发历程中应用较深，并且卓有成效！
+
+我这里就不详细介绍DAO模式了，你可以直接在项目根目录创建一个`dao`目录，这足够清晰明了。
+
+但是其他语言背景的开发者也许就不太熟悉DAO这种模式了，在web开发领域，MVC应用较广是的一种软件设计架构（也可称框架模式），
+这种架构下，Model（模型）是应用程序中用于处理应用程序数据逻辑的部分，所以你也可以直接创建一个`model`目录，它包含的文件结构
+可以是这样：
+```go
+├─model
+│      table_define.go  // 表结构定义
+│      user.go          // user表的操作方法集合
+│      user_wallet.go   // user_wallet表的操作方法集合
+```
+或许你还有自己的一套命名方式，这都不重要，重要的是解耦数据访问层与service层的代码，让项目的层次足够清晰，以便我们能够
+持续的保持愉快心情来维护它，而不是在往后的某一天，一边敲代码一边操着一口流利的"what the f**k" :clown_face:
+
+在model层定义直接操作底层数据的方法，然后愉快的在service层引用，解耦你的代码！
+
+## 13. 结束，新的开始
+
+### 小结
+本文档较为全面的介绍了如何使用[GrantZheng/kit](https://github.com/GrantZheng/kit) 作为go-kit框架的代码生成工具来辅助开发微服务，
+在使用过程中，文档作者(我)发现了该工具的一些可以优化的问题以及bug，部分已经提PR给原仓库了，后续的改动也会尽量合并过去，但一些不那么通用
+的改动可能仅存在于我的仓库： https://github.com/chaseSpace/kit ，这些较为【独特】的改动我会更新到文档中，如果你觉得它违反了大部分人
+的常识/习惯，还请告知我，谢谢~
+
+### 改进
+文档是花费我的业余时间编写的，因时间紧凑，无法避免一些小的瑕疵，以及更全面的介绍go-kit其他功能，例如
+- 如何接入Etcd（服务发现）
+- 如何接入OpenTelemetry（tracing）
+- 如何深度接入Prometheus（monitor）
+
+等等。。。如果您愿意一起来改进，欢迎提交您的PR！
+
+### 微服务旅程建议
+相比于快速开发出一个微服务，读者应该首先丰富自己对微服务的理论了解，没有理论奠定基础，一切实践都是盲目的；
+如果在开发过程中遇到一些微服务架构相关问题时，可能会丈二和尚摸不着头脑，对于团队来说，这是不可靠的。
+
+这里分享一些微服务的理论、实践文章：
+
+- [码农周报-微服务篇](https://github.com/chaseSpace/MNWeeklyCategory/blob/master/docs/MicroServiceLinks.md)
+- [阿里云-正确入门Service Mesh](https://mp.weixin.qq.com/s/KHsxiOOHjTosQcd61rPsgg)
+- [一文详解微服务架构知识](https://mp.weixin.qq.com/s/lpXkFsm01M9-27qeuo5JzA)
+
+## Go-kit中文群组
+
+![](https://github.com/chaseSpace/go-kit-examples/blob/master/qq_group_qrcode.png)
+
+[1]: https://github.com/golang-standards/project-layout/blob/master/README_zh.md

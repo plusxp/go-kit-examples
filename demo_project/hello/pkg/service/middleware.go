@@ -23,9 +23,9 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 
 }
 
-func (l loggingMiddleware) SayHi(ctx context.Context, name string, say string) (reply string, err error) {
+func (l loggingMiddleware) SayHi(ctx context.Context, name string) (reply string, err error) {
 	defer func() {
-		l.logger.Log("method", "SayHi", "name", name, "say", say, "reply", reply, "err", err)
+		l.logger.Log("method", "SayHi", "name", name, "reply", reply, "err", err)
 	}()
-	return l.next.SayHi(ctx, name, say)
+	return l.next.SayHi(ctx, name)
 }

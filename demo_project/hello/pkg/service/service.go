@@ -5,16 +5,10 @@ import "context"
 // HelloService describes the service.
 type HelloService interface {
 	// Add your methods here
-	// e.x: Foo(ctx context.Context,s string)(rs string, err error)
-	SayHi(ctx context.Context, name, say string) (reply string, err error)
+	SayHi(ctx context.Context, name string) (reply string, err error)
 }
 
 type basicHelloService struct{}
-
-func (b *basicHelloService) SayHi(ctx context.Context, name string, say string) (reply string, err error) {
-	// TODO implement the business logic of SayHi
-	return reply, err
-}
 
 // NewBasicHelloService returns a naive, stateless implementation of HelloService.
 func NewBasicHelloService() HelloService {
@@ -28,4 +22,8 @@ func New(middleware []Middleware) HelloService {
 		svc = m(svc)
 	}
 	return svc
+}
+
+func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply string, err error) {
+	return "Hi," + name, err
 }
