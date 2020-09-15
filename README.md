@@ -11,7 +11,7 @@
 -   Go-kit框架中文介绍（README.md）
 -   带中文注释的Go-kit官方示例，包含循序渐进的多个示例项目，[传送门](https://github.com/chaseSpace/go-kit-examples/tree/master/new-to-gokit)
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
--   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Gokit微服务)
+-   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
 
 ## 官方介绍
 Go-kit是使用Go语言构建微服务的一个工具箱，它可以解决分布式系统架构中的常见问题；
