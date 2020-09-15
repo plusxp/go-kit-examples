@@ -1,8 +1,5 @@
 # go-kit-examples
 
-[![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
-![](https://badgen.net/github/stars/go-kit/kit)
-![](https://badgen.net/github/release/go-kit/kit)
 
 # 前言
 本仓库建立的目的是尽可能地为想要使用Go-kit构建微服务架构的中文开发者提供帮助。
@@ -13,10 +10,13 @@
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
 -   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
 
-# 官方介绍
+# Go-kit官方介绍
+[![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
+![](https://badgen.net/github/stars/go-kit/kit)
+![](https://badgen.net/github/release/go-kit/kit)
+
 Go-kit是使用Go语言构建微服务的一个工具箱，它可以解决分布式系统架构中的常见问题；
 能够让我们专注于业务代码。
-
 
 # 特点
 

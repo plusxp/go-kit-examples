@@ -1,5 +1,5 @@
 
-### 通用工具
+### 通用工具(二进制或脚本)
 
 #### shfmt
 
@@ -13,6 +13,3 @@ Shell script formatter
 # quick use
 ./shfmt.exe -s -w -i 4 -bn -ci -sr -kp your_bash_main.sh
 ```
-
-
-
