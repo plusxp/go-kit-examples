@@ -20,14 +20,14 @@ fn_init_cmd() {
     # 注意：这里定义的变量当做全局变量使用，请不要在此函数外定义xxx_cmd这样的变量，会干扰
 
     # gen, 关于protoc命令，若后续在pb/proto/下增加目录，就需要适当添加相应目录到命令中(-I=../pb/proto/sub_folder)，仅添加proto文件则无需修改命令
-    gen_cmd="protoc -I=../pb/proto ../pb/proto/*.proto --go_out=plugins=grpc:$PROTO_OUTPUT_DIR"
-    gen_cmd_on_ok="echo gen proto ok"
-    gen_cmd_on_fail="echo gen proto fail"
+    readonly gen_cmd="protoc -I=../pb/proto ../pb/proto/*.proto --go_out=plugins=grpc:$PROTO_OUTPUT_DIR"
+    readonly gen_cmd_on_ok="echo gen proto ok"
+    readonly gen_cmd_on_fail="echo gen proto fail"
     # gofmt
-    gofmt_cmd="gofmt -l -s -w $PROJECT_DIR"
+    readonly gofmt_cmd="gofmt -l -s -w $PROJECT_DIR"
     # govet
-    govet_cmd="go vet $PROJECT_DIR/..." # go vet可能会修改go.mod文件，执行tidy来恢复
-    govet_cmd_on_ok="go mod tidy"
+    readonly govet_cmd="go vet $PROJECT_DIR/..." # go vet可能会修改go.mod文件，执行tidy来恢复
+    readonly govet_cmd_on_ok="go mod tidy"
 
 }
 
