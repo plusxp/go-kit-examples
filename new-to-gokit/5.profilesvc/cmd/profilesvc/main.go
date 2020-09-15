@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	__profilesvc "go-kit-examples/new-to-gokit/5.profilesvc"
+	profilesvc "go-kit-examples/new-to-gokit/5.profilesvc"
 	"net/http"
 	"os"
 	"os/signal"
@@ -26,15 +26,15 @@ func main() {
 		logger = log.With(logger, "caller", log.DefaultCaller)
 	}
 
-	var s __profilesvc.Service
+	var s profilesvc.Service
 	{
-		s = __profilesvc.NewInmemService()
-		s = __profilesvc.LoggingMiddleware(logger)(s)
+		s = profilesvc.NewInmemService()
+		s = profilesvc.LoggingMiddleware(logger)(s)
 	}
 
 	var h http.Handler
 	{
-		h = __profilesvc.MakeHTTPHandler(s, log.With(logger, "component", "HTTP"))
+		h = profilesvc.MakeHTTPHandler(s, log.With(logger, "component", "HTTP"))
 	}
 
 	errs := make(chan error)

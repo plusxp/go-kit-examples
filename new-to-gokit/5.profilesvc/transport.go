@@ -44,7 +44,6 @@ func MakeHTTPHandler(s Service, logger log.Logger) http.Handler {
 	// GET     /profiles/:id/addresses/:addressID  retrieve a particular profile address
 	// POST    /profiles/:id/addresses/            add a new address
 	// DELETE  /profiles/:id/addresses/:addressID  remove an address
-
 	r.Methods("POST").Path("/profiles/").Handler(httptransport.NewServer(
 		e.PostProfileEndpoint,
 		decodePostProfileRequest,

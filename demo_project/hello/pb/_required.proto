@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb;
+
+/*
+定义必须的协议
+*/
+
+enum Plat {
+    pc = 0;
+    ios = 1;
+    android = 2;
+}
+
+message BaseReq {
+    Plat plat = 1;
+}
+
+message BaseRsp {
+    int32 err_code = 1;
+}

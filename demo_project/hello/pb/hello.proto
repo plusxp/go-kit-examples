@@ -2,18 +2,21 @@ syntax = "proto3";
 
 package pb;
 
+import "_required.proto";
 
 
 //The Hello service definition.
 service Hello {
- rpc SayHi (SayHiRequest) returns (SayHiReply);
+    rpc SayHi (SayHiRequest) returns (SayHiReply);
 }
 
 message SayHiRequest {
- string name = 1;
+    BaseReq base_req = 1;
+    string name = 2;
 }
 
 message SayHiReply {
- string reply = 1;
+    BaseReq base_rsp = 2;
+    string reply = 1;
 }
 
