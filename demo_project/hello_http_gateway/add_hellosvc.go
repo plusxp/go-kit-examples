@@ -1,9 +1,11 @@
-package hello_http_gateway
+package main
 
 import (
 	"context"
 	"github.com/gorilla/mux"
-	"hello/client/grpc"
+	grpcclient "hello/client/grpc"
+	"hello/pb/gen-go/pb"
+	"hello/pb/gen-go/pbcommon"
 	"net/http"
 )
 
@@ -17,12 +19,14 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	// Extract params from path
 	v := mux.Vars(r)
 
+	// There is no need to verify params,
 	name := v["name"]
-	if name == "" {
 
+	c := grpcclient.New()
+	reply, code := c.SayHi(context.Background(), name)
+	rsp := &pb.SayHiReply{
+		BaseRsp: &pbcommon.BaseRsp{ErrCode: code},
+		Reply:   reply,
 	}
-
-	helloSvcClient := grpc.NewClient()
-	rsp, err := helloSvcClient.SayHi(context.Background(), "Jack Ma")
 	gw.JSON(w, rsp)
 }

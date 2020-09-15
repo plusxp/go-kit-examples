@@ -29,7 +29,7 @@ func newSvcClient() *Client {
 	conn, err = grpc.DialContext(ctx, "localhost:8082", grpcOpts...)
 	_util.PanicIfErr(err, nil)
 
-	sc, err = New(conn)
+	sc, err = NewSvc(conn)
 	_util.PanicIfErr(err, nil)
 
 	return &Client{
@@ -38,7 +38,7 @@ func newSvcClient() *Client {
 	}
 }
 
-func NewClient() *Client {
+func New() *Client {
 	if svcClient == nil {
 		svcClient = newSvcClient()
 	}

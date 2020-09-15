@@ -7,7 +7,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	c := NewClient()
+	c := New()
 	defer c.Stop()
 	reply, err := c.SayHi(context.Background(), "Jack Ma")
 	if err != nil {

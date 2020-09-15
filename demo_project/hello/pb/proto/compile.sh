@@ -17,4 +17,6 @@
 # See also
 #  https://github.com/grpc/grpc-go/tree/master/examples
 
-protoc hello.proto --go_out=plugins=grpc:.
+# 注意：common下的proto文件的go_package与当前路径下的proto文件不一致，两条命令貌似无法合并，会报：inconsistent package import paths:
+protoc *.proto --go_out=plugins=grpc:../../../
+protoc common/*.proto --go_out=plugins=grpc:../../../

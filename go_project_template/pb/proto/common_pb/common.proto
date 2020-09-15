@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package pb;
 
-option go_package = "go_pj_template/pb/gen-go/common_pb;common_pb";
+option go_package = "go_project_template/pb/gen-go/common_pb;common_pb";
 
 
 message BaseReq {

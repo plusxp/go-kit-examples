@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	pb "hello/pb"
+	"hello/pb/gen-go/pb"
 	endpoint "hello/pkg/endpoint"
 	grpc "hello/pkg/grpc"
 	service "hello/pkg/service"

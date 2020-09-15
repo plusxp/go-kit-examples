@@ -2,26 +2,18 @@ package endpoint
 
 import (
 	"context"
-	service "hello/pkg/service"
-
 	endpoint "github.com/go-kit/kit/endpoint"
+	"hello/pb/gen-go/pbcommon"
+	service "hello/pkg/service"
 )
-
-type Failure interface {
-	Failed() error
-}
 
 type SayHiRequest struct {
 	Name string `json:"name"`
 }
 
 type SayHiResponse struct {
-	Reply string `json:"reply"`
-	Err   error  `json:"err"`
-}
-
-func (r SayHiResponse) Failed() error {
-	return r.Err
+	Reply   string     `json:"reply"`
+	ErrCode pbcommon.R `json:"err_code"`
 }
 
 func MakeSayHiEndpoint(s service.HelloService) endpoint.Endpoint {
@@ -29,17 +21,17 @@ func MakeSayHiEndpoint(s service.HelloService) endpoint.Endpoint {
 		req := request.(*SayHiRequest)
 		reply, err := s.SayHi(ctx, req.Name)
 		return &SayHiResponse{
-			Err:   err,
-			Reply: reply,
+			ErrCode: err,
+			Reply:   reply,
 		}, nil
 	}
 }
 
-func (e Endpoints) SayHi(ctx context.Context, name string) (reply string, err error) {
+func (e Endpoints) SayHi(ctx context.Context, name string) (reply string, errCode pbcommon.R) {
 	request := &SayHiRequest{Name: name}
 	response, err := e.SayHiEndpoint(ctx, request)
 	if err != nil {
-		return
+		return "", pbcommon.R_RPC_ERR
 	}
-	return response.(*SayHiResponse).Reply, response.(*SayHiResponse).Err
+	return response.(*SayHiResponse).Reply, response.(*SayHiResponse).ErrCode
 }

@@ -12,17 +12,17 @@ import (
 	"github.com/sony/gobreaker"
 	"golang.org/x/time/rate"
 	grpc "google.golang.org/grpc"
-	pb "hello/pb"
+	"hello/pb/gen-go/pb"
 	endpoint1 "hello/pkg/endpoint"
 	service "hello/pkg/service"
 	"time"
 )
 
-// New returns an AddService backed by a gRPC server at the other end
+// NewSvc returns an AddService backed by a gRPC server at the other end
 //  of the conn. The caller is responsible for constructing the conn, and
 // eventually closing the underlying transport. We bake-in certain middlewares,
 // implementing the client library pattern.
-func New(conn *grpc.ClientConn) (service.HelloService, error) {
+func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 	/*
 		Create some security measures
 	*/
@@ -67,5 +67,5 @@ func encodeSayHiRequest(_ context.Context, request interface{}) (interface{}, er
 // a gRPC concat reply to a user-domain concat response.
 func decodeSayHiResponse(_ context.Context, reply interface{}) (interface{}, error) {
 	r := reply.(*pb.SayHiReply)
-	return &endpoint1.SayHiResponse{Reply: r.Reply}, nil
+	return &endpoint1.SayHiResponse{Reply: r.Reply, ErrCode: r.BaseRsp.ErrCode}, nil
 }

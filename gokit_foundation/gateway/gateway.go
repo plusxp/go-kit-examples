@@ -6,18 +6,22 @@ import (
 	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 )
 
 // Defines ExposedGateway is safe way to expose root gateway.
 type ExposedGateway interface {
+	Run() error
 	JSON(w http.ResponseWriter, rsp interface{}) error
+	log.Logger
 }
 
 type Gateway struct {
 	r      *mux.Router
 	logger log.Logger
-
-	addr string
+	addr   string
 }
 
 func New(r *mux.Router, addr string, logger log.Logger) ExposedGateway {
@@ -29,23 +33,39 @@ func New(r *mux.Router, addr string, logger log.Logger) ExposedGateway {
 }
 
 func (g *Gateway) OnStart() {
-	g.logger.Log("Gateway.OnStart: svr-addr", g.addr)
+	g.logger.Log("Gateway.OnStart:http-addr", g.addr)
 	g.setupMW()
 }
 
 func (g *Gateway) OnStop() {
-	g.logger.Log("Gateway.OnStop: svr-addr", g.addr)
+	g.logger.Log("Gateway.OnStop:http-addr", g.addr)
 }
 
 func (g *Gateway) Run() error {
 	defer g.OnStop()
+	g.OnStart()
 
+	sc := make(chan os.Signal)
 	ch := make(chan error)
+	signal.Notify(sc,
+		syscall.SIGINT,
+		syscall.SIGTERM,
+	)
 	go func() {
 		ch <- http.ListenAndServe(g.addr, g.r)
 	}()
-	err := <-ch
+
+	var err error
+	select {
+	case err = <-ch:
+	case s := <-sc:
+		g.logger.Log("Gateway.Run:on-signal", s)
+	}
 	return err
+}
+
+func (g *Gateway) Log(keyvals ...interface{}) error {
+	return g.logger.Log(keyvals...)
 }
 
 // setupMW setups mux middleware, you could customize that, it should be a private method.
@@ -61,7 +81,7 @@ func (g *Gateway) setupMW() {
 		})
 	}
 	g.r.Use(recoverMW)
-	// Process CORS issue is common.
+	// Processing CORS issue is common.
 	g.r.Use(mux.CORSMethodMiddleware(g.r))
 }
 

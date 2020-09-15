@@ -3,7 +3,7 @@ syntax = "proto3";
 package pb;
 
 // 注意填写项目的pb目录路径，可以划分子目录
-option go_package = "go_pj_template/pb/gen-go/pb;pb";
+option go_package = "go_project_template/pb/gen-go/pb;pb";
 
 import "common_pb/common.proto";
 

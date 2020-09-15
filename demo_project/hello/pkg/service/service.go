@@ -1,11 +1,14 @@
 package service
 
-import "context"
+import (
+	"context"
+	"hello/pb/gen-go/pbcommon"
+)
 
 // HelloService describes the service.
 type HelloService interface {
 	// Add your methods here
-	SayHi(ctx context.Context, name string) (reply string, err error)
+	SayHi(ctx context.Context, name string) (reply string, err pbcommon.R)
 }
 
 type basicHelloService struct{}
@@ -24,6 +27,9 @@ func New(middleware []Middleware) HelloService {
 	return svc
 }
 
-func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply string, err error) {
+func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply string, err pbcommon.R) {
+	if name == "XI" {
+		return "", pbcommon.R_INVALID_ARGS
+	}
 	return "Hi," + name, err
 }

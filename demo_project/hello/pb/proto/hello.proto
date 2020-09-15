@@ -1,9 +1,10 @@
 syntax = "proto3";
 
 package pb;
+option go_package = "hello/pb/gen-go/pb;pb";
 
-import "_required.proto";
-
+// 这里加了common/，protoc命令就不需要加-I=common
+import "common/common.proto";
 
 //The Hello service definition.
 service Hello {
@@ -11,12 +12,11 @@ service Hello {
 }
 
 message SayHiRequest {
-    BaseReq base_req = 1;
+    pbcommon.BaseReq base_req = 1;
     string name = 2;
 }
 
 message SayHiReply {
-    BaseReq base_rsp = 2;
+    pbcommon.BaseRsp base_rsp = 2;
     string reply = 1;
 }
-

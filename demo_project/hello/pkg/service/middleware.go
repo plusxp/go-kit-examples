@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"hello/pb/gen-go/pbcommon"
 
 	log "github.com/go-kit/kit/log"
 )
@@ -20,12 +21,11 @@ func LoggingMiddleware(logger log.Logger) Middleware {
 	return func(next HelloService) HelloService {
 		return &loggingMiddleware{logger, next}
 	}
-
 }
 
-func (l loggingMiddleware) SayHi(ctx context.Context, name string) (reply string, err error) {
+func (l loggingMiddleware) SayHi(ctx context.Context, name string) (reply string, errCode pbcommon.R) {
 	defer func() {
-		l.logger.Log("method", "SayHi", "name", name, "reply", reply, "err", err)
+		l.logger.Log("method", "SayHi", "name", name, "reply", reply, "errCode", errCode)
 	}()
 	return l.next.SayHi(ctx, name)
 }
