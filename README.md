@@ -4,7 +4,7 @@
 ![](https://badgen.net/github/stars/go-kit/kit)
 ![](https://badgen.net/github/release/go-kit/kit)
 
-## 前言
+# 前言
 本仓库建立的目的是尽可能地为想要使用Go-kit构建微服务架构的中文开发者提供帮助。
 
 仓库包含内容汇总：
@@ -13,17 +13,17 @@
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
 -   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
 
-## 官方介绍
+# 官方介绍
 Go-kit是使用Go语言构建微服务的一个工具箱，它可以解决分布式系统架构中的常见问题；
 能够让我们专注于业务代码。
 
 
-## 特点
+# 特点
 
 工具集，通过不同pkg支持auth/metrics/log/service-discovery/tracing/transport, 
 并且可以自己决定哪个功能/协议使用哪个库/后端，比如服务发现可以使用consul或者etcd，都有集成好的模块直接使用。
 
-## 框架分层
+# 框架分层
 
  1. Transport layer (HTTP, gRPC, Thrift, and net/rpc, 自由定制)
  2. Endpoint layer
@@ -31,21 +31,21 @@ Go-kit是使用Go语言构建微服务的一个工具箱，它可以解决分布
 
 请求由第一层按序流向第三层。 
 
-### Endpoints
+## Endpoints
 
    相当于controller内的一个handler，如果同时实现HTTP和gRPC协议，可以方便的将两种请求发往同一个endpoint。
 
-### Services
+## Services
 
   - 这一层主要聚焦业务逻辑，一个service可以被多个endpoint调用，一个endpoint可以调用多个service方法
   - 与gRPC一样，一个service在代码是作为一个interface，需要我们实现这个interface
   - service层只关注业务，与endpoint/transport无关，代码层分离
   
-## Middlewares
+# Middlewares
  
  Go kit使用中间件来添加更多功能，包括日志、限速、负载均衡、链路追踪等等。
  
-## 框架设计
+# 框架设计
 典型的洋葱模型
 
 ![Design](https://gokit.io/faq/onion.png)
@@ -64,7 +64,7 @@ Go-kit是使用Go语言构建微服务的一个工具箱，它可以解决分布
 
     `endpoint绑定具体传输协议的地方`
     
-## Error处理
+# Error处理
 
 service可能会返回err，有两种方式在endpoint中来封装err：
 
@@ -74,11 +74,11 @@ service可能会返回err，有两种方式在endpoint中来封装err：
 注意一点：endpoint返回的err会被中间件捕获到，比如断路器；所以这里区分网络导致的err和service返回的业务err。
 
 
-## 服务发现
+# 服务发现
 
 go-kit有相应的pkg支持Consul, etcd, ZooKeeper, and DNS SRV
 
-## 监控
+# 监控
 
 go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐使用它来建立go-kit服务
 
