@@ -11,8 +11,9 @@
 
 请注意，阅读此文档默认读者具备以下条件：
 
-- 一到两年以上的go语言开发经验
+- 一年以上的go语言开发经验
 - 一定的微服务理论基础
+- 了解gRPC及proto协议
 - 阅读过本仓库中`demo_project/new_addsvc`的大部分代码
 
 阅读`demo_project/new_addsvc`，是为了清楚了解go-kit的设计思想，以及成型后的代码布局。
