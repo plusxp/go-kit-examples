@@ -1,10 +1,7 @@
 # go-kit-examples
-
-
-# 前言
 本仓库建立的目的是尽可能地为想要使用Go-kit构建微服务架构的中文开发者提供帮助。
 
-仓库包含内容汇总：
+仓库包含以下内容：
 -   Go-kit框架中文介绍（README.md）
 -   带中文注释的Go-kit官方示例，包含循序渐进的多个示例项目，[传送门](https://github.com/chaseSpace/go-kit-examples/tree/master/new-to-gokit)
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
