@@ -1,22 +1,40 @@
 syntax = "proto3";
 
 package pb;
-option go_package = "hello/pb/gen-go/pb;pb";
 
-// 这里加了common/，protoc命令就不需要加-I=common
+
+option go_package = "hello/pb/gen-go/pb;pb"; // 这里加了common/，protoc命令就不需要加-I=common
 import "common/common.proto";
 
 //The Hello service definition.
 service Hello {
-    rpc SayHi (SayHiRequest) returns (SayHiReply);
+ rpc SayHi (SayHiRequest) returns (SayHiReply);
+ // 约会
+ rpc MakeADate (MakeADateReq) returns (MakeADateRsp);
 }
 
 message SayHiRequest {
-    pbcommon.BaseReq base_req = 1;
-    string name = 2;
+ pbcommon.BaseReq base_req = 1;
+ string           name = 2;
 }
 
 message SayHiReply {
-    pbcommon.BaseRsp base_rsp = 2;
-    string reply = 1;
+ pbcommon.BaseRsp base_rsp = 2;
+ string           reply = 1;
 }
+
+message MakeADateReq {
+ pbcommon.BaseReq base_req = 1;
+ int64            date_time = 2;
+ string           want_say = 3;
+}
+
+message MakeADateRsp {
+ pbcommon.BaseRsp base_rsp = 2;
+ string           reply = 1;
+}
+
+message MakeADateRequest {}
+
+message MakeADateReply {}
+

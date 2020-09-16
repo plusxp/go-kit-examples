@@ -29,3 +29,10 @@ func (l loggingMiddleware) SayHi(ctx context.Context, name string) (reply string
 	}()
 	return l.next.SayHi(ctx, name)
 }
+
+func (l loggingMiddleware) MakeADate(c0 context.Context, p1 *pb.MakeADateReq) (p0 *pb.MakeADateRsp) {
+	defer func() {
+		l.logger.Log("method", "MakeADate", "p1", p1, "p0", p0)
+	}()
+	return l.next.MakeADate(c0, p1)
+}

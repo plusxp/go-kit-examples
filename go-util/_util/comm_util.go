@@ -2,6 +2,7 @@ package _util
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-kit/kit/log"
 	"go-util/_go"
 	"math/rand"
@@ -142,4 +143,11 @@ func GetRunningFuncName(split ...string) string {
 		return fs[len(fs)-1]
 	}
 	return fn
+}
+
+// skip=1 为调用者位置，skip=2为调用者往上一层的位置，以此类推
+// return-example: /develop/go/test_go/tmp_test.go:88
+func FileWithLineNum(skip int) string {
+	_, file, line, _ := runtime.Caller(skip)
+	return fmt.Sprintf("%v:%v", file, line)
 }

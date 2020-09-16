@@ -2,6 +2,8 @@ package grpc
 
 import (
 	"context"
+	"errors"
+	pb "hello/pb"
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	endpoint "hello/pkg/endpoint"
@@ -10,20 +12,15 @@ import (
 	context1 "golang.org/x/net/context"
 )
 
-// makeSayHiHandler creates the handler logic
 func makeSayHiHandler(endpoints endpoint.Endpoints, options []grpc.ServerOption) grpc.Handler {
 	return grpc.NewServer(endpoints.SayHiEndpoint, decodeSayHiRequest, encodeSayHiResponse, options...)
 }
 
-// decodeSayHiResponse is a transport/grpc.DecodeRequestFunc that converts a
-// gRPC request to a user-domain SayHi request.
 func decodeSayHiRequest(_ context.Context, r interface{}) (interface{}, error) {
 	req := r.(*pb.SayHiRequest)
 	return &endpoint.SayHiRequest{Name: req.Name}, nil
 }
 
-// encodeSayHiResponse is a transport/grpc.EncodeResponseFunc that converts
-// a user-domain response to a gRPC reply.
 func encodeSayHiResponse(_ context.Context, r interface{}) (interface{}, error) {
 	rsp := r.(*endpoint.SayHiResponse)
 	return &pb.SayHiReply{
@@ -38,4 +35,23 @@ func (g *grpcServer) SayHi(ctx context1.Context, req *pb.SayHiRequest) (*pb.SayH
 		return nil, err
 	}
 	return rep.(*pb.SayHiReply), nil
+}
+
+func makeMakeADateHandler(endpoints endpoint.Endpoints, options []grpc.ServerOption) grpc.Handler {
+	return grpc.NewServer(endpoints.MakeADateEndpoint, decodeMakeADateRequest, encodeMakeADateResponse, options...)
+}
+
+func decodeMakeADateRequest(_ context.Context, r interface{}) (interface{}, error) {
+	return nil, errors.New("'Hello' Decoder is not impelemented")
+}
+
+func encodeMakeADateResponse(_ context.Context, r interface{}) (interface{}, error) {
+	return nil, errors.New("'Hello' Encoder is not impelemented")
+}
+func (g *grpcServer) MakeADate(ctx context1.Context, req *pb.MakeADateRequest) (*pb.MakeADateReply, error) {
+	_, rep, err := g.makeADate.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.MakeADateReply), nil
 }
