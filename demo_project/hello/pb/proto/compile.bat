@@ -7,5 +7,19 @@
 :: See also
 ::  https://github.com/grpc/grpc-go/tree/master/examples
 
-protoc *.proto --go_out=plugins=grpc:../../../
-protoc -I=common common/*.proto --go_out=plugins=grpc:../../../
+:: On windows cmd, the wildcard like `*.proto` is not supported,
+:: so there would be only generate it with for loop.
+
+@echo off
+set matchExp="*.proto"
+set matchExp2="common/*.proto"
+
+for %%i in ("%matchExp%") do (
+    protoc %%i --go_out=plugins=grpc:../../../
+)
+
+for %%i in ("%matchExp2%") do (
+    protoc common/%%i --go_out=plugins=grpc:../../../
+)
+
+echo protoc exec successful!

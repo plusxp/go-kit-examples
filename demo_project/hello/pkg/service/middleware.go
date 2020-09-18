@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 
 	log "github.com/go-kit/kit/log"
@@ -30,7 +31,7 @@ func (l loggingMiddleware) SayHi(ctx context.Context, name string) (reply string
 	return l.next.SayHi(ctx, name)
 }
 
-func (l loggingMiddleware) MakeADate(c0 context.Context, p1 *pb.MakeADateReq) (p0 *pb.MakeADateRsp) {
+func (l loggingMiddleware) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply) {
 	defer func() {
 		l.logger.Log("method", "MakeADate", "p1", p1, "p0", p0)
 	}()

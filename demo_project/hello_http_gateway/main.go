@@ -34,6 +34,7 @@ func main() {
 
 		// 用子路由器来注册更多的路由，他们共享主路由器的配置，注意：主路由器已有的配置不能在子路由器中再次配置，可能会导致一些问题
 		helloSvcRoute.HandleFunc("/sayhi/{name}", gw.SayHi).Methods("GET", "OPTIONS")
+		helloSvcRoute.HandleFunc("/make_a_date/{date:\\d{4}-\\d\\d-\\d\\d}", gw.SayHi).Methods("GET", "OPTIONS")
 
 	}
 

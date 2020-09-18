@@ -14,7 +14,7 @@ type HelloService interface {
 	SayHi(ctx context.Context, name string) (reply string, err pbcommon.R)
 
 	// 为了方便client更直接的返回response，service层也可以直接使用定好的req&rsp协议
-	MakeADate(context.Context, *pb.MakeADateReq) *pb.MakeADateRsp
+	MakeADate(context.Context, *pb.MakeADateRequest) *pb.MakeADateReply
 }
 
 type basicHelloService struct{}
@@ -40,11 +40,12 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 	return "Hi," + name, err
 }
 
-func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateReq) (p0 *pb.MakeADateRsp) {
+// c0,p1是kit默认的变量命名规则，暂时认为没必要改
+func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply) {
 	t := time.Unix(p1.DateTime, 0)
 	month, day := t.Month(), t.Day()
 
-	p0 = &pb.MakeADateRsp{
+	p0 = &pb.MakeADateReply{
 		BaseRsp: &pbcommon.BaseRsp{},
 		Reply:   fmt.Sprintf("Sorry, I am too busy~"),
 	}

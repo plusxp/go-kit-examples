@@ -51,8 +51,18 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 		sayHiEndpoint = breaker(sayHiEndpoint)
 	}
 
+	var makeADateEndpoint endpoint.Endpoint
+	{
+		makeADateEndpoint = grpc1.NewClient(conn, "pb.Hello", "MakeADate",
+			encodeMakeADateRequest, decodeMakeADateResponse, pb.MakeADateReply{}, grpcBefore).Endpoint()
+		makeADateEndpoint = opentracing.TraceClient(otTracer, "makeADate")(makeADateEndpoint)
+		makeADateEndpoint = limiter(makeADateEndpoint)
+		makeADateEndpoint = breaker(makeADateEndpoint)
+	}
+
 	return endpoint1.Endpoints{
-		SayHiEndpoint: sayHiEndpoint,
+		SayHiEndpoint:     sayHiEndpoint,
+		MakeADateEndpoint: makeADateEndpoint,
 	}, nil
 }
 
@@ -68,4 +78,16 @@ func encodeSayHiRequest(_ context.Context, request interface{}) (interface{}, er
 func decodeSayHiResponse(_ context.Context, reply interface{}) (interface{}, error) {
 	r := reply.(*pb.SayHiReply)
 	return &endpoint1.SayHiResponse{Reply: r.Reply, ErrCode: r.BaseRsp.ErrCode}, nil
+}
+
+// encodeMakeADateRequest is a transport/grpc.EncodeRequestFunc that converts a
+//  user-domain MakeADate request to a gRPC request.
+func encodeMakeADateRequest(_ context.Context, request interface{}) (interface{}, error) {
+	return request.(*pb.MakeADateRequest), nil
+}
+
+// decodeMakeADateResponse is a transport/grpc.DecodeResponseFunc that converts
+// a gRPC concat reply to a user-domain concat response.
+func decodeMakeADateResponse(_ context.Context, reply interface{}) (interface{}, error) {
+	return reply.(*pb.MakeADateReply), nil
 }

@@ -110,10 +110,10 @@ func initGRPCHandler(endpoints endpoint.Endpoints, g *group.Group) {
 
 }
 func getServiceMiddleware(logger log.Logger) (mw []service.Middleware) {
-	mw = []service.Middleware{}
-	mw = addDefaultServiceMiddleware(logger, mw)
+	mw = []service.Middleware{
+		service.LoggingMiddleware(logger),
+	}
 	// Append your middleware here
-
 	return
 }
 func getEndpointMiddleware(logger log.Logger) (mw map[string][]endpoint1.Middleware) {
@@ -123,10 +123,20 @@ func getEndpointMiddleware(logger log.Logger) (mw map[string][]endpoint1.Middlew
 		Name:      "request_duration_seconds",
 		Namespace: "example",
 		Subsystem: "hello",
-	}, []string{"method", "success"})
-	addDefaultEndpointMiddleware(logger, duration, mw)
-	// Add you endpoint middleware here
+	}, []string{"success"})
+	// 为每个接口添加中间件
+	//mw["SayHi"] = []endpoint1.Middleware{
+	//	endpoint.InstrumentingMiddleware(duration),
+	//	endpoint.LoggingMiddleware(logger),
+	//}
+	//mw["MakeADate"] = []endpoint1.Middleware{
+	//	endpoint.InstrumentingMiddleware(duration),
+	//	endpoint.LoggingMiddleware(logger),
+	//}
 
+	// 也可以把中间件一次性添加给所有接口
+	addEndpointMiddlewareToAllMethods(mw, endpoint.InstrumentingMiddleware(duration))
+	addEndpointMiddlewareToAllMethods(mw, endpoint.LoggingMiddleware(logger))
 	return
 }
 func initMetricsEndpoint(g *group.Group) {

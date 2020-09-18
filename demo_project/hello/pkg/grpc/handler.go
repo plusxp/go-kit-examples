@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"errors"
-	pb "hello/pb"
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	endpoint "hello/pkg/endpoint"

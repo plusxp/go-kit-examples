@@ -3,7 +3,7 @@ package grpc
 
 import (
 	grpc "github.com/go-kit/kit/transport/grpc"
-	proto "hello/p/proto"
+	pb "hello/pb/gen-go/pb"
 	endpoint "hello/pkg/endpoint"
 )
 
@@ -13,7 +13,7 @@ type grpcServer struct {
 	makeADate grpc.Handler
 }
 
-func NewGRPCServer(endpoints endpoint.Endpoints, options map[string][]grpc.ServerOption) proto.HelloServer {
+func NewGRPCServer(endpoints endpoint.Endpoints, options map[string][]grpc.ServerOption) pb.HelloServer {
 	return &grpcServer{
 		makeADate: makeMakeADateHandler(endpoints, options["MakeADate"]),
 		sayHi:     makeSayHiHandler(endpoints, options["SayHi"]),

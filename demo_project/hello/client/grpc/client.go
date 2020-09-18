@@ -5,6 +5,7 @@ import (
 	"go-util/_util"
 	"google.golang.org/grpc"
 	"hello/pkg/service"
+	"log"
 	"time"
 )
 
@@ -25,9 +26,10 @@ func newSvcClient() *Client {
 
 	var ctx, cancel = context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
-
+	log.Println(111)
 	conn, err = grpc.DialContext(ctx, "localhost:8082", grpcOpts...)
 	_util.PanicIfErr(err, nil)
+	log.Println(222)
 
 	sc, err = NewSvc(conn)
 	_util.PanicIfErr(err, nil)

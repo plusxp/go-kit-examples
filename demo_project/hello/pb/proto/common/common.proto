@@ -1,10 +1,10 @@
 syntax = "proto3";
 
 package pbcommon;
-option go_package = "hello/pb/gen-go/pbcommon;pbcommon";
 
 // 注意import路径的根路径必须是/pb/proto/
 import "common/resultcode.proto";
+option go_package = "hello/pb/gen-go/pbcommon;pbcommon";
 
 /*
 定义必须的协议
