@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	endpoint "hello/pkg/endpoint"
@@ -40,12 +39,15 @@ func makeMakeADateHandler(endpoints endpoint.Endpoints, options []grpc.ServerOpt
 	return grpc.NewServer(endpoints.MakeADateEndpoint, decodeMakeADateRequest, encodeMakeADateResponse, options...)
 }
 
+// grpc.Req ==> user-domain.Req
 func decodeMakeADateRequest(_ context.Context, r interface{}) (interface{}, error) {
-	return nil, errors.New("'Hello' Decoder is not impelemented")
+	req := r.(*pb.MakeADateRequest)
+	return &endpoint.MakeADateRequest{P1: req}, nil
 }
 
 func encodeMakeADateResponse(_ context.Context, r interface{}) (interface{}, error) {
-	return nil, errors.New("'Hello' Encoder is not impelemented")
+	rsp := r.(*endpoint.MakeADateResponse)
+	return rsp.P0, nil
 }
 func (g *grpcServer) MakeADate(ctx context1.Context, req *pb.MakeADateRequest) (*pb.MakeADateReply, error) {
 	_, rep, err := g.makeADate.ServeGRPC(ctx, req)

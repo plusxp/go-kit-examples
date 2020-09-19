@@ -3,9 +3,9 @@ package grpc
 import (
 	"context"
 	"go-util/_util"
+	"gokit_foundation"
 	"google.golang.org/grpc"
 	"hello/pkg/service"
-	"log"
 	"time"
 )
 
@@ -16,9 +16,10 @@ type Client struct {
 
 var svcClient *Client
 
-func newSvcClient() *Client {
+func newHelloClient(logger *gokit_foundation.UnionLogger) *Client {
 	var grpcOpts = []grpc.DialOption{
 		grpc.WithInsecure(), // 因为没有使用tls，必须加上这个，否则连接失败
+		grpc.WithBlock(),    // 若不加这项，远程服务断开再恢复时，网关调用会继续失败
 	}
 	var err error
 	var conn *grpc.ClientConn
@@ -26,10 +27,12 @@ func newSvcClient() *Client {
 
 	var ctx, cancel = context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
-	log.Println(111)
+
 	conn, err = grpc.DialContext(ctx, "localhost:8082", grpcOpts...)
-	_util.PanicIfErr(err, nil)
-	log.Println(222)
+	if err != nil {
+		_ = logger.Kvlgr.Log("client.go: newHelloClient.err", err)
+		return nil
+	}
 
 	sc, err = NewSvc(conn)
 	_util.PanicIfErr(err, nil)
@@ -40,9 +43,9 @@ func newSvcClient() *Client {
 	}
 }
 
-func New() *Client {
+func New(logger *gokit_foundation.UnionLogger) *Client {
 	if svcClient == nil {
-		svcClient = newSvcClient()
+		svcClient = newHelloClient(logger)
 	}
 	return svcClient
 }

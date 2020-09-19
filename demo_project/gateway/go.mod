@@ -1,9 +1,10 @@
-module hello_http_gateway
+module gateway
 
 go 1.12
 
 require (
 	github.com/gorilla/mux v1.8.0
+	go-util v0.0.0-00010101000000-000000000000
 	gokit_foundation v0.0.0-00010101000000-000000000000
 	hello v0.0.0-00010101000000-000000000000
 )

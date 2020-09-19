@@ -29,10 +29,12 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 	var otTracer stdopentracing.Tracer
 	otTracer = stdopentracing.GlobalTracer()
 	limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 100))
-	breaker := circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
-		Name:    "SayHi",
-		Timeout: 30 * time.Second,
-	}))
+	breaker := func(method string) endpoint.Middleware {
+		return circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
+			Name:    method,
+			Timeout: 30 * time.Second,
+		}))
+	}
 
 	// Create go-kit grpc hooks, e.g.
 	//      - grpctransport.ClientAfter(),
@@ -48,7 +50,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 			encodeSayHiRequest, decodeSayHiResponse, pb.SayHiReply{}, grpcBefore).Endpoint()
 		sayHiEndpoint = opentracing.TraceClient(otTracer, "sayHi")(sayHiEndpoint)
 		sayHiEndpoint = limiter(sayHiEndpoint)
-		sayHiEndpoint = breaker(sayHiEndpoint)
+		sayHiEndpoint = breaker("sayHi")(sayHiEndpoint)
 	}
 
 	var makeADateEndpoint endpoint.Endpoint
@@ -57,7 +59,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 			encodeMakeADateRequest, decodeMakeADateResponse, pb.MakeADateReply{}, grpcBefore).Endpoint()
 		makeADateEndpoint = opentracing.TraceClient(otTracer, "makeADate")(makeADateEndpoint)
 		makeADateEndpoint = limiter(makeADateEndpoint)
-		makeADateEndpoint = breaker(makeADateEndpoint)
+		makeADateEndpoint = breaker("MakeADate")(makeADateEndpoint)
 	}
 
 	return endpoint1.Endpoints{
@@ -83,11 +85,13 @@ func decodeSayHiResponse(_ context.Context, reply interface{}) (interface{}, err
 // encodeMakeADateRequest is a transport/grpc.EncodeRequestFunc that converts a
 //  user-domain MakeADate request to a gRPC request.
 func encodeMakeADateRequest(_ context.Context, request interface{}) (interface{}, error) {
-	return request.(*pb.MakeADateRequest), nil
+	req := request.(*endpoint1.MakeADateRequest)
+	return req.P1, nil
 }
 
 // decodeMakeADateResponse is a transport/grpc.DecodeResponseFunc that converts
 // a gRPC concat reply to a user-domain concat response.
 func decodeMakeADateResponse(_ context.Context, reply interface{}) (interface{}, error) {
-	return reply.(*pb.MakeADateReply), nil
+	req := reply.(*pb.MakeADateReply)
+	return &endpoint1.MakeADateResponse{P0: req}, nil
 }

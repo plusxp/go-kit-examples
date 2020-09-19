@@ -50,7 +50,7 @@ func main() {
 
 	flag.Parse()
 
-	logger := gokit_foundation.NewLogger()
+	logger := gokit_foundation.NewKvLogger(nil)
 	grpcServer := NewSvr(logger)
 
 	grpcListener, err := net.Listen("tcp", addr)

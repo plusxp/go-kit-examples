@@ -3,16 +3,15 @@ package main
 import (
 	"context"
 	"github.com/gorilla/mux"
-	grpcclient "hello/client/grpc"
+	helloclient "hello/client/grpc"
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
-	"log"
 	"net/http"
 	"time"
 )
 
 /*
-API defined here.
+	代理hello服务
 */
 
 // RESTFUL-API
@@ -26,7 +25,10 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	name := v["name"]
 
 	// new一个写好的RPC客户端
-	c := grpcclient.New()
+	c := helloclient.New(gw.Logger())
+	// 如果c==nil，直接panic即可，不要作隐藏处理（安装recover中间件让程序不要退出即可）
+	// 也可以直接把Must放到 helloclient.New 里面去执行
+	gw.Mylgr.Must(c != nil)
 
 	// 像本地调用一样的远程调用
 	reply, code := c.SayHi(context.Background(), name)
@@ -39,6 +41,8 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	gw.JSON(w, rsp)
 }
 
+// 第二种接口定义方式也许更方便，在service，endpoint层直接使用pb协议定义好的req&rsp
+// 作为方法的入参出参
 func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 
 	v := mux.Vars(r)
@@ -53,7 +57,9 @@ func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 		gw.JSON(w, rsp)
 	}()
 
-	c := grpcclient.New()
+	c := helloclient.New(gw.UnionLogger)
+	// 如果c==nil，直接panic即可，不要作隐藏处理（安装recover中间件让程序不要退出即可）
+	gw.Mylgr.Must(c != nil)
 
 	t, err := time.Parse("2006-01-02", date)
 	if err != nil {
@@ -61,16 +67,15 @@ func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(333)
-
-	rpcRsp := c.MakeADate(context.Background(), &pb.MakeADateRequest{
+	rpcRsp, err := c.MakeADate(context.Background(), &pb.MakeADateRequest{
 		BaseReq:  &pbcommon.BaseReq{Plat: pbcommon.Plat_pc},
 		DateTime: t.Unix(),
 		WantSay:  "Do you willing to date with me?",
 	})
-	log.Println(444)
 
-	if rpcRsp != nil {
-		rsp = rpcRsp
+	if err != nil {
+		gw.Kvlgr.Log("err", err)
+		return
 	}
+	rsp = rpcRsp
 }

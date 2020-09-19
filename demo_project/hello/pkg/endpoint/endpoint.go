@@ -5,7 +5,6 @@ import (
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	service "hello/pkg/service"
-	"log"
 
 	endpoint "github.com/go-kit/kit/endpoint"
 )
@@ -46,25 +45,39 @@ type MakeADateRequest struct {
 
 // MakeADateResponse collects the response parameters for the MakeADate method.
 type MakeADateResponse struct {
-	P0 *pb.MakeADateReply `json:"p0"`
+	P0  *pb.MakeADateReply `json:"p0"`
+	Err error
 }
 
 // MakeMakeADateEndpoint returns an endpoint that invokes MakeADate on the service.
 func MakeMakeADateEndpoint(s service.HelloService) endpoint.Endpoint {
 	return func(c0 context.Context, request interface{}) (interface{}, error) {
 		req := request.(*MakeADateRequest)
-		p0 := s.MakeADate(c0, req.P1)
-		return &MakeADateResponse{P0: p0}, nil
+		p0, err := s.MakeADate(c0, req.P1)
+		return &MakeADateResponse{P0: p0, Err: err}, err
 	}
 }
 
 // MakeADate implements Service. Primarily useful in a client.
-func (e Endpoints) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply) {
+func (e Endpoints) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply, err error) {
 	request := &MakeADateRequest{P1: p1}
 	response, err := e.MakeADateEndpoint(c0, request)
 	if err != nil {
-		log.Println(111, err)
-		return
+		// 注意：endpoint层返回的err会被client端使用的限流、断路器等设施捕获
+		// 所以这个err只有在系统级（如db故障，依赖服务异常）异常时返回，业务err应该放在reply中
+		return nil, err
 	}
-	return response.(*MakeADateResponse).P0
+	return response.(*MakeADateResponse).P0, err
+}
+
+// Failed implements Failer.
+func (r MakeADateResponse) Failed() error {
+	return r.Err
+}
+
+// Failure is an interface that should be implemented by response types.
+// Response encoders can check if responses are Failer, and if so they've
+// failed, and if so encode them using a separate write path based on the error.
+type Failure interface {
+	Failed() error
 }

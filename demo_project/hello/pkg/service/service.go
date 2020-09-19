@@ -14,7 +14,7 @@ type HelloService interface {
 	SayHi(ctx context.Context, name string) (reply string, err pbcommon.R)
 
 	// 为了方便client更直接的返回response，service层也可以直接使用定好的req&rsp协议
-	MakeADate(context.Context, *pb.MakeADateRequest) *pb.MakeADateReply
+	MakeADate(context.Context, *pb.MakeADateRequest) (*pb.MakeADateReply, error)
 }
 
 type basicHelloService struct{}
@@ -41,7 +41,7 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 }
 
 // c0,p1是kit默认的变量命名规则，暂时认为没必要改
-func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply) {
+func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply, err error) {
 	t := time.Unix(p1.DateTime, 0)
 	month, day := t.Month(), t.Day()
 
@@ -50,9 +50,14 @@ func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateReques
 		Reply:   fmt.Sprintf("Sorry, I am too busy~"),
 	}
 
+	// 手动抛出错误，仍然应该正常返回rsp
+	if month == 12 && day == 12 {
+		return p0, fmt.Errorf("dependency svc err")
+	}
+
 	// 只接受10月1日作为约会时间
 	if month == 10 && day == 1 {
-		p0.Reply = fmt.Sprintf("OK~, I was going to arrive on 10.1")
+		p0.Reply = fmt.Sprintf("OK~, I will arrive on 10.1")
 	}
-	return p0
+	return p0, nil
 }
