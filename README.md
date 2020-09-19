@@ -117,12 +117,11 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 ## API网关
 
-- 使用具有强大路由和参数匹配功能的[mux](#https://github.com/gorilla/mux) 库作为路由器（当然也可以使用你喜欢的库替换）
+- 使用具有强大路由和参数匹配功能的[mux](https://github.com/gorilla/mux) 库作为路由器（当然也可以使用你喜欢的库替换）
 - 包含了grpc接口调用，并简单演示了如何使用mux的参数匹配功能
 - 极为简洁实用的代码
 
-[gateway](#https://github.com/chaseSpace/go-kit-examples/tree/master/demo_project/gateway)
-
+[Gateway](https://github.com/chaseSpace/go-kit-examples/tree/master/demo_project/gateway) 
 
 ## 更新日志
 
