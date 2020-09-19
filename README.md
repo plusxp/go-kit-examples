@@ -3,7 +3,7 @@
 
 仓库包含以下内容：
 -   Go-kit框架中文介绍（README.md）
--   带中文注释的Go-kit官方示例，包含循序渐进的多个示例项目，[传送门](https://github.com/chaseSpace/go-kit-examples/tree/master/new-to-gokit)
+-   带中文注释的Go-kit官方示例，包含循序渐进的多个[示例项目](https://github.com/chaseSpace/go-kit-examples/tree/master/new-to-gokit)
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
 -   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
 -   [可用于实际项目的API网关](#API网关)
