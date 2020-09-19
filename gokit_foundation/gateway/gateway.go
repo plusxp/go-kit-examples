@@ -3,10 +3,9 @@ package gateway
 import (
 	"context"
 	"encoding/json"
-	"errors"
-	"github.com/go-kit/kit/log"
 	"github.com/gorilla/mux"
 	"go-util/_util"
+	"gokit_foundation"
 	"net/http"
 	"os"
 	"os/signal"
@@ -15,34 +14,27 @@ import (
 	"time"
 )
 
-// Defines ExposedGateway is safe way to expose root gateway.
-//type ExposedGateway interface {
-//	Run() error
-//	JSON(w http.ResponseWriter, rsp interface{}) error
-//	log.Logger
-//}
-
 type Gateway struct {
-	r      *mux.Router
-	logger log.Logger
-	addr   string
+	r *mux.Router
+	*gokit_foundation.UnionLogger
+	addr string
 }
 
-func New(r *mux.Router, addr string, logger log.Logger) *Gateway {
+func New(r *mux.Router, addr string, logger *gokit_foundation.UnionLogger) *Gateway {
 	return &Gateway{
-		r:      r,
-		logger: logger,
-		addr:   addr,
+		r:           r,
+		UnionLogger: logger,
+		addr:        addr,
 	}
 }
 
 func (g *Gateway) onStart() {
-	g.logger.Log("Gateway.OnStart:http-addr", g.addr)
+	g.Kvlgr.Log("Gateway.OnStart:http-addr", g.addr)
 	g.setupMW()
 }
 
 func (g *Gateway) onStop() {
-	g.logger.Log("Gateway.OnStop:http-addr", g.addr)
+	g.Kvlgr.Log("Gateway.OnStop:http-addr", g.addr)
 }
 
 // Run使用最简洁的方式实现 统一start，优雅stop
@@ -77,17 +69,20 @@ func (g *Gateway) Run() error {
 
 	_ = srv.Shutdown(ctx)
 
-	g.logger.Log("Gateway.Run", "Stopped", "Signal", s)
+	g.Kvlgr.Log("Gateway.Run", "Stopped", "Signal", s)
 	return err
 }
 
-// setupMW setups mux middleware, you could customize that, it should be a private method.
+// setupMW 安装中间件
 func (g *Gateway) setupMW() {
 	recoverMW := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			defer func() {
 				if err := recover(); err != nil {
-					err := g.logger.Log("Gateway.recoverMW: got err", err)
+					g.Kvlgr.Log("Gateway.recover_mw", "==================== PANIC ====================")
+					err = g.Kvlgr.Log("Gateway.recover_mw", err)
+					err = g.Kvlgr.Log("Gateway.recover_mw", "===============================================")
+					// 有些时候仍然有必要打印堆栈信息
 					debug.PrintStack()
 					_util.PanicIfErr(err, nil)
 				}
@@ -97,13 +92,13 @@ func (g *Gateway) setupMW() {
 	}
 
 	/*
-		For mux pkg, the usage of middleware is used in the reverse order of installation
+		mux 使用mw的顺序与安装的顺序相反
 	*/
 
 	g.r.Use(recoverMW)
 }
 
-// JSON is helper func to write response.
+// JSON 直接封装+响应json数据.
 func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 	var (
 		b   []byte
@@ -111,7 +106,7 @@ func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 	)
 	defer func() {
 		if err != nil {
-			g.logger.Log("Gateway.JSON: got err", err)
+			g.Kvlgr.Log("Gateway.JSON: got err", err)
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
@@ -124,5 +119,7 @@ func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 	return err
 }
 
-// Defines Err vars here is an example, you should define them in proto file if you use protobuf as data transport protocol.
-var ErrReqParams = errors.New("ErrReqParams")
+// 用于传递logger
+func (g *Gateway) Logger() *gokit_foundation.UnionLogger {
+	return g.UnionLogger
+}
