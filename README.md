@@ -7,6 +7,7 @@
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
 -   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
 -   [可用于实际项目的API网关](#API网关)
+-   [更新日志](#更新日志)
 
 ## Go-kit官方介绍
 [![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
@@ -121,3 +122,10 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 - 极为简洁实用的代码
 
 [gateway](#https://github.com/chaseSpace/go-kit-examples/tree/master/demo_project/gateway)
+
+
+## 更新日志
+
+[CHANGELOG](CHANGELOG)
+
+[CHANGELOG]:https://github.com/chaseSpace/go-kit-examples/tree/master/CHANGELOG.md
