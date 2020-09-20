@@ -8,6 +8,8 @@
 -   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
 -   [可用于实际项目的API网关](#API网关)
 -   [更新日志](#更新日志)
+___
+-   [Go-kit中文群组](#go-kit中文群组)
 
 ## Go-kit官方介绍
 [![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
@@ -128,3 +130,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 [CHANGELOG][CHANGELOG]
 
 [CHANGELOG]:https://github.com/chaseSpace/go-kit-examples/blob/master/CHANGELOG.md
+
+## Go-kit中文群组
+
+![](https://github.com/chaseSpace/go-kit-examples/blob/master/wx_group.jpg)

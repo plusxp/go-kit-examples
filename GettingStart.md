@@ -49,8 +49,7 @@ ___
 ___
 -   [12. 自由尚在](#12-自由尚在)
 -   [13. 结束，新的开始](#13-结束新的开始)
-___
--   [Go-kit中文群组](#go-kit中文群组)
+
 
 ## 1. 关于kit
 我们需要知道它的一些功能、特点
@@ -552,9 +551,5 @@ ok      hello/client/grpc       1.118s
 - [码农周报-微服务篇](https://github.com/chaseSpace/MNWeeklyCategory/blob/master/docs/MicroServiceLinks.md)
 - [阿里云-正确入门Service Mesh](https://mp.weixin.qq.com/s/KHsxiOOHjTosQcd61rPsgg)
 - [一文详解微服务架构知识](https://mp.weixin.qq.com/s/lpXkFsm01M9-27qeuo5JzA)
-
-## Go-kit中文群组
-
-![](https://github.com/chaseSpace/go-kit-examples/blob/master/wx_group.jpg)
 
 [1]: https://github.com/golang-standards/project-layout/blob/master/README_zh.md
