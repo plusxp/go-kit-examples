@@ -86,14 +86,14 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 ## 业界常用的Go项目目录结构
 
 规范的Go项目目录结构，参考[golang-standards/project-layout](https://github.com/golang-standards/project-layout/blob/master/README_zh.md)
-    
-请参考template/目录，开发新的app时，可直接复制该模板初始化app目录结构，不需要的目录可删除
 
-按照Go项目规范组织代码结构，可以极大地减少沟通成本，提高团队开发效率。
+在此基础上我添加了proto文件的目录划分，请参考template/目录，开发新的app时，可直接复制该模板初始化app目录结构，不需要的目录可删除
+
+按照Go项目规范组织代码结构，可以极大地减少沟通成本，提高团队开发效率
 
 ## 完整可用以实战参考的项目
 
-[new_addsvc](https://github.com/chaseSpace/go-kit-examples/tree/master/new_addsvc)
+[new_addsvc](https://github.com/chaseSpace/go-kit-examples/tree/master/demo_project/new_addsvc)
 
 - /pkg目录包含了service、endpoint、transport三层的代码，前两者都有中间件，也可以在transport层添加中间件以实现完整的链路追踪
 - /pb目录包含了定义proto文件的`/pb`目录和存放pb.go文件的`/gen-go`目录
