@@ -95,9 +95,9 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 [new_addsvc](https://github.com/chaseSpace/go-kit-examples/tree/master/demo_project/new_addsvc)
 
-- /pkg目录包含了service、endpoint、transport三层的代码，前两者都有中间件，也可以在transport层添加中间件以实现完整的链路追踪
-- /pb目录包含了存放proto文件的`/proto`目录和存放`*.pb.go`文件的`/gen-go`目录
-- /internal目录包含了这个app私有的方法
+- `/pkg`目录包含了service、endpoint、transport三层的代码，前两者都有中间件，也可以在transport层添加中间件以实现完整的链路追踪
+- `/pb`目录包含了存放proto文件的`proto/`目录和存放`*.pb.go`文件的`gen-go/`目录
+- `/internal`目录包含了这个app私有的方法
 
 这个项目会持续更新，包括项目目录结构，代码优化，不过基本骨架已搭成，后续要做的是提取可以提取的代码到foundation中，以及必要的结构调整，
 较大更新会以日志形式贴出。
