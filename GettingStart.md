@@ -14,22 +14,23 @@
 - 一年以上的go语言开发经验
 - 一定的微服务理论基础
 - 了解gRPC及proto协议
-- 阅读过本仓库中`demo_project/new_addsvc`的大部分代码
-
-阅读`demo_project/new_addsvc`，是为了清楚了解go-kit的设计思想，以及成型后的代码布局。
+- 了解go-kit框架分层思想(transport, endpoint, service)
+- 最好阅读过`demo_project/new_addsvc`项目，以便了解成型后的项目布局
 
 ---
 
-了解`new_addsvc`的项目布局之后，读者应该知道如果所有的代码都需要自己编写，那使用go-kit开发只会降低
-我们的开发效率，这显然无法接受；但是在仔细观察该服务的具体代码后，我们可以清楚的了解到，有几个层次的代码
-都是根据service层的实现而编写的，它们的代码**模式**非常的有迹可循，经常使用go开发的读者很快可以想到，
+读完官方示例或者`demo_project/new_addsvc`的项目之后，读者应该知道如果所有的代码都需要自己编写，那使用go-kit开发
+微服务的效率将是难以接受的；但是在仔细观察该服务的具体代码后，我们可以清楚了解到，有几个层次的代码
+都是根据service层的实现而编写的，它们的代码**模式**非常的有迹可循，有经验的go开发者很快可以想到，
 为什么这些层次的代码不能使用工具生成呢？是的，早已有人想到这一点，它们开发出了go-kit的CLI工具，有了这个
-工具，我们使用go-kit开发那就是如虎添翼，下面一起看看。
+工具，我们使用go-kit开发那就是如虎添翼，下面一起来看看。
 
 我调研了[go-kit](https://github.com/go-kit/kit) 官方文档中列出的几个代码生成工具，找到了一个比较适合
 使用的repo，那就是[kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
 正在开发，或者不再维护；这个repo其实也是fork一个不再维护的400+star的项目而来，该作者声称自己所在团队已深度使用
-go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）
+go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）  
+> 注：在使用过程我发现该工具仍不够灵活以及缺乏一些功能，目前我已fork此项目，并增加了诸多功能，请查看[chaseSpace/kit][kit]，
+下文也是基于此仓库编写。
 
 ## 目录
 -   [1. 关于kit](#1-关于kit)
@@ -66,29 +67,22 @@ ___
 首先安装go-kit CLI工具
 ```bash
 # 默认使用modules包管理
-# 注意：这个仓库是我fork而来，go.mod的module name是原仓库名，就不能通过go get方式下载
-# 在使用过程中我发现了一些问题，一个个的去提PR修复效率太慢，所以我只能先提交到我的仓库中，再考虑合并到原仓库，
-# 后续我可能会考虑持续维护它:)
-mkdir $GOPATH/pkg/mod/git_repo -p
-cd $GOPATH/pkg/mod/git_repo
-git clone https://github.com/chaseSpace/kit.git
-cd kit
-go install 
+# 注意：这个仓库是fork而来，go.mod的module name是原仓库名，不能通过go get方式下载
+$ mkdir $GOPATH/pkg/mod/git_repo -p
+$ cd $GOPATH/pkg/mod/git_repo
+$ git clone https://github.com/chaseSpace/kit.git
+$ cd kit
+$ go install 
 
 # check usage
-kit help
+$ kit help
 ```
 
-## 3. 创建Project
-
-kit文档说的是创建service，但这里替换为project或许更有助于理解
-
-<br/>
+## 3. 创建Service
 
 ```bash
-kit new service hello
-kit n s hello # 缩写
-# 若要指定生成的go.mod内的模块名，指令后加上 --module module_hello，缩写-m，默认使用项目名作为模块名
+$ kit new service hello       // 缩写： kit n s hello
+# 若要指定生成的go.mod内的模块名，指令后加上 --module module_hello，缩写-m，默认使用service名作为模块名
 ```
 
 这条命令将会在当前目录下创建一个hello目录，结构如下
@@ -105,10 +99,10 @@ c:\users\...\go-kit-examples\demo_project\hello
 ## 4. 生成Service模板
 
 ```bash
-kit g s hello
-kit g s hello --dmw # 创建默认middleware
-kit g s hello -t grpc # 指定 transport (default is http)
-kit g s hello --dmw -t grpc  # 连起来使用
+$ kit g s hello
+$ kit g s hello --dmw # 创建默认middleware
+$ kit g s hello -t grpc # 指定 transport (default http)
+$ kit g s hello --dmw -t grpc  # 连起来使用
 ```
 
 这些命令会执行以下操作：
@@ -117,8 +111,8 @@ kit g s hello --dmw -t grpc  # 连起来使用
 - 创建service层middleware: `hello/pkg/service/middleware.go`
 - 创建endpoint: `hello/pkg/endpoint/endpoint.go` and `hello/pkg/endpoint/endpoint_gen.go`
 - `--dmw` 创建endpoint middleware: `hello/pkg/endpoint/middleware.go`
-- 创建transport files e.x http: `service-name/pkg/http/handler.go`
-- 若使用`-t grpc`，则创建grpc transport files: `service-name/pkg/grpc/handler.go
+- 创建transport files e.g. http: `service-name/pkg/http/handler.go` 以及 `service-name/pkg/http/handler_gen.go`
+- 若使用`-t grpc`，则创建grpc transport files: `service-name/pkg/grpc/handler.go` 以及 `service-name/pkg/grpc/handler_gen.go`
 - 创建service main file  
 `hello/cmd/service/service.go`  
 `hello/cmd/service/service_gen.go`  
@@ -167,21 +161,20 @@ c:\users\...\go-kit-examples\demo_project\hello
             service.go
 ```
 
-注意，kit工具在/pkg目录生成了grpc目录，并且将pb目录也放在其中，根据`go_project_template`项目布局，/pb目录
-应该放在项目根目录，这样方便快速找到一个服务的pb文件；所以我给维护者提了PR以支持此功能，有兴趣[点这里](https://github.com/GrantZheng/kit/issues/11)  
+注意，kit工具在/pkg目录生成了grpc目录，并且将pb目录也放在其中，根据`go_project_template`项目布局，`/pb`目录
+应该放在项目根目录，这样方便快速找到一个服务的pb文件，当然你可以有自己的布局；
 
-
-现在，你拉取master的代码应该是支持这个功能了，使用方法：
 ```go
-// 注意：先把上面生成的pb目录和grpc、endpoint目录都删除，它们都需重新生成
+// 注意：先把上面生成的grpc、endpoint目录都删除，它们都需重新生成
 
 // 查看-t grpc后面可跟的选项
-kit g s hello -t grpc --help
-// -p 指定pb/目录要放的位置，这里我放到hello/下；-i 指定代码中pb文件的import路径
-cd demo_project/
-kit g s hello --dmw -t grpc -p hello/ -i hello/pb
-// 如果要在pb/下划分子目录存放pb文件，就自己根据需要修改
+$ kit g s hello -t grpc --help
+// -p 指定proto文件目录要放的位置，这里我放到hello/pb/proto/下；-i 指定代码中pb文件的import路径，gen-go/pb目录会自动创建
+$ cd demo_project/
+$ mkdir -p hello/pb/proto  // 需要提前创建此目录
+$ kit g s hello --dmw -t grpc -p hello/pb/proto -i hello/pb/gen-go/pb
 ```
+
 现在的hello目录结构如下：
 ```go
 c:\users\...\go-kit-examples\demo_project\hello
@@ -196,9 +189,10 @@ c:\users\...\go-kit-examples\demo_project\hello
 │          service_gen.go
 │
 ├─pb
-│      compile.bat   // windows下会生成这个文件，linux则是.sh文件，都是包含的proto命令脚本
-│      hello.pb.go
-│      hello.proto
+│  │
+│  └─proto
+│        compile.sh <-------- 包含protoc命令的脚本
+│        hello.proto
 │
 └─pkg
     ├─endpoint
@@ -213,6 +207,9 @@ c:\users\...\go-kit-examples\demo_project\hello
             middleware.go
             service.go
 ```
+
+>注：目前的kit版本已经支持通过当前shell环境来生成compile文件，即使在windows下，我们也可以进入bash或sh的shell环境，
+这个时候可以生成compile.sh而不是compile.bat文件
 
 ## 5. 编辑proto文件
 打开pb/hello.proto文件，按如下修改：
@@ -244,7 +241,7 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 ```
 
 ## 7. 需要完善的工作
-打开/pkg/grpc/handler.go, 你看到`encode...`和`decode...`这样的函数了吗？
+打开`/pkg/grpc/handler.go`, 你看到`encode...`和`decode...`这样的函数了吗？
 这里我们还需要完成两项工作：
 - gRPC-layer的Req --decode-->> Endpoint-layer的Req
 - gRPC-layer的Rsp <<--encode-- Endpoint-layer的Rsp
@@ -263,7 +260,7 @@ func encodeSayHiResponse(_ context.Context, r interface{}) (interface{}, error) 
 ```
 :rotating_light: 注意：这是容易出错的地方，因为编码时没有任何提示帮助我们填写正确的类型，同时我们也不应该
 使用_,ok的方式来避免panic，出现类型错误一定是编码bug，不应该hide it。  
-（当然，为避免程序退出，我们可以使用grpc的recovery中间件）
+>当然，为避免程序退出，我们应该有额外的panic捕获措施，如grpc的recovery中间件
 
 ## 8. 启动server
 OK，现在可以启动这个服务了
@@ -277,8 +274,8 @@ ts=2020-09-12T12:36:00.6258776Z caller=service.go:107 transport=gRPC addr=:8082
 */
 ```
 
-然后，来简单看一下cmd目录下的代码，main.go就不用看了，它调用了cmd/service/service.go的Run()，
-所以我们直接看cmd/service/service.go, 下面是一部分代码:
+然后，来简单看一下cmd目录下的代码，main.go就不用看了，它调用了`cmd/service/service.go`的Run()，
+所以我们直接看后者代码, 下面是部分代码片段:
 ```go
 var fs = flag.NewFlagSet("hello", flag.ExitOnError)
 var debugAddr = fs.String("debug.addr", ":8080", "Debug and metrics listen address")
@@ -290,7 +287,7 @@ var thriftAddr = fs.String("thrift-addr", ":8083", "Thrift listen address")
 这里提供了http,grpc,thrift三个RPC地址变量作为启动参数，但其实我们只用到了grpc，如果你用goland你会看到除了grpc
 其他几个变量都是有提示‘unused variable’，所以这里可以直接删掉这几行代码，以免扰乱视线。
 
-然后在讲一下Run()方法的最后几行代码：
+然后再提一下Run()方法的最后几行代码：
 ```go
 svc := service.New(getServiceMiddleware(logger))
 eps := endpoint.New(svc, getEndpointMiddleware(logger))
@@ -302,6 +299,7 @@ logger.Log("exit", g.Run())
 
 这里的代码非常简洁明了，前三行就是以洋葱模式一层层的封装svc对象（各层都可应用中间件），`initMetricsEndpoint`就是
 启动指标http服务供prometheus来拉svc的监控数据，`initCancelInterrupt`就是监听信号，优雅退出服务。
+> 关于`cmd/service/service.go`中的部分编码模式，我们可以修改为自己惯用的方式，kit命令不会覆盖已有的`service.go`
 
 ### github.com/oklog/oklog/pkg/group
 
