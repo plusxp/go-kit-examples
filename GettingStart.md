@@ -549,5 +549,6 @@ ok      hello/client/grpc       1.118s
 - [码农周报-微服务篇](https://github.com/chaseSpace/MNWeeklyCategory/blob/master/docs/MicroServiceLinks.md)
 - [阿里云-正确入门Service Mesh](https://mp.weixin.qq.com/s/KHsxiOOHjTosQcd61rPsgg)
 - [一文详解微服务架构知识](https://mp.weixin.qq.com/s/lpXkFsm01M9-27qeuo5JzA)
+- [煎鱼博客: go与微服务相关讲解](https://eddycjy.com/posts/)
 
 [1]: https://github.com/golang-standards/project-layout/blob/master/README_zh.md
