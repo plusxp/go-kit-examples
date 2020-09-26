@@ -1,10 +1,14 @@
 package gateway
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	gogojsonpb "github.com/gogo/protobuf/jsonpb"
+	gogoproto "github.com/gogo/protobuf/proto"
+	"github.com/golang/protobuf/jsonpb"
+	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
-	"go-util/_util"
 	"gokit_foundation"
 	"net/http"
 	"os"
@@ -16,25 +20,25 @@ import (
 
 type Gateway struct {
 	r *mux.Router
-	*gokit_foundation.UnionLogger
+	*gokit_foundation.Logger
 	addr string
 }
 
-func New(r *mux.Router, addr string, logger *gokit_foundation.UnionLogger) *Gateway {
+func New(r *mux.Router, addr string, logger *gokit_foundation.Logger) *Gateway {
 	return &Gateway{
-		r:           r,
-		UnionLogger: logger,
-		addr:        addr,
+		r:      r,
+		Logger: logger,
+		addr:   addr,
 	}
 }
 
 func (g *Gateway) onStart() {
-	g.Kvlgr.Log("Gateway.OnStart:http-addr", g.addr)
+	g.Log("Gateway.OnStart:http-addr", g.addr)
 	g.setupMW()
 }
 
 func (g *Gateway) onStop() {
-	g.Kvlgr.Log("Gateway.OnStop:http-addr", g.addr)
+	g.Log("Gateway.OnStop:http-addr", g.addr)
 }
 
 // Run使用最简洁的方式实现 统一start，优雅stop
@@ -69,7 +73,7 @@ func (g *Gateway) Run() error {
 
 	_ = srv.Shutdown(ctx)
 
-	g.Kvlgr.Log("Gateway.Run", "Stopped", "Signal", s)
+	g.Log("Gateway.Run", "Stopped", "Signal", s)
 	return err
 }
 
@@ -79,12 +83,11 @@ func (g *Gateway) setupMW() {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			defer func() {
 				if err := recover(); err != nil {
-					g.Kvlgr.Log("Gateway.recover_mw", "==================== PANIC ====================")
-					err = g.Kvlgr.Log("Gateway.recover_mw", err)
-					err = g.Kvlgr.Log("Gateway.recover_mw", "===============================================")
+					g.Log("Gateway.recover_mw", "==================== PANIC ====================")
+					err = g.Log("Gateway.recover_mw", err)
+					err = g.Log("Gateway.recover_mw", "===============================================")
 					// 有些时候仍然有必要打印堆栈信息
 					debug.PrintStack()
-					_util.PanicIfErr(err, nil)
 				}
 			}()
 			next.ServeHTTP(w, req)
@@ -98,6 +101,16 @@ func (g *Gateway) setupMW() {
 	g.r.Use(recoverMW)
 }
 
+var defProtojsonpbM = &jsonpb.Marshaler{
+	EnumsAsInts:  true, // proto enum类型仍然转为整数，而不是代表其含义的str
+	EmitDefaults: true, // 仍然展示零值字段
+}
+
+var defGogojsonpbM = &gogojsonpb.Marshaler{
+	EnumsAsInts:  true,
+	EmitDefaults: true,
+}
+
 // JSON 直接封装+响应json数据.
 func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 	var (
@@ -106,20 +119,33 @@ func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 	)
 	defer func() {
 		if err != nil {
-			g.Kvlgr.Log("Gateway.JSON: got err", err)
 			w.WriteHeader(http.StatusInternalServerError)
+			g.Log("Gateway.JSON: got err", err)
 			return
 		}
+		_, _ = w.Write(b)
 	}()
-	b, err = json.Marshal(rsp)
-	if err != nil {
-		return err
+
+	// 使用对应proto库的jsonpb工具来封装json，解决零值字段被忽略的问题
+	// 一般来说一个项目要么使用标准protobuf库，要么使用gogo protobuf库
+	// 了解gogo protobuf：https://github.com/gogo/protobuf
+
+	buf := bytes.NewBuffer(nil)
+	switch rsp.(type) {
+	case proto.Message:
+		err = defProtojsonpbM.Marshal(buf, rsp.(proto.Message))
+		b = buf.Bytes()
+	case gogoproto.Message:
+		err = defGogojsonpbM.Marshal(buf, rsp.(gogoproto.Message))
+		b = buf.Bytes()
+	default:
+		b, err = json.Marshal(rsp)
 	}
-	_, err = w.Write(b)
+
 	return err
 }
 
 // 用于传递logger
-func (g *Gateway) Logger() *gokit_foundation.UnionLogger {
-	return g.UnionLogger
+func (g *Gateway) RawLogger() *gokit_foundation.Logger {
+	return g.Logger
 }

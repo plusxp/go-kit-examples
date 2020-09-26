@@ -20,9 +20,8 @@ func main() {
 	*/
 	r := mux.NewRouter()
 
-	kvLogger := gokit_foundation.NewKvLogger(nil)
-	unionLogger := gokit_foundation.NewUnionLogger(kvLogger, nil, &gokit_foundation.CustomizeLogger{})
-	root := gateway.New(r, *httpAddr, unionLogger)
+	lgr := gokit_foundation.NewLogger(nil)
+	root := gateway.New(r, *httpAddr, lgr)
 
 	gw := &MyGateWay{root}
 

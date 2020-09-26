@@ -29,10 +29,13 @@ func (l *CustomizeLogger) PanicIfErr(err error, ignore ...error) {
 	}
 }
 
-// 在你希望panic时将panic行打印在第一行，以便快速找到出错位置
-func (l *CustomizeLogger) Must(b bool) {
+// 在你希望panic时将panic代码行打印在第一行，以便快速找到出错位置
+func (l *CustomizeLogger) Must(b bool, hint ...string) {
 	if !b {
 		trace := l.tracePanicLine()
-		panic(fmt.Sprintf("CustomizeLogger.PanicIfErr TRACE：%s", trace))
+		if len(hint) > 0 {
+			panic(fmt.Sprintf("[from]:CustomizeLogger.Must [hint]:%s [trace]: %s", hint[0], trace))
+		}
+		panic(fmt.Sprintf("[from]:CustomizeLogger.Must [trace]: %s", trace))
 	}
 }
