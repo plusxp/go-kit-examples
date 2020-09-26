@@ -81,7 +81,7 @@ $ kit help
 ## 3. 创建Service
 
 ```bash
-$ kit new service hello       // 缩写： kit n s hello
+$ kit new service hello       # 缩写： kit n s hello
 # 若要指定生成的go.mod内的模块名，指令后加上 --module module_hello，缩写-m，默认使用service名作为模块名
 ```
 
@@ -100,9 +100,7 @@ c:\users\...\go-kit-examples\demo_project\hello
 
 ```bash
 $ kit g s hello
-$ kit g s hello --dmw # 创建默认middleware
-$ kit g s hello -t grpc # 指定 transport (default http)
-$ kit g s hello --dmw -t grpc  # 连起来使用
+$ kit g s hello --dmw -t grpc  # -dmw指定endpoint中间件(可选)，-t grpc指定 transport (default http)
 ```
 
 这些命令会执行以下操作：
@@ -113,6 +111,7 @@ $ kit g s hello --dmw -t grpc  # 连起来使用
 - `--dmw` 创建endpoint middleware: `hello/pkg/endpoint/middleware.go`
 - 创建transport files e.g. http: `service-name/pkg/http/handler.go` 以及 `service-name/pkg/http/handler_gen.go`
 - 若使用`-t grpc`，则创建grpc transport files: `service-name/pkg/grpc/handler.go` 以及 `service-name/pkg/grpc/handler_gen.go`
+- 若使用`-t grpc`，则创建`pkg/grpc/pb/`目录存放proto文件，以及它的编译脚本
 - 创建service main file  
 `hello/cmd/service/service.go`  
 `hello/cmd/service/service_gen.go`  
@@ -152,7 +151,7 @@ c:\users\...\go-kit-examples\demo_project\hello
     │  │  handler_gen.go
     │  │
     │  └─pb
-    │          compile.bat
+    │          compile.sh  <-------proto文件编译脚本，根据当前shell环境生成对应脚本
     │          hello.pb.go
     │          hello.proto
     │
@@ -162,16 +161,16 @@ c:\users\...\go-kit-examples\demo_project\hello
 ```
 
 注意，kit工具在/pkg目录生成了grpc目录，并且将pb目录也放在其中，根据`go_project_template`项目布局，`/pb`目录
-应该放在项目根目录，这样方便快速找到一个服务的pb文件，当然你可以有自己的布局；
+最好放在项目根目录，这样方便快速找到一个服务的pb文件，当然你可以有自己的布局；
 
+现在把上面生成的grpc、endpoint目录都删除，重新生成它们：
 ```go
-// 注意：先把上面生成的grpc、endpoint目录都删除，它们都需重新生成
-
 // 查看-t grpc后面可跟的选项
 $ kit g s hello -t grpc --help
-// -p 指定proto文件目录要放的位置，这里我放到hello/pb/proto/下；-i 指定代码中pb文件的import路径，gen-go/pb目录会自动创建
+// -p 指定proto文件要放的位置，这里我放到hello/pb/proto/下；-i 指定代码中pb文件的import路径，gen-go/pb目录会自动创建
+// 注意：这里我们使用hello/pb/gen-go/来存放所有的*.pb.go文件
 $ cd demo_project/
-$ mkdir -p hello/pb/proto  // 需要提前创建此目录
+$ mkdir -p hello/pb/proto  // 提前创建此目录
 $ kit g s hello --dmw -t grpc -p hello/pb/proto -i hello/pb/gen-go/pb
 ```
 
@@ -191,7 +190,8 @@ c:\users\...\go-kit-examples\demo_project\hello
 ├─pb
 │  │
 │  └─proto
-│        compile.sh <-------- 包含protoc命令的脚本
+│        compile.sh
+|        hello.pb.go
 │        hello.proto
 │
 └─pkg
@@ -208,28 +208,52 @@ c:\users\...\go-kit-examples\demo_project\hello
             service.go
 ```
 
->注：目前的kit版本已经支持通过当前shell环境来生成compile文件，即使在windows下，我们也可以进入bash或sh的shell环境，
-这个时候可以生成compile.sh而不是compile.bat文件
+## 5. 编辑脚本和proto文件
+因为我们指定了`-i`修改了pb文件import path为`hello/pb/proto`, 所以还需要手动修改`compile.sh`：
+```bash
+// old
+protoc hello.proto --go_out=plugins=grpc:.
 
-## 5. 编辑proto文件
-打开pb/hello.proto文件，按如下修改：
+// new
+protoc hello.proto --go_out=plugins=grpc:../../../
+```
+`../../../`表示从脚本所在位置向外【三层】走到`hello/pb/proto`这个路径根目录`hello/`的父目录位置，
+如果你熟悉pb协议，那应该不会有什么问题，如果你完全没接触过grpc，那请先按照文档操作
+
+
+然后编辑pb/hello.proto文件，按如下修改：
 ```proto
 message SayHiRequest {
- string what = 1;
+ string name = 1;
 }
 
 message SayHiReply {
  string reply = 1;
 }
 ```
-生成pb代码：
+再次运行刚才的kit命令生成pb代码：
 ```bash
-# windows
-cd hello/pb
-compile.bat
+$ kit g s hello --dmw -t grpc -p hello/pb/proto -i hello/pb/gen-go/pb
+time="2020-09-26T08:59:19+08:00" level=info msg="exec>[sh -c /C/Users/.../go-kit-examples/hello/pb/proto/compile.sh]"
+time="2020-09-26T08:59:19+08:00" level=warning msg="==============================================================="
+time="2020-09-26T08:59:19+08:00" level=warning msg="The GRPC implementation is not finished you need to update your"
+time="2020-09-26T08:59:19+08:00" level=warning msg=" service proto buffer and run the compile script."
+time="2020-09-26T08:59:19+08:00" level=warning msg=---------------------------------------------------------------
+time="2020-09-26T08:59:19+08:00" level=warning msg="You also need to implement the Encoders and Decoders!"
+time="2020-09-26T08:59:19+08:00" level=warning msg="==============================================================="
+```
+如你所想，kit会执行已存在的`compile.sh`
 
-# unix
-./compile.sh
+看看生成的pb代码位置:
+```bash
+c:\users\...\go-kit-examples\demo_project\hello
+│  go.mod
+│
+├─pb
+│  ├─gen-go
+│  │  └─pb
+│  │          hello.pb.go
+| ...忽略了一些文件
 ```
 
 ## 6. 实现Service接口
@@ -243,8 +267,8 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 ## 7. 需要完善的工作
 打开`/pkg/grpc/handler.go`, 你看到`encode...`和`decode...`这样的函数了吗？
 这里我们还需要完成两项工作：
-- gRPC-layer的Req --decode-->> Endpoint-layer的Req
-- gRPC-layer的Rsp <<--encode-- Endpoint-layer的Rsp
+- gRPC-layer的Req ---decode---> Endpoint-layer的Req
+- gRPC-layer的Rsp <---encode--- Endpoint-layer的Rsp
 
 像下面这样：
 ```go
@@ -274,7 +298,7 @@ ts=2020-09-12T12:36:00.6258776Z caller=service.go:107 transport=gRPC addr=:8082
 */
 ```
 
-然后，来简单看一下cmd目录下的代码，main.go就不用看了，它调用了`cmd/service/service.go`的Run()，
+然后来简单看一下cmd目录下的代码，main.go就不用看了，它调用了`cmd/service/service.go`的Run()，
 所以我们直接看后者代码, 下面是部分代码片段:
 ```go
 var fs = flag.NewFlagSet("hello", flag.ExitOnError)
@@ -303,9 +327,9 @@ logger.Log("exit", g.Run())
 
 ### github.com/oklog/oklog/pkg/group
 
-你发现了吗？生成的代码使用了这个库来完成了服务启动时需要启动多个后台goroutine的任务，每个人或者团队在这方面也许
+生成的代码使用了这个库来完成了服务启动时需要启动多个后台goroutine的任务，每个人或者团队在这方面也许
 都有自己的实践，可以进行service.go二次塑形，kit下一次执行不会再改动此文件（因为存在），当然你也可以直接用这个库，
-并没有什么不好，只是你需要搞清楚它的用法。
+只是你需要搞清楚它的用法。
 
 ## 9. 生成Client side代码
 
@@ -364,15 +388,15 @@ func New(conn *grpc.ClientConn, options map[string][]grpc1.ClientOption) (servic
 - 服务发现(consul/etcd...)
 - 负载均衡
 - 重试
-- 链路追踪埋点
+- 链路追踪
 - 限速
 - 断路器
 
 同时还需注意这些措施的添加顺序，上面的措施应该更靠近底层conn对象。
 
-另外，如果你有更多措施建议想添加到此文档中，可以通过issue告知我 :)
+另外，如果你有更多措施建议想添加到此文档中，可以通过issue告知我
 
-为方便快速启动client，我就不添加服务发现、负载均衡到示例代码中了，如有需要可参考
+为方便快速启动client，我就不添加服务发现/负载均衡到示例代码中了，如有需要可参考
 `demo_project/new_addsvc/client/client.go`
 
 下面是添加了部分措施之后的`client/grpc/grpc.go`:
@@ -423,6 +447,7 @@ package grpc
 import (
 	"context"
 	"go-util/_util"
+	"gokit_foundation"
 	"google.golang.org/grpc"
 	"hello/pkg/service"
 	"time"
@@ -435,9 +460,10 @@ type Client struct {
 
 var svcClient *Client
 
-func newSvcClient() *Client {
+func newHelloClient(logger *gokit_foundation.Logger) *Client {
 	var grpcOpts = []grpc.DialOption{
 		grpc.WithInsecure(), // 因为没有使用tls，必须加上这个，否则连接失败
+		grpc.WithBlock(),    // 若不加这项，远程服务断开再恢复时，网关调用会继续失败
 	}
 	var err error
 	var conn *grpc.ClientConn
@@ -447,9 +473,10 @@ func newSvcClient() *Client {
 	defer cancel()
 
 	conn, err = grpc.DialContext(ctx, "localhost:8082", grpcOpts...)
-	_util.PanicIfErr(err, nil)
+	// 出错时直接在这一层panic，外面就不需要处理
+	logger.Must(err == nil, "HelloClient is nil")
 
-	sc, err = New(conn)
+	sc, err = NewSvc(conn)
 	_util.PanicIfErr(err, nil)
 
 	return &Client{
@@ -458,21 +485,22 @@ func newSvcClient() *Client {
 	}
 }
 
-func NewClient() *Client {
+func MustNew(logger *gokit_foundation.Logger) *Client {
 	if svcClient == nil {
-		svcClient = newSvcClient()
+		svcClient = newHelloClient(logger)
 	}
 	return svcClient
 }
 
-func (c *Client) Stop() {
+func (c *Client) Close() {
 	if c.conn != nil {
 		_ = c.conn.Close()
 	}
 }
+
 ```
 
-好了，client的工作已经完成，现在我们来写一个test方法，创建`hello/client/grpc/grpc_test.go`：
+client的工作已经完成，现在我们来写一个test方法，创建`hello/client/grpc/grpc_test.go`：
 ```go
 package grpc
 
@@ -483,13 +511,14 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	c := NewClient()
-	defer c.Stop()
+	lgr := gokit_foundation.NewLogger(nil)
+	c := MustNew(lgr)
+	defer c.Close()
 	reply, err := c.SayHi(context.Background(), "Jack Ma")
-	if err != nil {
+	if err != pbcommon.R_OK {
 		t.Error(err)
 	}
-	log.Print("rsp:", reply)
+	lgr.Log("rsp", reply)
 }
 ```
 
@@ -497,7 +526,7 @@ func TestNew(t *testing.T) {
 ```go
 cd hello/client/grpc/
 $ go test -run=TestNew
-2020/09/13 18:45:48 rsp:Hi,Jack Ma
+ts="2020-09-26 12:20:32" caller=client/grpc/grpc_in_use_test.go:18 rsp="Hi,Jack Ma"
 PASS
 ok      hello/client/grpc       1.118s
 ```

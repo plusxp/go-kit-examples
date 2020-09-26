@@ -1,3 +1,7 @@
+## 2020年9月26日12:23 Update
+- `gokit_foundation\gateway` 优化，支持标准proto/gogo.proto Message的marshal，演示如何解决json序列化零值字段被忽略的问题
+- `gokit_foundation\log.go` 优化，简化结构及方法
+- 更新`GettingStart.md`，匹配最新kit
 
 ## 2020年9月19日12:32 Update 
 - 基本完成 `/demo_project/hello`  
