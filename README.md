@@ -135,4 +135,4 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 ## Go-kit中文群组
 
-![](https://github.com/chaseSpace/go-kit-examples/blob/master/wx_group.jpg)
+![](https://i1.100024.xyz/i/2020/09/26/kk8hlb.jpg)
