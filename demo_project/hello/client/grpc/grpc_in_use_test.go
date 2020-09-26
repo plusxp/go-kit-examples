@@ -2,17 +2,18 @@ package grpc
 
 import (
 	"context"
+	"gokit_foundation"
 	"hello/pb/gen-go/pbcommon"
-	"log"
 	"testing"
 )
 
 func TestNew(t *testing.T) {
-	c := New()
-	defer c.Stop()
+	lgr := gokit_foundation.NewLogger(nil)
+	c := MustNew(lgr)
+	defer c.Close()
 	reply, err := c.SayHi(context.Background(), "Jack Ma")
 	if err != pbcommon.R_OK {
 		t.Error(err)
 	}
-	log.Print("rsp:", reply)
+	lgr.Log("rsp", reply)
 }
