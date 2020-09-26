@@ -7,16 +7,16 @@ import (
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	"net/http"
-	"time"
 )
 
 /*
 	代理hello服务
 */
 
-// RESTFUL-API
-// 这里网关实现并没有过度封装handlerFunc，仍然把 w,r两个对象暴露给接口使用
-// 把更多的自由留给开发者
+/*
+1. 第一种接口代理：完全还原service层的方法的入参出参(这就需要在网关层做参数的验证和封装)
+2. 这里网关实现并没有过度封装handlerFunc，仍然把 w,r两个对象暴露给接口使用，把更多的自由留给开发者
+*/
 func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 
 	// 直接从url路径中提取参数
@@ -25,10 +25,7 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	name := v["name"]
 
 	// new一个写好的RPC客户端
-	c := helloclient.New(gw.Logger())
-	// 如果c==nil，直接panic即可，不要作隐藏处理（安装recover中间件让程序不要退出即可）
-	// 也可以直接把Must放到 helloclient.New 里面去执行
-	gw.Mylgr.Must(c != nil)
+	c := helloclient.MustNew(gw.RawLogger())
 
 	// 像本地调用一样的远程调用
 	reply, code := c.SayHi(context.Background(), name)
@@ -41,12 +38,14 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	gw.JSON(w, rsp)
 }
 
-// 第二种接口定义方式也许更方便，在service，endpoint层直接使用pb协议定义好的req&rsp
-// 作为方法的入参出参
+/*
+1. 第二种接口定义方式也许更方便，在service，endpoint层直接使用pb协议定义好的req&rsp
+2. 可完全将入参验证下放到service层
+*/
 func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 
 	v := mux.Vars(r)
-	date := v["date"]
+	dateStr := v["date"]
 
 	// 先声明rsp
 	rsp := &pb.MakeADateReply{
@@ -57,24 +56,16 @@ func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 		gw.JSON(w, rsp)
 	}()
 
-	c := helloclient.New(gw.UnionLogger)
-	// 如果c==nil，直接panic即可，不要作隐藏处理（安装recover中间件让程序不要退出即可）
-	gw.Mylgr.Must(c != nil)
-
-	t, err := time.Parse("2006-01-02", date)
-	if err != nil {
-		rsp.BaseRsp.ErrCode = pbcommon.R_INVALID_ARGS
-		return
-	}
+	c := helloclient.MustNew(gw.RawLogger())
 
 	rpcRsp, err := c.MakeADate(context.Background(), &pb.MakeADateRequest{
-		BaseReq:  &pbcommon.BaseReq{Plat: pbcommon.Plat_pc},
-		DateTime: t.Unix(),
-		WantSay:  "Do you willing to date with me?",
+		BaseReq: &pbcommon.BaseReq{Plat: pbcommon.Plat_pc},
+		DateStr: dateStr,
+		WantSay: "Do you willing to date with me?",
 	})
 
 	if err != nil {
-		gw.Kvlgr.Log("err", err)
+		gw.Log("err", err)
 		return
 	}
 	rsp = rpcRsp

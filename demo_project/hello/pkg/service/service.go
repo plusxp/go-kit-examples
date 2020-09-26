@@ -42,13 +42,19 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 
 // c0,p1是kit默认的变量命名规则，暂时认为没必要改
 func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply, err error) {
-	t := time.Unix(p1.DateTime, 0)
-	month, day := t.Month(), t.Day()
-
 	p0 = &pb.MakeADateReply{
 		BaseRsp: &pbcommon.BaseRsp{},
-		Reply:   fmt.Sprintf("Sorry, I am too busy~"),
 	}
+
+	t, err := time.Parse("2006-01-02", p1.DateStr)
+	if err != nil {
+		p0.BaseRsp.ErrCode = pbcommon.R_INVALID_ARGS
+		return
+	}
+
+	p0.Reply = fmt.Sprintf("Sorry, I am too busy~")
+
+	month, day := t.Month(), t.Day()
 
 	// 手动抛出错误，仍然应该正常返回rsp
 	if month == 12 && day == 12 {
