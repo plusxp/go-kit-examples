@@ -29,7 +29,7 @@
 使用的repo，那就是[kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
 正在开发，或者不再维护；这个repo其实也是fork一个不再维护的400+star的项目而来，该作者声称自己所在团队已深度使用
 go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）  
-> 注：在使用过程我发现该工具仍不够灵活以及缺乏一些功能，目前我已fork此项目，并增加了诸多功能，请查看[chaseSpace/kit][kit]，
+> 注：在使用过程我发现该工具仍不够灵活以及缺乏一些功能，目前我已fork此项目，并增加了诸多功能，请查看 [chaseSpace/kit][kit] ，
 下文也是基于此仓库编写。
 
 ## 目录
@@ -578,4 +578,5 @@ ok      hello/client/grpc       1.118s
 - [一文详解微服务架构知识](https://mp.weixin.qq.com/s/lpXkFsm01M9-27qeuo5JzA)
 - [煎鱼博客: go与微服务相关讲解](https://eddycjy.com/posts/)
 
+[kit]: https://github.com/chaseSpace/kit.git
 [1]: https://github.com/golang-standards/project-layout/blob/master/README_zh.md
