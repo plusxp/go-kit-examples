@@ -13,26 +13,25 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
+	"net/http"
 	config2 "new_addsvc/config"
-	internal2 "new_addsvc/internal"
+	"new_addsvc/internal"
 	"new_addsvc/pb/gen-go/addsvcpb"
-	endpoint2 "new_addsvc/pkg/endpoint"
-	service2 "new_addsvc/pkg/service"
-	transport2 "new_addsvc/pkg/transport"
+	"new_addsvc/pkg/endpoint"
+	"new_addsvc/pkg/service"
+	"new_addsvc/pkg/transport"
 	"os"
 )
 
 func NewSvr(logger log.Logger) addsvcpb.AddServer {
-	// todo 启动http.DefaultServeMux
-	metricsObj := internal2.NewMetrics()
-	//http.ListenAndServe(":8080", nil)
+	metricsObj := internal.NewMetrics()
+	_ = http.ListenAndServe(":8080", nil)
 	var tracer stdopentracing.Tracer
 	tracer = stdopentracing.GlobalTracer()
 
-	// grpctransport(endpoint(svc))
-	svc := service2.New(logger, metricsObj.Ints, metricsObj.Chars)
-	endpoints := endpoint2.New(svc, logger, metricsObj.Duration, tracer)
-	grpcServer := transport2.NewGRPCServer(endpoints, tracer, logger)
+	svc := service.New(logger, metricsObj.Ints, metricsObj.Chars)
+	endpoints := endpoint.New(svc, logger, metricsObj.Duration, tracer)
+	grpcServer := transport.NewGRPCServer(endpoints, tracer, logger)
 	return grpcServer
 }
 
@@ -75,7 +74,7 @@ func main() {
 	onSignalTask := _util.ListenSignalTask(ctx, cancel, logger, onClose)
 	ak.AddTask(onSignalTask)
 
-	svcRegTask := internal2.SvcRegisterTask(ctx, config2.ServiceName, svrHost, *port)
+	svcRegTask := internal.SvcRegisterTask(ctx, config2.ServiceName, svrHost, *port)
 	// 添加后台任务：service discovery
 	ak.AddTask(svcRegTask)
 
