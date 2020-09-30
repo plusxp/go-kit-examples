@@ -112,7 +112,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 -   增加定时任务的实战示例
 -   更新GettingStart.md适配最新kit (:white_check_mark:)
--   new_addsvc/script兼容windows
+-   new_addsvc/script兼容windows (:white_check_mark:)
 -   gateway增加通用的反序列rsp的方法已简化网关接口代码，增加鉴权示例
 
 ## 使用代码生成工具快速开发Go-kit微服务
