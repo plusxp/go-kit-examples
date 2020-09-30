@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 source _import_echo_color.sh
+source _os_util.sh
 
 # 执行各种构建、安装、分析等操作的脚本
 # 函数命名习惯：main func内调用的func命名以 fn_ 开头, 其他func内调用的func命名以 _fn_开头
@@ -14,7 +15,7 @@ declare CMD_ARRAY=()
 
 fn_init_cmd() {
 	# ------------------- 所有的CMD选项 ----------------------
-	CMD_ARRAY=("gen" "gofmt" "govet")
+	readonly CMD_ARRAY=("gen" "gofmt" "govet")
 	# ...CMD_on_ok后缀的指令 表示 CMD指令执行成功后要继续执行的指令，类似的还有_on_fail,  _on_any
 	# 新增命令，只需在这里定义即可，无需其他操作
 	# 注意：这里定义的变量当做全局变量使用，请不要在此函数外定义xxx_cmd这样的变量，会干扰
@@ -42,7 +43,7 @@ _fn_execute() {
 
 	# 执行cmd对应指令
 	$cmd
-	result_code=$?
+	local result_code=$?
 
 	# 下面执行可能需要执行的附加指令
 
@@ -129,16 +130,20 @@ fn_init() {
 		PROJECT_DIR=$project_dir
 	fi
 
-	PROTO_OUTPUT_DIR=$(   dirname "$PROJECT_DIR")
+	PROTO_OUTPUT_DIR=$(dirname "$PROJECT_DIR")
+	# windows上运行需要转换路径为windows路径，d:\\xxx
+	if [[ $(_fn_is_windows) == 'true' ]]; then
+		PROTO_OUTPUT_DIR=$(_fn_convert_to_windows_path $PROTO_OUTPUT_DIR)
+	fi
 	readonly    PROJECT_DIR
 	readonly    PROTO_OUTPUT_DIR
 
 	imported_fn_echo_color_msg    "> initial vars"
-	m="
+	_echo="
     PROJECT_DIR: $PROJECT_DIR
     PROTO_OUTPUT_DIR: $PROTO_OUTPUT_DIR
     "
-	imported_fn_echo_color_msg    "$m"
+	imported_fn_echo_color_msg    "$_echo"
 }
 
 main() {
