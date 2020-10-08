@@ -6,6 +6,8 @@ import (
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	"time"
+
+	"github.com/go-kit/kit/log"
 )
 
 // HelloService describes the service.
@@ -15,18 +17,22 @@ type HelloService interface {
 
 	// 为了方便client更直接的返回response，service层也可以直接使用定好的req&rsp协议
 	MakeADate(context.Context, *pb.MakeADateRequest) (*pb.MakeADateReply, error)
+
+	UpdateUserInfo(context.Context, *pb.UpdateUserInfoRequest) (*pb.UpdateUserInfoReply, error)
 }
 
-type basicHelloService struct{}
+type basicHelloService struct {
+	logger log.Logger
+}
 
 // NewBasicHelloService returns a naive, stateless implementation of HelloService.
-func NewBasicHelloService() HelloService {
-	return &basicHelloService{}
+func NewBasicHelloService(logger log.Logger) HelloService {
+	return &basicHelloService{logger}
 }
 
 // New returns a HelloService with all of the expected middleware wired in.
-func New(middleware []Middleware) HelloService {
-	var svc HelloService = NewBasicHelloService()
+func New(middleware []Middleware, logger log.Logger) HelloService {
+	var svc HelloService = NewBasicHelloService(logger)
 	for _, m := range middleware {
 		svc = m(svc)
 	}
@@ -52,6 +58,8 @@ func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateReques
 		return
 	}
 
+	b.logger.Log("MakeADate - want_say:", p1.WantSay)
+
 	p0.Reply = fmt.Sprintf("Sorry, I am too busy~")
 
 	month, day := t.Month(), t.Day()
@@ -66,4 +74,12 @@ func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateReques
 		p0.Reply = fmt.Sprintf("OK~, I will arrive on 10.1")
 	}
 	return p0, nil
+}
+
+func (b *basicHelloService) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoReply, e1 error) {
+	p0 = &pb.UpdateUserInfoReply{
+		BaseRsp: &pbcommon.BaseRsp{},
+	}
+	// 不做任何事（请注意一定返回一个非nil的rsp，除非发生严重错误）
+	return p0, e1
 }
