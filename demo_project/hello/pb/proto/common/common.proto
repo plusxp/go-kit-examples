@@ -23,3 +23,11 @@ message BaseReq {
 message BaseRsp {
     R err_code = 1;
 }
+
+message StdReq {
+    BaseReq base_req = 1;
+}
+
+message StdRsp {
+    BaseRsp base_rsp = 1;
+}
