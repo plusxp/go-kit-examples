@@ -11,6 +11,7 @@ require (
 	go-util v0.0.0-00010101000000-000000000000
 	google.golang.org/grpc v1.32.0
 	google.golang.org/protobuf v1.25.0 // indirect
+	gopkg.in/jose.v1 v1.0.0-20161127122323-a941c3995164
 )
 
 replace go-util => ../go-util

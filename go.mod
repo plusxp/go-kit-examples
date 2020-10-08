@@ -38,6 +38,7 @@ require (
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.23.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20200227125254-8fa46927fb4f // indirect
+	gopkg.in/jose.v1 v1.0.0-20161127122323-a941c3995164 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20190731080439-ebfcffb1b5c0
 )
