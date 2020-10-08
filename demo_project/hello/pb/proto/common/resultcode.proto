@@ -13,6 +13,8 @@ enum R {
     UNKNOWN_ERR = 5;
     RPC_ERR = 6;
     JSON_UNMARSHAL_ERR = 7;
+    AUTH_ERR = 8;
+
     // 101...
     INVALID_ARGS = 101;
 }
