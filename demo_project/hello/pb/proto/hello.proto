@@ -2,16 +2,16 @@ syntax = "proto3";
 
 package pb;
 
-// import 语句必须在 option xxx之上，否则无法被kit识别，这条语句会被删除
+// import 语句必须在 option xxx之上，否则无法被kit识别，这条语句在下次执行kit命令时会被删除
 import "common/common.proto";
 
 option go_package = "hello/pb/gen-go/pb;pb";
 
 //The Hello service definition.
 service Hello {
-    rpc SayHi (SayHiRequest) returns (SayHiReply);
-    // 约会
-    rpc MakeADate (MakeADateRequest) returns (MakeADateReply);
+    rpc SayHi          (SayHiRequest         ) returns (SayHiReply         );
+    rpc MakeADate      (MakeADateRequest     ) returns (MakeADateReply     );
+    rpc UpdateUserInfo (UpdateUserInfoRequest) returns (UpdateUserInfoReply);
 }
 
 message SayHiRequest {
@@ -25,13 +25,23 @@ message SayHiReply {
 }
 
 message MakeADateRequest {
-    pbcommon.BaseReq base_req  = 1;
+    pbcommon.BaseReq base_req = 1;
     string           date_str = 2;
-    string           want_say  = 3;
+    string           want_say = 3;
 }
 
 message MakeADateReply {
     pbcommon.BaseRsp base_rsp = 2;
     string           reply    = 1;
+}
+
+message UpdateUserInfoRequest {
+    pbcommon.BaseReq base_req = 1;
+    uint32           user_id  = 2;
+    string           new_name = 3;
+}
+
+message UpdateUserInfoReply {
+    pbcommon.BaseRsp base_rsp = 1;
 }
 

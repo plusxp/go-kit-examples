@@ -39,7 +39,6 @@ func makeMakeADateHandler(endpoints endpoint.Endpoints, options []grpc.ServerOpt
 	return grpc.NewServer(endpoints.MakeADateEndpoint, decodeMakeADateRequest, encodeMakeADateResponse, options...)
 }
 
-// grpc.Req ==> user-domain.Req
 func decodeMakeADateRequest(_ context.Context, r interface{}) (interface{}, error) {
 	req := r.(*pb.MakeADateRequest)
 	return &endpoint.MakeADateRequest{P1: req}, nil
@@ -55,4 +54,25 @@ func (g *grpcServer) MakeADate(ctx context1.Context, req *pb.MakeADateRequest) (
 		return nil, err
 	}
 	return rep.(*pb.MakeADateReply), nil
+}
+
+func makeUpdateUserInfoHandler(endpoints endpoint.Endpoints, options []grpc.ServerOption) grpc.Handler {
+	return grpc.NewServer(endpoints.UpdateUserInfoEndpoint, decodeUpdateUserInfoRequest, encodeUpdateUserInfoResponse, options...)
+}
+
+func decodeUpdateUserInfoRequest(_ context.Context, req interface{}) (interface{}, error) {
+	r := req.(*pb.UpdateUserInfoRequest)
+	return &endpoint.UpdateUserInfoRequest{P1: r}, nil
+}
+
+func encodeUpdateUserInfoResponse(_ context.Context, rsp interface{}) (interface{}, error) {
+	r := rsp.(*endpoint.UpdateUserInfoResponse)
+	return r.P0, nil
+}
+func (g *grpcServer) UpdateUserInfo(ctx context1.Context, req *pb.UpdateUserInfoRequest) (*pb.UpdateUserInfoReply, error) {
+	_, rep, err := g.updateUserInfo.ServeGRPC(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	return rep.(*pb.UpdateUserInfoReply), nil
 }

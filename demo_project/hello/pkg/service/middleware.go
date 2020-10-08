@@ -37,3 +37,10 @@ func (l loggingMiddleware) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest
 	}()
 	return l.next.MakeADate(c0, p1)
 }
+
+func (l loggingMiddleware) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoReply, e1 error) {
+	defer func() {
+		l.logger.Log("method", "UpdateUserInfo", "p1", p1, "p0", p0, "e1", e1)
+	}()
+	return l.next.UpdateUserInfo(c0, p1)
+}

@@ -24,7 +24,7 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	// 这个便利性来自于mux
 	name := v["name"]
 
-	// new一个写好的RPC客户端
+	// new一个写好的RPC客户端, 这里演示了一种logger传递方法，实际项目中并不一定需要这样做
 	c := helloclient.MustNew(gw.RawLogger())
 
 	// 像本地调用一样的远程调用
@@ -40,33 +40,59 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 
 /*
 1. 第二种接口定义方式也许更方便，在service，endpoint层直接使用pb协议定义好的req&rsp
-2. 可完全将入参验证下放到service层
+2. 网关在header中提取token做身份验证，验证通过后直接从body中反序列化req=>grpc Req
 */
 func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
-
 	v := mux.Vars(r)
-	dateStr := v["date"]
-
-	// 先声明rsp
-	rsp := &pb.MakeADateReply{
-		BaseRsp: &pbcommon.BaseRsp{ErrCode: pbcommon.R_RPC_ERR},
-	}
-
-	defer func() {
-		gw.JSON(w, rsp)
-	}()
 
 	c := helloclient.MustNew(gw.RawLogger())
 
-	rpcRsp, err := c.MakeADate(context.Background(), &pb.MakeADateRequest{
+	var err error
+	var rsp *pb.MakeADateReply
+
+	rsp, err = c.MakeADate(context.Background(), &pb.MakeADateRequest{
 		BaseReq: &pbcommon.BaseReq{Plat: pbcommon.Plat_pc},
-		DateStr: dateStr,
-		WantSay: "Do you willing to date with me?",
+		DateStr: v["date"],
+		WantSay: v["want_say"],
 	})
 
 	if err != nil {
-		gw.Log("err", err)
+		gw.Log("RPC MakeADate err", err)
+		rsp = &pb.MakeADateReply{
+			BaseRsp: &pbcommon.BaseRsp{ErrCode: pbcommon.R_RPC_ERR},
+		}
+	}
+	gw.JSON(w, rsp)
+}
+
+/*
+第三个接口在网关中实现了身份验证以及统一从http body中反序列化rpc接口参数的实现
+*/
+func (gw *MyGateWay) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
+	// 不再从url中获取参数
+	// v := mux.Vars(r)
+
+	c := helloclient.MustNew(gw.RawLogger())
+
+	rpcReq := &pb.UpdateUserInfoRequest{
+		BaseReq: &pbcommon.BaseReq{},
+	}
+	// Prepare执行身份验证，反序列化等操作（从http header中读取token，从http body中读取rpc request args）
+	ok := gw.Prepare(w, r, rpcReq)
+	if !ok {
+		// gateway.Prepare内部已经打了日志，这里不需要再log
 		return
 	}
-	rsp = rpcRsp
+
+	var err error
+	var rsp *pb.UpdateUserInfoReply
+
+	rsp, err = c.UpdateUserInfo(context.Background(), rpcReq)
+	if err != nil {
+		rsp = &pb.UpdateUserInfoReply{
+			BaseRsp: &pbcommon.BaseRsp{ErrCode: pbcommon.R_RPC_ERR},
+		}
+		gw.Log("RPC UpdateUserInfo err", err)
+	}
+	gw.JSON(w, rsp)
 }

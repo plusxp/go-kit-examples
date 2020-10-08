@@ -81,3 +81,41 @@ func (r MakeADateResponse) Failed() error {
 type Failure interface {
 	Failed() error
 }
+
+// UpdateUserInfoRequest collects the request parameters for the UpdateUserInfo method.
+type UpdateUserInfoRequest struct {
+	P1 *pb.UpdateUserInfoRequest `json:"p1"`
+}
+
+// UpdateUserInfoResponse collects the response parameters for the UpdateUserInfo method.
+type UpdateUserInfoResponse struct {
+	P0 *pb.UpdateUserInfoReply `json:"p0"`
+	E1 error                   `json:"e1"`
+}
+
+// MakeUpdateUserInfoEndpoint returns an endpoint that invokes UpdateUserInfo on the service.
+func MakeUpdateUserInfoEndpoint(s service.HelloService) endpoint.Endpoint {
+	return func(c0 context.Context, request interface{}) (interface{}, error) {
+		req := request.(*UpdateUserInfoRequest)
+		p0, e1 := s.UpdateUserInfo(c0, req.P1)
+		return &UpdateUserInfoResponse{
+			E1: e1,
+			P0: p0,
+		}, nil
+	}
+}
+
+// Failed implements Failer.
+func (r UpdateUserInfoResponse) Failed() error {
+	return r.E1
+}
+
+// UpdateUserInfo implements Service. Primarily useful in a client.
+func (e Endpoints) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoReply, e1 error) {
+	request := &UpdateUserInfoRequest{P1: p1}
+	response, err := e.UpdateUserInfoEndpoint(c0, request)
+	if err != nil {
+		return
+	}
+	return response.(*UpdateUserInfoResponse).P0, response.(*UpdateUserInfoResponse).E1
+}

@@ -44,27 +44,37 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 	/*
 		Install into endpoints with above measures
 	*/
-	var sayHiEndpoint endpoint.Endpoint
+	var SayHiEndpoint endpoint.Endpoint
 	{
-		sayHiEndpoint = grpc1.NewClient(conn, "pb.Hello", "SayHi",
+		SayHiEndpoint = grpc1.NewClient(conn, "pb.Hello", "SayHi",
 			encodeSayHiRequest, decodeSayHiResponse, pb.SayHiReply{}, grpcBefore).Endpoint()
-		sayHiEndpoint = opentracing.TraceClient(otTracer, "sayHi")(sayHiEndpoint)
-		sayHiEndpoint = limiter(sayHiEndpoint)
-		sayHiEndpoint = breaker("sayHi")(sayHiEndpoint)
+		SayHiEndpoint = opentracing.TraceClient(otTracer, "SayHi")(SayHiEndpoint)
+		SayHiEndpoint = limiter(SayHiEndpoint)
+		SayHiEndpoint = breaker("SayHi")(SayHiEndpoint)
 	}
 
-	var makeADateEndpoint endpoint.Endpoint
+	var MakeADateEndpoint endpoint.Endpoint
 	{
-		makeADateEndpoint = grpc1.NewClient(conn, "pb.Hello", "MakeADate",
+		MakeADateEndpoint = grpc1.NewClient(conn, "pb.Hello", "MakeADate",
 			encodeMakeADateRequest, decodeMakeADateResponse, pb.MakeADateReply{}, grpcBefore).Endpoint()
-		makeADateEndpoint = opentracing.TraceClient(otTracer, "makeADate")(makeADateEndpoint)
-		makeADateEndpoint = limiter(makeADateEndpoint)
-		makeADateEndpoint = breaker("MakeADate")(makeADateEndpoint)
+		MakeADateEndpoint = opentracing.TraceClient(otTracer, "MakeADate")(MakeADateEndpoint)
+		MakeADateEndpoint = limiter(MakeADateEndpoint)
+		MakeADateEndpoint = breaker("MakeADate")(MakeADateEndpoint)
+	}
+
+	var UpdateUserInfoEndpoint endpoint.Endpoint
+	{
+		UpdateUserInfoEndpoint = grpc1.NewClient(conn, "pb.Hello", "UpdateUserInfo",
+			encodeUpdateUserInfoRequest, decodeUpdateUserInfoResponse, pb.UpdateUserInfoReply{}, grpcBefore).Endpoint()
+		UpdateUserInfoEndpoint = opentracing.TraceClient(otTracer, "UpdateUserInfo")(UpdateUserInfoEndpoint)
+		UpdateUserInfoEndpoint = limiter(UpdateUserInfoEndpoint)
+		UpdateUserInfoEndpoint = breaker("UpdateUserInfo")(UpdateUserInfoEndpoint)
 	}
 
 	return endpoint1.Endpoints{
-		SayHiEndpoint:     sayHiEndpoint,
-		MakeADateEndpoint: makeADateEndpoint,
+		SayHiEndpoint:          SayHiEndpoint,
+		MakeADateEndpoint:      MakeADateEndpoint,
+		UpdateUserInfoEndpoint: UpdateUserInfoEndpoint,
 	}, nil
 }
 
@@ -92,6 +102,20 @@ func encodeMakeADateRequest(_ context.Context, request interface{}) (interface{}
 // decodeMakeADateResponse is a transport/grpc.DecodeResponseFunc that converts
 // a gRPC concat reply to a user-domain concat response.
 func decodeMakeADateResponse(_ context.Context, reply interface{}) (interface{}, error) {
-	req := reply.(*pb.MakeADateReply)
-	return &endpoint1.MakeADateResponse{P0: req}, nil
+	rsp := reply.(*pb.MakeADateReply)
+	return &endpoint1.MakeADateResponse{P0: rsp}, nil
+}
+
+// encodeUpdateUserInfoRequest is a transport/grpc.EncodeRequestFunc that converts a
+//  user-domain UpdateUserInfo request to a gRPC request.
+func encodeUpdateUserInfoRequest(_ context.Context, request interface{}) (interface{}, error) {
+	req := request.(*endpoint1.UpdateUserInfoRequest)
+	return req.P1, nil
+}
+
+// decodeUpdateUserInfoResponse is a transport/grpc.DecodeResponseFunc that converts
+// a gRPC concat reply to a user-domain concat response.
+func decodeUpdateUserInfoResponse(_ context.Context, reply interface{}) (interface{}, error) {
+	rsp := reply.(*pb.UpdateUserInfoReply)
+	return &endpoint1.UpdateUserInfoResponse{P0: rsp}, nil
 }
