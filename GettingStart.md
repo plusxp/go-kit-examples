@@ -98,6 +98,18 @@ c:\users\...\go-kit-examples\demo_project\hello
 
 ## 4. 生成Service模板
 
+在执行之前，首先需要在service.go中添加我们的api定义，示例：
+
+```go
+// HelloService describes the service.
+type HelloService interface {
+	// Add your methods here
+	SayHi(ctx context.Context, name string) (reply string, err error)
+}
+```
+
+这里选择grpc作为RPC技术栈
+
 ```bash
 $ kit g s hello
 $ kit g s hello --dmw -t grpc  # -dmw指定endpoint中间件(可选)，-t grpc指定 transport (default http)
@@ -117,16 +129,6 @@ $ kit g s hello --dmw -t grpc  # -dmw指定endpoint中间件(可选)，-t grpc�
 `hello/cmd/service/service_gen.go`  
 `hello/cmd/main.go`
 
-由于grpc作为微服务架构中常用的rpc选择，所以在这里我们直接执行 `kit g s hello --dmw -t grpc`，
-在执行之前，首先需要在service.go中添加我们的api定义，示例：
-
-```go
-// HelloService describes the service.
-type HelloService interface {
-	// Add your methods here
-	SayHi(ctx context.Context, name string) (reply string, err error)
-}
-```
 最后得到的目录结构如下：
 
 ```DOS
