@@ -1,3 +1,8 @@
+## 2020年10月9日 Update
+- `demo_project/hello`增加新接口`UpdateUserInfo`
+- 网关增加`Prepare`方法，完成req鉴权(jwt)和参数反序列化操作
+- 简单优化已有的网关接口逻辑
+
 ## 2020年9月30日20:04 Update
 -  main.sh支持在windows上运行
 
