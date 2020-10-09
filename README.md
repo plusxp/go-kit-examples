@@ -129,7 +129,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 ## 更新日志
 
-[CHANGELOG][CHANGELOG]
+[CHANGELOG][CHANGELOG] (上次更新于2020年10月9日)
 
 [CHANGELOG]:https://github.com/chaseSpace/go-kit-examples/blob/master/CHANGELOG.md
 

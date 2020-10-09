@@ -2,6 +2,9 @@
 - `demo_project/hello`增加新接口`UpdateUserInfo`
 - 网关增加`Prepare`方法，完成req鉴权(jwt)和参数反序列化操作
 - 简单优化已有的网关接口逻辑
+- [Kit][1] 仓库更新:
+    -   生成service的方法名中的Reply更新为Response
+    -   endpoint方法注释简单优化
 
 ## 2020年9月30日20:04 Update
 -  main.sh支持在windows上运行
@@ -20,7 +23,7 @@
 - 基本完成 `/demo_project/gateway`，使用mux作为路由器
 - 完善 `/gokit_foundation`，增加完善的logger机制
 
-- [Kit][1] 仓库 update:
+- [Kit][1] 仓库更新:
     -   :tada: 增加[examples/hello][2]，仅包含grpc作为transport, 并包含[文档][3]
     -   生成的代码中，endpoint层的参数req&rsp更新为指针类型
     -   大幅优化对proto文件的支持，现支持根据当前shell解释器环境生成对应的proto文件编译脚本（以前是根据操作系统类型），修复部分bug
