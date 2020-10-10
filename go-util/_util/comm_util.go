@@ -17,6 +17,7 @@ import (
 
 func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log.Logger, onClose func()) _go.AsyncTask {
 	return func(context.Context, _go.Setter) {
+		logger.Log("NewSafeAsyncTask", "ListenSignal")
 		sc := make(chan os.Signal)
 		signal.Notify(sc,
 			syscall.SIGINT,  // 键盘中断
@@ -24,8 +25,12 @@ func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log
 		)
 		select {
 		case s := <-sc:
+			fmt.Fprint(os.Stdout, "\n")
+			logger.Log("ListenSignalTask", "===================== Closing ======================")
 			logger.Log("recv-signal", s, "Task", "done!")
 		case <-ctx.Done():
+			fmt.Fprint(os.Stdout, "\n")
+			logger.Log("ListenSignalTask", "===================== Closing ======================")
 			logger.Log("ctx.Done", "OK", "Task", "done!")
 		}
 		onClose()
@@ -45,12 +50,10 @@ func InCollection(elem interface{}, coll []interface{}) bool {
 
 func PanicIfErr(err interface{}, ignoreErrs []error, printText ...string) {
 	if err != nil {
-		var intErrs []interface{}
 		for _, e := range ignoreErrs {
-			intErrs = append(intErrs, e)
-		}
-		if InCollection(err, intErrs) {
-			return
+			if err == e {
+				return
+			}
 		}
 		if len(printText) > 0 {
 			panic(printText[0])
