@@ -1,4 +1,4 @@
 
-# 所有部署相关的文件，包含配置/脚本等
+# 所有部署相关的配置文件
 
-如`docker-compose.yml`, `build.sh`
+如`docker-compose.yml`, 如有脚本请统一放到script/
