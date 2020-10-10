@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 	"fmt"
+	"github.com/go-kit/kit/log"
 	stdconsul "github.com/hashicorp/consul/api"
 	"go-util/_go"
 	"gokit_foundation"
@@ -15,8 +16,9 @@ import (
 // protocol-svc_name-addr, e.g. grpc-UserServer-127.0.0.1:8888
 const consulSvcIDFormat = "%s-%s-%s:%d"
 
-func regTask(_ context.Context, svcName, svcHost string, port int) _go.AsyncTask {
-	return func(context.Context, _go.Setter) {
+func SvcRegisterTask(_ context.Context, logger log.Logger, svcName, svcHost string, port int) _go.AsyncTask {
+	return func(_ context.Context, setter _go.Setter) {
+		logger.Log("NewSafeAsyncTask", "SvcRegister")
 		// consul agent配置，根据实际的填写
 		reg := &stdconsul.AgentServiceRegistration{
 			ID:                fmt.Sprintf(consulSvcIDFormat, "grpc", svcName, svcHost, port),
@@ -35,10 +37,8 @@ func regTask(_ context.Context, svcName, svcHost string, port int) _go.AsyncTask
 			},
 		}
 
-		gokit_foundation.RegisterWithConsul(reg)
+		if err := gokit_foundation.RegisterWithConsul(reg); err != nil {
+			setter.SetErr(err)
+		}
 	}
-}
-
-func SvcRegisterTask(ctx context.Context, svcName, svcHost string, port int) _go.AsyncTask {
-	return regTask(ctx, svcName, svcHost, port)
 }

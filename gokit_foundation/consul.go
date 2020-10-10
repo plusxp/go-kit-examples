@@ -1,7 +1,6 @@
 package gokit_foundation
 
 import (
-	"fmt"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/sd/consul"
 	stdconsul "github.com/hashicorp/consul/api"
@@ -12,7 +11,10 @@ import (
 
 var DefaultRegister *consul.Registrar
 
-func RegisterWithConsul(svcRegistration *stdconsul.AgentServiceRegistration) *consul.Registrar {
+func RegisterWithConsul(svcRegistration *stdconsul.AgentServiceRegistration) error {
+	if DefaultRegister != nil {
+		return nil
+	}
 	consulAddr := os.Getenv("CONSUL_ADDR")
 	if consulAddr == "" {
 		//panic(fmt.Sprintf("%s CONSUL_ADDR not set", time.Now().String()[:19]))
@@ -27,7 +29,7 @@ func RegisterWithConsul(svcRegistration *stdconsul.AgentServiceRegistration) *co
 		Scheme: "http", // default
 	})
 	if err != nil {
-		panic(fmt.Sprintf("%s stdconsul.NewClient %v", time.Now().String()[:19], err))
+		return err
 	}
 
 	kitConsulClient := consul.NewClient(consulClient)
@@ -35,10 +37,8 @@ func RegisterWithConsul(svcRegistration *stdconsul.AgentServiceRegistration) *co
 
 	registrar := consul.NewRegistrar(kitConsulClient, svcRegistration, log.With(logger, "component", "register"))
 	registrar.Register()
-	if DefaultRegister == nil {
-		DefaultRegister = registrar
-	}
-	return registrar
+	DefaultRegister = registrar
+	return nil
 }
 
 func ConsulDeregister() {

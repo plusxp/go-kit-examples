@@ -15,7 +15,7 @@ type Service interface {
 // New returns a basic Service with all of the expected middlewares wired in.
 func New(logger log.Logger, ints, chars metrics.Counter) Service {
 	var svc Service
-	// 使用洋葱模式封装svc(添加mw)
+	// 使用洋葱模式封装svc(添加中间件)
 	{
 		svc = NewBasicService()
 		svc = UnifyMiddleware(logger, ints, chars)(svc)

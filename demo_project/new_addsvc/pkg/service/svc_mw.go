@@ -8,7 +8,7 @@ import (
 
 type Middleware func(Service) Service
 
-// mw
+// 统一mw
 func UnifyMiddleware(loggermw log.Logger, ints, chars metrics.Counter) Middleware {
 	return func(next Service) Service {
 		instrumw := instrumentingMiddleware{

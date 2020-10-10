@@ -16,8 +16,9 @@ import (
 	"time"
 )
 
-// eps 内包含的ep对应service每个接口，而且必须一致
-// ep非常重要，在RPC调用时，client调用的也是ep，对调用者隐藏了transport层
+// 以下Endpoint简称ep
+// Endpoints内包含的ep对应service每个接口，而且必须一致
+// ep在RPC调用时，client调用的也是ep，对调用者隐藏了transport层
 type AddSvcEndpoints struct {
 	SumEndpoint    endpoint.Endpoint
 	ConcatEndpoint endpoint.Endpoint

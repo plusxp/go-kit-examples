@@ -52,7 +52,7 @@ func NewKvLogger(logger log.Logger) log.Logger {
 	)
 
 	var l log.Logger
-	l = log.NewLogfmtLogger(os.Stderr)
+	l = log.NewLogfmtLogger(os.Stdout)
 	l = log.With(l, "ts", ts)
 	l = log.With(l, "caller", hommizationCaller)
 	return l

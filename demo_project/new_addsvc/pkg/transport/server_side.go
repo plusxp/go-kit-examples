@@ -18,7 +18,7 @@ type grpcServer struct {
 }
 
 // NewGRPCServer makes a set of endpoints available as a gRPC AddServer.
-// 这里也可以返回一个httpSvr
+// 这里也可以返回一个httpSvr(如果使用http作为RPC方式)
 func NewGRPCServer(endpoints endpoint2.AddSvcEndpoints, otTracer stdopentracing.Tracer, logger log.Logger) pb.AddServer {
 	options := []grpctransport.ServerOption{
 		grpctransport.ServerErrorHandler(transport.NewLogErrorHandler(logger)),
