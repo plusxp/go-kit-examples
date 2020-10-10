@@ -26,8 +26,7 @@ import (
 
 func NewSvr(logger log.Logger) addsvcpb.AddServer {
 	metricsObj := internal.NewMetrics()
-	var tracer stdopentracing.Tracer
-	tracer = stdopentracing.GlobalTracer()
+	tracer := stdopentracing.GlobalTracer()
 
 	// 依次创建 svc，endpoint，transport三层的对象，每一层都会在上一层基础上封装
 	// 在svc和endpoint层以中间件的形式添加【指标上传、api日志】功能
