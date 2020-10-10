@@ -11,7 +11,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/gorilla/mux"
 	"gokit_foundation"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -147,7 +146,6 @@ func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 			g.Log("Gateway.JSON: err", err)
 			return
 		}
-		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write(b)
 	}()
 
@@ -194,7 +192,7 @@ func (g *Gateway) Prepare(w http.ResponseWriter, httpReq *http.Request, rpcReq i
 	}
 	if rpcReq != nil {
 		if err = g.unmarshalReq(httpReq, rpcReq); err != nil {
-			log.Print(err)
+			g.Log("Gateway.Prepare unmarshalReq err", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
