@@ -2,6 +2,7 @@
 - `demo_project/new_addsvc`优化`main.go`，添加更详细的注释
 - 更新`README.md` (`go_project_template`部分)
 - 抽离公共bash scripts到 `bash-util/`
+- 更新`GettingStart.md`（`小结`部分）
 
 ## 2020年10月9日 Update
 - `demo_project/hello`增加新接口`UpdateUserInfo`
