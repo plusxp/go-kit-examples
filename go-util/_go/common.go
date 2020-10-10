@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"time"
 )
 
 type Setter interface {
@@ -71,6 +72,7 @@ func (a *SafeAsyncTask) AddTask(f ...AsyncTask) {
 func (a *SafeAsyncTask) schedule() {
 	for _, f := range a.tasks {
 		a.wg.Add(1)
+		time.Sleep(time.Millisecond) // Guarantee schedule sequence
 		go func(f func(ctx context.Context, tgr Setter)) {
 			defer func() {
 				if err := recover(); err != nil {
@@ -89,8 +91,8 @@ func (a *SafeAsyncTask) schedule() {
 	}
 }
 
-// Run start all the tasks as one goroutine per task
-func (a *SafeAsyncTask) Run() {
+// Start start all the tasks as one goroutine per task
+func (a *SafeAsyncTask) Start() {
 	if a.isScheduled {
 		panic("go-util._go: all task have been scheduled!")
 	}
@@ -98,9 +100,13 @@ func (a *SafeAsyncTask) Run() {
 	a.isScheduled = true
 }
 
+func (a *SafeAsyncTask) Wait() {
+	a.wg.Wait()
+}
+
 // Run start all the tasks as one goroutine per task, then return until them done
-func (a *SafeAsyncTask) RunAndWait() {
-	a.Run()
+func (a *SafeAsyncTask) Run() {
+	a.Start()
 	a.wg.Wait()
 }
 
