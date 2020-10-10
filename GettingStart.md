@@ -112,7 +112,7 @@ type HelloService interface {
 
 ```bash
 $ kit g s hello
-$ kit g s hello --dmw -t grpc  # -dmw指定endpoint中间件(可选)，-t grpc指定 transport (default http)
+$ kit g s hello --dmw -t grpc  # -dmw生成endpoint中间件(可选)，-t grpc指定 transport (default http)
 ```
 
 这些命令会执行以下操作：

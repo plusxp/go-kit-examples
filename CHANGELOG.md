@@ -1,3 +1,6 @@
+## 2020年10月10日 Update
+- `demo_project/new_addsvc`优化`main.go`，添加更详细的注释
+
 ## 2020年10月9日 Update
 - `demo_project/hello`增加新接口`UpdateUserInfo`
 - 网关增加`Prepare`方法，完成req鉴权(jwt)和参数反序列化操作
