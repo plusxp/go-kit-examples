@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-source _echo_color.sh
-source _os_util.sh
+source ../../bash-util/_echo_color.sh
+source ../../bash-util/_os_util.sh
 
 # 执行各种构建、安装、分析等操作的脚本
-# 函数命名习惯：main func内调用的func命名以 fn_ 开头, 其他func内调用的func命名以 _fn_开头
+# 函数命名习惯：main.sh内定义且在main func内调用的func命名以 fn_ 开头, 其他func命名以 _fn_开头
 #
 flag=$1
 project_dir=$2
@@ -14,11 +14,11 @@ declare PROTO_OUTPUT_DIR
 declare CMD_ARRAY=()
 
 fn_init_cmd() {
-	# ------------------- 所有的CMD选项 ----------------------
+	# ------------------- 所有的CMD选项(若添加新命令则需添加到这个数组) ----------------------
 	readonly CMD_ARRAY=("gen" "gofmt" "govet")
-	# ...CMD_on_ok后缀的指令 表示 CMD指令执行成功后要继续执行的指令，类似的还有_on_fail,  _on_any
+	# xxx_cmd_on_ok后缀的指令 表示这个cmd指令执行成功后要继续执行的指令，类似的还有_on_fail,  _on_any
 	# 新增命令，只需在这里定义即可，无需其他操作
-	# 注意：这里定义的变量当做全局变量使用，请不要在此函数外定义xxx_cmd这样的变量，会干扰
+	# 注意：这里定义的变量当做全局变量使用，请不要在此函数外定义xxx_cmd这样的全局变量，会干扰
 
 	# gen, 关于protoc命令，若后续在pb/proto/下增加目录，就需要适当添加相应目录到命令中(-I=../pb/proto/sub_folder)，仅添加proto文件则无需修改命令
 	readonly    gen_cmd="protoc -I=../pb/proto ../pb/proto/*.proto --go_out=plugins=grpc:$PROTO_OUTPUT_DIR"
