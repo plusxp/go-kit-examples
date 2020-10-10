@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-source _import_echo_color.sh
+source _echo_color.sh
 source _os_util.sh
 
 # 执行各种构建、安装、分析等操作的脚本
