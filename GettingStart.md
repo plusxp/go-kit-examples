@@ -9,7 +9,7 @@
 <br/>
 
 
-请注意，阅读此文档默认读者具备以下条件：
+请注意，继续阅读此文档需要读者具备以下条件：
 
 - 一年以上的go语言开发经验
 - 一定的微服务理论基础
@@ -29,7 +29,8 @@
 使用的repo，那就是[kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
 正在开发，或者不再维护；这个repo其实也是fork一个不再维护的400+star的项目而来，该作者声称自己所在团队已深度使用
 go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）  
-> 注：在使用过程我发现该工具仍不够灵活以及缺乏一些功能，目前我已fork此项目，并增加了诸多功能，请查看 [chaseSpace/kit][kit] ，
+
+但是在使用过程我发现该工具仍不够灵活以及缺乏一些功能，目前我已fork此项目，并增加了诸多功能，请查看 [chaseSpace/kit][kit] ，
 下文也是基于此仓库编写。
 
 ## 目录
@@ -551,15 +552,21 @@ ok      hello/client/grpc       1.118s
 │      user_wallet.go   // user_wallet表的操作方法集合
 ```
 或许你还有自己的一套规划方案，这都不重要，重要的是解耦数据访问层与service层的代码，让项目的层次足够清晰，以便我们能够
-持续的保持愉快心情来维护它，而不是在往后的某一天，一边敲代码一边操着一口流利的"what the f**k" 😤
+持续的保持愉快心情来维护它。
 
-在model层定义直接操作底层数据的方法，然后愉快的在service层引用，解耦你的代码！
+在model层定义直接操作底层数据的方法，然后在service层引用，解耦不同层次的代码！
 
 ## 13. 结束，新的开始
 
 ### 小结
-本文档较为全面的介绍了如何使用[GrantZheng/kit](https://github.com/GrantZheng/kit) 作为go-kit框架的代码生成工具来辅助开发微服务，
-在使用过程中，我发现了该工具的一些可以优化的问题以及bug，目前已经fork该项目进行优化以及bug修改。
+本文档较为全面的介绍了如何使用[GrantZheng/kit](https://github.com/GrantZheng/kit) 作为go-kit框架的代码生成工具来辅助开发一个
+微服务项目，相关注意点也已列出；但本文档的目的是介绍快速开发一个最小架构的微服务，所以有些功能是没有用到的，比如身份认证、服务注册等，
+这些功能读者可以在`demo_project/new_addsvc`中找到相应的例子。
+
+当然`hello`示例项目也不会就此停止，我将持续为此项目添砖加瓦，使其更完善，但文档可能就不会同步更新了(也没太大必要，有些东西一通百通)，
+所以读者还需要尽可能详细的阅读各项目的代码(代码中包含中文注释)，如仍有疑问，可通过issue或加`README.md`页的中文WX群提问。
+
+[Gateway][gateway] 实现了一个http网关，代理了hello项目中的接口。
 
 ### 改进
 文档是花费我的业余时间编写的，因时间紧凑，无法避免一些小的瑕疵，以及更全面的介绍go-kit其他功能，例如
@@ -580,5 +587,6 @@ ok      hello/client/grpc       1.118s
 - [一文详解微服务架构知识](https://mp.weixin.qq.com/s/lpXkFsm01M9-27qeuo5JzA)
 - [煎鱼博客: go与微服务相关讲解](https://eddycjy.com/posts/)
 
+[gateway]: https://github.com/chaseSpace/go-kit-examples/tree/master/demo_project/gateway
 [kit]: https://github.com/chaseSpace/kit.git
 [1]: https://github.com/golang-standards/project-layout/blob/master/README_zh.md
