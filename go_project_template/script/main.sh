@@ -4,7 +4,7 @@ source ../../bash-util/_os_util.sh
 
 # 执行各种构建、安装、分析等操作的脚本
 # 函数命名习惯：main.sh内定义且在main func内调用的func命名以 fn_ 开头, 其他func命名以 _fn_开头
-#
+
 flag=$1
 project_dir=$2
 
