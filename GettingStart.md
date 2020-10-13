@@ -112,8 +112,7 @@ type HelloService interface {
 这里选择grpc作为RPC技术栈
 
 ```bash
-$ kit g s hello
-$ kit g s hello --dmw -t grpc  # -dmw生成endpoint中间件(可选)，-t grpc指定 transport (default http)
+$ kit g s hello --dmw -t grpc  # -dmw生成endpoint中间件(可选)，-t grpc指定 transport (默认http)
 ```
 
 这些命令会执行以下操作：
