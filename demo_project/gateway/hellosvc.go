@@ -40,7 +40,6 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 
 /*
 1. 第二种接口定义方式也许更方便，在service，endpoint层直接使用pb协议定义好的req&rsp
-2. 网关在header中提取token做身份验证，验证通过后直接从body中反序列化req=>grpc Req
 */
 func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 	v := mux.Vars(r)
@@ -66,7 +65,10 @@ func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-第三个接口在网关中实现了身份验证以及统一从http body中反序列化rpc接口参数的实现
+1. 第三个接口在网关中实现了身份验证以及统一从http body中反序列化rpc接口参数的实现
+2. 这种方式在项目中可能应用的更多，它不是一种REST-FUL接口风格了，为了提高开发效率和可维护性，
+	所有接口仅支持POST方式调用，token放在header中，请求参数放在body中传递，服务端仅从body中读取参数，
+	然后直接透传至RPC接口
 */
 func (gw *MyGateWay) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	// 不再从url中获取参数

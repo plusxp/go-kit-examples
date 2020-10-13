@@ -15,7 +15,7 @@ const SimpleLayout = "2006-01-02 15:04:05"
 type Logger struct {
 	log.Logger
 	//logrus.FieldLogger
-	*CustomizeLogger // 自定义logger
+	*CustomizeLogger // 自定义logger，作为扩展
 }
 
 func NewLogger(logger log.Logger) *Logger {
