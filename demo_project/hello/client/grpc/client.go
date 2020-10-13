@@ -42,7 +42,7 @@ func newHelloClient(logger *gokit_foundation.Logger) *Client {
 }
 
 func MustNew(logger *gokit_foundation.Logger) *Client {
-	if svcClient == nil {
+	if svcClient == nil || svcClient.conn == nil {
 		svcClient = newHelloClient(logger)
 	}
 	return svcClient
@@ -51,5 +51,7 @@ func MustNew(logger *gokit_foundation.Logger) *Client {
 func (c *Client) Close() {
 	if c.conn != nil {
 		_ = c.conn.Close()
+		// 允许Close后再MustNew
+		c.conn = nil
 	}
 }
