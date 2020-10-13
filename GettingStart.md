@@ -221,7 +221,7 @@ protoc hello.proto --go_out=plugins=grpc:.
 protoc hello.proto --go_out=plugins=grpc:../../../
 ```
 `../../../`表示从脚本所在位置向外【三层】走到`hello/pb/proto`这个路径根目录`hello/`的父目录位置，
-如果你熟悉pb协议，那应该不会有什么问题，如果你完全没接触过grpc，那请先按照文档操作
+如果你熟悉protobuf，那应该不会有什么问题，如果你完全没接触过protobuf，那请先按照文档操作
 
 
 然后编辑pb/hello.proto文件，按如下修改：
