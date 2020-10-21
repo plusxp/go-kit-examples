@@ -30,10 +30,10 @@ func SvcRegisterTask(_ context.Context, logger log.Logger, svcName, svcHost stri
 			// 配置实例本身的健康检查
 			Check: &stdconsul.AgentServiceCheck{
 				// consul服务必须能够访问这个地址，否则认为实例掉线
-				GRPC:                           fmt.Sprintf("%s:%d/%s", svcHost, port, "grpc_health"),
+				GRPC:                           fmt.Sprintf("%s:%d/%s", svcHost, port, "grpc_health"), // or `grpc.health.v1.Health`
 				Timeout:                        "5s",
 				Interval:                       "5s",
-				DeregisterCriticalServiceAfter: "15s", //check失败后多久删除本服务
+				DeregisterCriticalServiceAfter: "15s", //check失败后多久删除本服务（位于consul中的服务条目）
 			},
 		}
 
