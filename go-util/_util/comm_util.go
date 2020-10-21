@@ -23,19 +23,27 @@ func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log
 			syscall.SIGINT,  // 键盘中断
 			syscall.SIGTERM, // 软件终止
 		)
-		select {
-		case s := <-sc:
+
+		_log := func(z interface{}) {
 			fmt.Fprint(os.Stdout, "\n")
 			logger.Log("ListenSignalTask", "===================== Closing ======================")
-			logger.Log("recv-signal", s, "Task", "done!")
-		case <-ctx.Done():
-			fmt.Fprint(os.Stdout, "\n")
-			logger.Log("ListenSignalTask", "===================== Closing ======================")
-			logger.Log("ctx.Done", "OK", "Task", "done!")
+			switch z.(type) {
+			case os.Signal:
+				logger.Log("recv-signal", z, "task", "done")
+			case struct{}:
+				logger.Log("ctx.Done", "ok", "task", "done")
+			}
 		}
+		var s interface{}
+		select {
+		case s = <-sc:
+		case s = <-ctx.Done():
+		}
+		_log(s)
+
 		onClose()
 		signal.Stop(sc)
-		cancel()
+		cancel() // 最后调用
 	}
 }
 
