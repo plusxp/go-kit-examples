@@ -100,6 +100,8 @@ func main() {
 		grpcSrv.GracefulStop()
 		err = httpSvr.Shutdown(closeCtx)
 		_util.PanicIfErr(err, nil)
+
+		logger.Log("onClose", "done")
 	}
 
 	// 添加后台任务：监听退出信号（第一个添加）
