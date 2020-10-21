@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"net"
 	"net/http"
-	config2 "new_addsvc/config"
+	"new_addsvc/config"
 	"new_addsvc/internal"
 	"new_addsvc/pb/gen-go/addsvcpb"
 	"new_addsvc/pkg/endpoint"
@@ -47,13 +47,13 @@ func init() {
 new_addsvc服务依赖了一些外部中间件如下：
 -	强依赖(若连不上则无法启动)
 	-	consul
--	若依赖(不需要连接或连不上也能启动)
+-	弱依赖(不需要连接或连不上也能启动)
 	-	prometheus
 */
 
 func main() {
-	// 这个地址必须能够被你的consul-server访问，否则consul的健康检查会失败
-	svrHost := "127.0.0.1"
+	// 服务运行的主机地址，必须能够被你的consul-server访问，否则consul的健康检查会失败
+	svrHost := "192.168.1.15"
 	var grpcPort = flag.Int("grpc.port", 8080, "grpc listen address")
 	var httpPort = flag.Int("http.port", 8081, "http listen address")
 
@@ -63,7 +63,7 @@ func main() {
 	flag.Parse()
 
 	logger := gokit_foundation.NewKvLogger(nil)
-	grpcSvr := NewSvr(logger)
+	addSvrAPI := NewSvr(logger)
 
 	grpcLis, err := net.Listen("tcp", grpcSvrAddr)
 	_util.PanicIfErr(err, nil)
@@ -74,11 +74,11 @@ func main() {
 	/*
 		初始化grpcSvr和httpSvr
 	*/
-	baseSvr := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
+	grpcSvr := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
 	httpSvr := &http.Server{}
 
 	// 创建一个所有后台任务共享的ctx，当进程退出时，所有后台任务都应该监听到ctx.Done()，然后graceful exit
-	var uniformCtx, cancel = context.WithCancel(context.Background())
+	var shareCtx, cancel = context.WithCancel(context.Background())
 
 	/*
 		这里使用 NewSafeAsyncTask 完成程序的一系列启动任务
@@ -86,7 +86,7 @@ func main() {
 	*/
 
 	// 初始化一个SafeAsyncTask对象
-	ak := _go.NewSafeAsyncTask(uniformCtx, cancel)
+	ak := _go.NewSafeAsyncTask(shareCtx, cancel)
 
 	// 程序退出时的操作
 	onClose := func() {
@@ -97,17 +97,17 @@ func main() {
 		// 这里因为程序要退出了，所以不用再 defer cancel(), 其他时候最好执行 defer cancel() 释放其内部资源
 		closeCtx, _ := context.WithTimeout(context.Background(), time.Second*2)
 
-		baseSvr.GracefulStop()
+		grpcSvr.GracefulStop()
 		err = httpSvr.Shutdown(closeCtx)
 		_util.PanicIfErr(err, nil)
 	}
 
 	// 添加后台任务：监听退出信号（第一个添加）
-	onSignalTask := _util.ListenSignalTask(uniformCtx, cancel, logger, onClose)
+	onSignalTask := _util.ListenSignalTask(shareCtx, cancel, logger, onClose)
 	ak.AddTask(onSignalTask)
 
 	// 添加后台任务：service discovery
-	svcRegTask := internal.SvcRegisterTask(uniformCtx, logger, config2.ServiceName, svrHost, *grpcPort)
+	svcRegTask := internal.SvcRegisterTask(shareCtx, logger, config.ServiceName, svrHost, *grpcPort)
 	ak.AddTask(svcRegTask)
 
 	// http服务监听8080, 目前只提供metric接口给prometheus调用
@@ -123,16 +123,16 @@ func main() {
 
 	// 添加后台任务：启动rpc-svr
 	startGrpcSvrTask := func(_ context.Context, setter _go.Setter) {
-		logger.Log("NewSafeAsyncTask", "GrpcSvr", "grpcSvrAddr", grpcSvrAddr)
+		logger.Log("NewSafeAsyncTask", "grpcSvr", "grpcSvrAddr", grpcSvrAddr)
 		// 这里注册了AddSvr以及healthSvr
-		addsvcpb.RegisterAddServer(baseSvr, grpcSvr)
+		addsvcpb.RegisterAddServer(grpcSvr, addSvrAPI)
 
 		s := gokit_foundation.NewHealthCheckSvr()
-		grpc_health_v1.RegisterHealthServer(baseSvr, s)
+		grpc_health_v1.RegisterHealthServer(grpcSvr, s)
 
-		err := baseSvr.Serve(grpcLis)
+		err := grpcSvr.Serve(grpcLis)
 		if err != nil {
-			logger.Log("NewSafeAsyncTask", "GrpcSvr", "err", err)
+			logger.Log("NewSafeAsyncTask", "grpcSvr", "err", err)
 			setter.SetErr(err)
 		}
 	}
