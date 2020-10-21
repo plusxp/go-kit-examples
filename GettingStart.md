@@ -28,7 +28,7 @@
 我调研了[go-kit](https://github.com/go-kit/kit) 官方文档中列出的几个代码生成工具，找到了一个比较适合
 使用的repo，那就是[kit](https://github.com/GrantZheng/kit) ，其他repo要么比较简陋，要么
 正在开发，或者不再维护；这个repo其实也是fork一个不再维护的400+star的项目而来，该作者声称自己所在团队已深度使用
-go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了（点赞！）  
+go-kit，无法接受没有可靠的go-kit辅助工具，所以自己fork来继续维护了(:thumbsup:)
 
 但是在使用过程我发现该工具仍不够灵活以及缺乏一些功能，目前我已fork此项目，并增加了诸多功能，请查看 [chaseSpace/kit][kit] ，
 下文也是基于此仓库编写。
