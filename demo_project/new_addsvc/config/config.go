@@ -1,3 +1,3 @@
 package config
 
-const ServiceName = "addsvc"
+const ServiceName = "new_addsvc"
