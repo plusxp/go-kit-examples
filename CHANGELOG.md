@@ -1,3 +1,8 @@
+## 2020年10月21日 Update
+- 修复[kit][1]在go1.15(可能包含其他go版本，但go1.12是正常的)下不能正常工作的bug
+- 修正注释：`gateway/hellosvc.go`
+- 部分文字表述更新：`GettingStart.md`,`README.md`
+
 ## 2020年10月10日 Update
 - `demo_project/new_addsvc`优化`main.go`，添加更详细的注释
 - 更新`README.md` (`go_project_template`部分)
