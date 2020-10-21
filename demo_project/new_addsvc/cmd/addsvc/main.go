@@ -33,8 +33,8 @@ func NewSvr(logger log.Logger) addsvcpb.AddServer {
 	svc := service.New(logger, metricsObj.Ints, metricsObj.Chars)
 	// 在endpoint层和transport层添加路径追踪功能
 	endpoints := endpoint.New(svc, logger, metricsObj.Duration, tracer)
-	grpcServer := transport.NewGRPCServer(endpoints, tracer, logger)
-	return grpcServer
+	addSrv := transport.NewGRPCServer(endpoints, tracer, logger)
+	return addSrv
 }
 
 // for test
@@ -63,7 +63,7 @@ func main() {
 	flag.Parse()
 
 	logger := gokit_foundation.NewKvLogger(nil)
-	addSvrAPI := NewSvr(logger)
+	addSrv := NewSvr(logger)
 
 	grpcLis, err := net.Listen("tcp", grpcSvrAddr)
 	_util.PanicIfErr(err, nil)
@@ -74,7 +74,7 @@ func main() {
 	/*
 		初始化grpcSvr和httpSvr
 	*/
-	grpcSvr := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
+	grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
 	httpSvr := &http.Server{}
 
 	// 创建一个所有后台任务共享的ctx，当进程退出时，所有后台任务都应该监听到ctx.Done()，然后graceful exit
@@ -97,7 +97,7 @@ func main() {
 		// 这里因为程序要退出了，所以不用再 defer cancel(), 其他时候最好执行 defer cancel() 释放其内部资源
 		closeCtx, _ := context.WithTimeout(context.Background(), time.Second*2)
 
-		grpcSvr.GracefulStop()
+		grpcSrv.GracefulStop()
 		err = httpSvr.Shutdown(closeCtx)
 		_util.PanicIfErr(err, nil)
 	}
@@ -123,16 +123,16 @@ func main() {
 
 	// 添加后台任务：启动rpc-svr
 	startGrpcSvrTask := func(_ context.Context, setter _go.Setter) {
-		logger.Log("NewSafeAsyncTask", "grpcSvr", "grpcSvrAddr", grpcSvrAddr)
+		logger.Log("NewSafeAsyncTask", "grpcSrv", "grpcSvrAddr", grpcSvrAddr)
 		// 这里注册了AddSvr以及healthSvr
-		addsvcpb.RegisterAddServer(grpcSvr, addSvrAPI)
+		addsvcpb.RegisterAddServer(grpcSrv, addSrv)
 
 		s := gokit_foundation.NewHealthCheckSvr()
-		grpc_health_v1.RegisterHealthServer(grpcSvr, s)
+		grpc_health_v1.RegisterHealthServer(grpcSrv, s)
 
-		err := grpcSvr.Serve(grpcLis)
+		err := grpcSrv.Serve(grpcLis)
 		if err != nil {
-			logger.Log("NewSafeAsyncTask", "grpcSvr", "err", err)
+			logger.Log("NewSafeAsyncTask", "grpcSrv", "err", err)
 			setter.SetErr(err)
 		}
 	}
