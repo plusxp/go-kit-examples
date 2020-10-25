@@ -4,6 +4,16 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	pb "hello/pb/gen-go/pb"
+	endpoint "hello/pkg/endpoint"
+	grpc "hello/pkg/grpc"
+	service "hello/pkg/service"
+	"net"
+	http1 "net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	endpoint1 "github.com/go-kit/kit/endpoint"
 	log "github.com/go-kit/kit/log"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
@@ -16,17 +26,8 @@ import (
 	prometheus1 "github.com/prometheus/client_golang/prometheus"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 	grpc1 "google.golang.org/grpc"
-	pb "hello/pb/gen-go/pb"
-	endpoint "hello/pkg/endpoint"
-	grpc "hello/pkg/grpc"
-	service "hello/pkg/service"
-	"net"
-	http1 "net/http"
-	"os"
-	"os/signal"
 	appdash "sourcegraph.com/sourcegraph/appdash"
 	opentracing "sourcegraph.com/sourcegraph/appdash/opentracing"
-	"syscall"
 )
 
 var tracer opentracinggo.Tracer
@@ -91,6 +92,8 @@ func Run() {
 	g := createService(eps)
 	initMetricsEndpoint(g)
 	initCancelInterrupt(g)
+	initShortTimeTask()
+	defer onClose()
 	logger.Log("exit", g.Run())
 
 }
@@ -99,17 +102,23 @@ func initGRPCHandler(endpoints endpoint.Endpoints, g *group.Group) {
 	// Add your GRPC options here
 
 	grpcServer := grpc.NewGRPCServer(endpoints, options)
-	grpcListener, err := net.Listen("tcp", *grpcAddr)
-	if err != nil {
-		logger.Log("transport", "gRPC", "during", "Listen", "err", err)
-	}
+
+	var grpcListener net.Listener
+	var err error
+
 	g.Add(func() error {
 		logger.Log("transport", "gRPC", "addr", *grpcAddr)
+		grpcListener, err = net.Listen("tcp", *grpcAddr)
+		if err != nil {
+			return err
+		}
 		baseServer := grpc1.NewServer()
 		pb.RegisterHelloServer(baseServer, grpcServer)
 		return baseServer.Serve(grpcListener)
 	}, func(error) {
-		grpcListener.Close()
+		if grpcListener != nil {
+			grpcListener.Close()
+		}
 	})
 
 }
@@ -135,15 +144,21 @@ func getEndpointMiddleware(logger log.Logger) (mw map[string][]endpoint1.Middlew
 }
 func initMetricsEndpoint(g *group.Group) {
 	http1.DefaultServeMux.Handle("/metrics", promhttp.Handler())
-	debugListener, err := net.Listen("tcp", *debugAddr)
-	if err != nil {
-		logger.Log("transport", "debug/HTTP", "during", "Listen", "err", err)
-	}
+
+	var debugListener net.Listener
+	var err error
+
 	g.Add(func() error {
 		logger.Log("transport", "debug/HTTP", "addr", *debugAddr)
+		debugListener, err = net.Listen("tcp", *debugAddr)
+		if err != nil {
+			return err
+		}
 		return http1.Serve(debugListener, http1.DefaultServeMux)
 	}, func(error) {
-		debugListener.Close()
+		if debugListener != nil {
+			debugListener.Close()
+		}
 	})
 }
 func initCancelInterrupt(g *group.Group) {

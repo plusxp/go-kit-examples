@@ -13,12 +13,12 @@ import (
 // HelloService describes the service.
 type HelloService interface {
 	// 服务方法，对应接口
-	SayHi(ctx context.Context, name string) (reply string, err pbcommon.R)
+	SayHi(ctx context.Context, name string) (Response string, err pbcommon.R)
 
 	// 为了方便client更直接的返回response，service层也可以直接使用定好的req&rsp协议
-	MakeADate(context.Context, *pb.MakeADateRequest) (*pb.MakeADateReply, error)
+	MakeADate(context.Context, *pb.MakeADateRequest) (*pb.MakeADateResponse, error)
 
-	UpdateUserInfo(context.Context, *pb.UpdateUserInfoRequest) (*pb.UpdateUserInfoReply, error)
+	UpdateUserInfo(context.Context, *pb.UpdateUserInfoRequest) (*pb.UpdateUserInfoResponse, error)
 }
 
 type basicHelloService struct {
@@ -39,7 +39,7 @@ func New(middleware []Middleware, logger log.Logger) HelloService {
 	return svc
 }
 
-func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply string, err pbcommon.R) {
+func (b *basicHelloService) SayHi(ctx context.Context, name string) (Response string, err pbcommon.R) {
 	if name == "XI" {
 		return "", pbcommon.R_INVALID_ARGS
 	}
@@ -47,8 +47,8 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (reply strin
 }
 
 // c0,p1是kit默认的变量命名规则，暂时认为没必要改
-func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply, err error) {
-	p0 = &pb.MakeADateReply{
+func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateResponse, err error) {
+	p0 = &pb.MakeADateResponse{
 		BaseRsp: &pbcommon.BaseRsp{},
 	}
 
@@ -76,8 +76,8 @@ func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateReques
 	return p0, nil
 }
 
-func (b *basicHelloService) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoReply, e1 error) {
-	p0 = &pb.UpdateUserInfoReply{
+func (b *basicHelloService) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoResponse, e1 error) {
+	p0 = &pb.UpdateUserInfoResponse{
 		BaseRsp: &pbcommon.BaseRsp{},
 	}
 	// 不做任何事（请注意一定返回一个非nil的rsp，除非发生严重错误）

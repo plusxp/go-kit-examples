@@ -45,7 +45,7 @@ type MakeADateRequest struct {
 
 // MakeADateResponse collects the response parameters for the MakeADate method.
 type MakeADateResponse struct {
-	P0  *pb.MakeADateReply `json:"p0"`
+	P0  *pb.MakeADateResponse `json:"p0"`
 	Err error
 }
 
@@ -59,7 +59,7 @@ func MakeMakeADateEndpoint(s service.HelloService) endpoint.Endpoint {
 }
 
 // MakeADate implements Service. Primarily useful in a client.
-func (e Endpoints) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateReply, err error) {
+func (e Endpoints) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateResponse, err error) {
 	request := &MakeADateRequest{P1: p1}
 	response, err := e.MakeADateEndpoint(c0, request)
 	if err != nil {
@@ -89,8 +89,8 @@ type UpdateUserInfoRequest struct {
 
 // UpdateUserInfoResponse collects the response parameters for the UpdateUserInfo method.
 type UpdateUserInfoResponse struct {
-	P0 *pb.UpdateUserInfoReply `json:"p0"`
-	E1 error                   `json:"e1"`
+	P0 *pb.UpdateUserInfoResponse `json:"p0"`
+	E1 error                      `json:"e1"`
 }
 
 // MakeUpdateUserInfoEndpoint returns an endpoint that invokes UpdateUserInfo on the service.
@@ -111,7 +111,7 @@ func (r UpdateUserInfoResponse) Failed() error {
 }
 
 // UpdateUserInfo implements Service. Primarily useful in a client.
-func (e Endpoints) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoReply, e1 error) {
+func (e Endpoints) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoResponse, e1 error) {
 	request := &UpdateUserInfoRequest{P1: p1}
 	response, err := e.UpdateUserInfoEndpoint(c0, request)
 	if err != nil {
