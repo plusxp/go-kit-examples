@@ -1,3 +1,9 @@
+## 2020年10月25日 Update
+- [kit][1] 现已支持 `go get`命令安装，无需clone后安装
+- [kit][1] 增加 `-v` flag以支持查看version
+- [kit][1] `cmd/service.go` 内的initXXX函数写法优化，解决端口冲突后运行不正常
+- `demo_project/hello` 新增定时任务示例，包含分布式锁，redis相关
+
 ## 2020年10月21日 Update
 - 修复[kit][1]在go1.15(可能包含其他go版本，但go1.12是正常的)下不能正常工作的bug
 - 修正注释：`gateway/hellosvc.go`
