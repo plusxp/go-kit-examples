@@ -72,7 +72,7 @@ func (m *SayHiRequest) GetName() string {
 	return ""
 }
 
-type SayHiReply struct {
+type SayHiResponse struct {
 	BaseRsp              *pbcommon.BaseRsp `protobuf:"bytes,2,opt,name=base_rsp,json=baseRsp,proto3" json:"base_rsp,omitempty"`
 	Reply                string            `protobuf:"bytes,1,opt,name=reply,proto3" json:"reply,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
@@ -80,39 +80,39 @@ type SayHiReply struct {
 	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *SayHiReply) Reset()         { *m = SayHiReply{} }
-func (m *SayHiReply) String() string { return proto.CompactTextString(m) }
-func (*SayHiReply) ProtoMessage()    {}
-func (*SayHiReply) Descriptor() ([]byte, []int) {
+func (m *SayHiResponse) Reset()         { *m = SayHiResponse{} }
+func (m *SayHiResponse) String() string { return proto.CompactTextString(m) }
+func (*SayHiResponse) ProtoMessage()    {}
+func (*SayHiResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_61ef911816e0a8ce, []int{1}
 }
 
-func (m *SayHiReply) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_SayHiReply.Unmarshal(m, b)
+func (m *SayHiResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_SayHiResponse.Unmarshal(m, b)
 }
-func (m *SayHiReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_SayHiReply.Marshal(b, m, deterministic)
+func (m *SayHiResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_SayHiResponse.Marshal(b, m, deterministic)
 }
-func (m *SayHiReply) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_SayHiReply.Merge(m, src)
+func (m *SayHiResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_SayHiResponse.Merge(m, src)
 }
-func (m *SayHiReply) XXX_Size() int {
-	return xxx_messageInfo_SayHiReply.Size(m)
+func (m *SayHiResponse) XXX_Size() int {
+	return xxx_messageInfo_SayHiResponse.Size(m)
 }
-func (m *SayHiReply) XXX_DiscardUnknown() {
-	xxx_messageInfo_SayHiReply.DiscardUnknown(m)
+func (m *SayHiResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_SayHiResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_SayHiReply proto.InternalMessageInfo
+var xxx_messageInfo_SayHiResponse proto.InternalMessageInfo
 
-func (m *SayHiReply) GetBaseRsp() *pbcommon.BaseRsp {
+func (m *SayHiResponse) GetBaseRsp() *pbcommon.BaseRsp {
 	if m != nil {
 		return m.BaseRsp
 	}
 	return nil
 }
 
-func (m *SayHiReply) GetReply() string {
+func (m *SayHiResponse) GetReply() string {
 	if m != nil {
 		return m.Reply
 	}
@@ -174,7 +174,7 @@ func (m *MakeADateRequest) GetWantSay() string {
 	return ""
 }
 
-type MakeADateReply struct {
+type MakeADateResponse struct {
 	BaseRsp              *pbcommon.BaseRsp `protobuf:"bytes,2,opt,name=base_rsp,json=baseRsp,proto3" json:"base_rsp,omitempty"`
 	Reply                string            `protobuf:"bytes,1,opt,name=reply,proto3" json:"reply,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
@@ -182,39 +182,39 @@ type MakeADateReply struct {
 	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *MakeADateReply) Reset()         { *m = MakeADateReply{} }
-func (m *MakeADateReply) String() string { return proto.CompactTextString(m) }
-func (*MakeADateReply) ProtoMessage()    {}
-func (*MakeADateReply) Descriptor() ([]byte, []int) {
+func (m *MakeADateResponse) Reset()         { *m = MakeADateResponse{} }
+func (m *MakeADateResponse) String() string { return proto.CompactTextString(m) }
+func (*MakeADateResponse) ProtoMessage()    {}
+func (*MakeADateResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_61ef911816e0a8ce, []int{3}
 }
 
-func (m *MakeADateReply) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_MakeADateReply.Unmarshal(m, b)
+func (m *MakeADateResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_MakeADateResponse.Unmarshal(m, b)
 }
-func (m *MakeADateReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_MakeADateReply.Marshal(b, m, deterministic)
+func (m *MakeADateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_MakeADateResponse.Marshal(b, m, deterministic)
 }
-func (m *MakeADateReply) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_MakeADateReply.Merge(m, src)
+func (m *MakeADateResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MakeADateResponse.Merge(m, src)
 }
-func (m *MakeADateReply) XXX_Size() int {
-	return xxx_messageInfo_MakeADateReply.Size(m)
+func (m *MakeADateResponse) XXX_Size() int {
+	return xxx_messageInfo_MakeADateResponse.Size(m)
 }
-func (m *MakeADateReply) XXX_DiscardUnknown() {
-	xxx_messageInfo_MakeADateReply.DiscardUnknown(m)
+func (m *MakeADateResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MakeADateResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_MakeADateReply proto.InternalMessageInfo
+var xxx_messageInfo_MakeADateResponse proto.InternalMessageInfo
 
-func (m *MakeADateReply) GetBaseRsp() *pbcommon.BaseRsp {
+func (m *MakeADateResponse) GetBaseRsp() *pbcommon.BaseRsp {
 	if m != nil {
 		return m.BaseRsp
 	}
 	return nil
 }
 
-func (m *MakeADateReply) GetReply() string {
+func (m *MakeADateResponse) GetReply() string {
 	if m != nil {
 		return m.Reply
 	}
@@ -276,39 +276,39 @@ func (m *UpdateUserInfoRequest) GetNewName() string {
 	return ""
 }
 
-type UpdateUserInfoReply struct {
+type UpdateUserInfoResponse struct {
 	BaseRsp              *pbcommon.BaseRsp `protobuf:"bytes,1,opt,name=base_rsp,json=baseRsp,proto3" json:"base_rsp,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
 	XXX_sizecache        int32             `json:"-"`
 }
 
-func (m *UpdateUserInfoReply) Reset()         { *m = UpdateUserInfoReply{} }
-func (m *UpdateUserInfoReply) String() string { return proto.CompactTextString(m) }
-func (*UpdateUserInfoReply) ProtoMessage()    {}
-func (*UpdateUserInfoReply) Descriptor() ([]byte, []int) {
+func (m *UpdateUserInfoResponse) Reset()         { *m = UpdateUserInfoResponse{} }
+func (m *UpdateUserInfoResponse) String() string { return proto.CompactTextString(m) }
+func (*UpdateUserInfoResponse) ProtoMessage()    {}
+func (*UpdateUserInfoResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_61ef911816e0a8ce, []int{5}
 }
 
-func (m *UpdateUserInfoReply) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_UpdateUserInfoReply.Unmarshal(m, b)
+func (m *UpdateUserInfoResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_UpdateUserInfoResponse.Unmarshal(m, b)
 }
-func (m *UpdateUserInfoReply) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_UpdateUserInfoReply.Marshal(b, m, deterministic)
+func (m *UpdateUserInfoResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_UpdateUserInfoResponse.Marshal(b, m, deterministic)
 }
-func (m *UpdateUserInfoReply) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_UpdateUserInfoReply.Merge(m, src)
+func (m *UpdateUserInfoResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_UpdateUserInfoResponse.Merge(m, src)
 }
-func (m *UpdateUserInfoReply) XXX_Size() int {
-	return xxx_messageInfo_UpdateUserInfoReply.Size(m)
+func (m *UpdateUserInfoResponse) XXX_Size() int {
+	return xxx_messageInfo_UpdateUserInfoResponse.Size(m)
 }
-func (m *UpdateUserInfoReply) XXX_DiscardUnknown() {
-	xxx_messageInfo_UpdateUserInfoReply.DiscardUnknown(m)
+func (m *UpdateUserInfoResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_UpdateUserInfoResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_UpdateUserInfoReply proto.InternalMessageInfo
+var xxx_messageInfo_UpdateUserInfoResponse proto.InternalMessageInfo
 
-func (m *UpdateUserInfoReply) GetBaseRsp() *pbcommon.BaseRsp {
+func (m *UpdateUserInfoResponse) GetBaseRsp() *pbcommon.BaseRsp {
 	if m != nil {
 		return m.BaseRsp
 	}
@@ -317,11 +317,11 @@ func (m *UpdateUserInfoReply) GetBaseRsp() *pbcommon.BaseRsp {
 
 func init() {
 	proto.RegisterType((*SayHiRequest)(nil), "pb.SayHiRequest")
-	proto.RegisterType((*SayHiReply)(nil), "pb.SayHiReply")
+	proto.RegisterType((*SayHiResponse)(nil), "pb.SayHiResponse")
 	proto.RegisterType((*MakeADateRequest)(nil), "pb.MakeADateRequest")
-	proto.RegisterType((*MakeADateReply)(nil), "pb.MakeADateReply")
+	proto.RegisterType((*MakeADateResponse)(nil), "pb.MakeADateResponse")
 	proto.RegisterType((*UpdateUserInfoRequest)(nil), "pb.UpdateUserInfoRequest")
-	proto.RegisterType((*UpdateUserInfoReply)(nil), "pb.UpdateUserInfoReply")
+	proto.RegisterType((*UpdateUserInfoResponse)(nil), "pb.UpdateUserInfoResponse")
 }
 
 func init() {
@@ -329,30 +329,30 @@ func init() {
 }
 
 var fileDescriptor_61ef911816e0a8ce = []byte{
-	// 366 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x53, 0xcf, 0x4f, 0xea, 0x40,
-	0x10, 0x4e, 0x79, 0x8f, 0x5f, 0xc3, 0x7b, 0x04, 0x17, 0x08, 0xd0, 0x13, 0xe9, 0x09, 0x13, 0x2d,
-	0x09, 0xc6, 0x93, 0x27, 0x91, 0x03, 0x1c, 0x34, 0xa4, 0xc8, 0xc5, 0x4b, 0xb3, 0x2b, 0x23, 0x12,
-	0x4b, 0xbb, 0x74, 0x8b, 0xa4, 0x7f, 0x95, 0xff, 0xa2, 0x99, 0x6d, 0xa3, 0x58, 0x49, 0x4c, 0x88,
-	0xa7, 0x9d, 0xd9, 0x6f, 0x67, 0xbe, 0xf9, 0xf6, 0xdb, 0x85, 0xca, 0x33, 0x7a, 0x5e, 0x60, 0xcb,
-	0x30, 0x88, 0x02, 0x96, 0x93, 0xc2, 0xac, 0x3f, 0x06, 0xeb, 0x75, 0xe0, 0xf7, 0x93, 0x25, 0x01,
-	0xac, 0x29, 0xfc, 0x9b, 0xf1, 0x78, 0xbc, 0x72, 0x70, 0xb3, 0x45, 0x15, 0xb1, 0x33, 0x28, 0x09,
-	0xae, 0xd0, 0x0d, 0x71, 0xd3, 0x36, 0xba, 0x46, 0xaf, 0x32, 0x38, 0xb1, 0xa5, 0x48, 0x4b, 0x86,
-	0x5c, 0xa1, 0x83, 0x1b, 0xa7, 0x28, 0x92, 0x80, 0x31, 0xf8, 0xeb, 0xf3, 0x35, 0xb6, 0x73, 0x5d,
-	0xa3, 0x57, 0x76, 0x74, 0x6c, 0x4d, 0x01, 0xd2, 0x8e, 0xd2, 0x8b, 0x3f, 0xfb, 0x29, 0xa9, 0x4f,
-	0x7d, 0xef, 0xa7, 0x64, 0xda, 0x4f, 0x49, 0xd6, 0x80, 0x7c, 0x48, 0x65, 0x9a, 0xba, 0xec, 0x24,
-	0x89, 0xf5, 0x0a, 0xb5, 0x5b, 0xfe, 0x82, 0xd7, 0x23, 0x1e, 0xe1, 0x71, 0x73, 0x76, 0xa0, 0xb4,
-	0xe0, 0x11, 0xba, 0x2a, 0x0a, 0xd3, 0x59, 0x8b, 0x94, 0xcf, 0xa2, 0x90, 0xa0, 0x1d, 0xf7, 0x23,
-	0x57, 0xf1, 0xb8, 0xfd, 0x27, 0x81, 0x28, 0x9f, 0xf1, 0xd8, 0xba, 0x87, 0xea, 0x1e, 0xef, 0x6f,
-	0xa9, 0x89, 0xa1, 0x39, 0x97, 0xc4, 0x3e, 0x57, 0x18, 0x4e, 0xfc, 0xa7, 0xe0, 0x38, 0x49, 0x2d,
-	0x28, 0x6e, 0x15, 0x86, 0xee, 0x6a, 0xa1, 0x27, 0xf9, 0xef, 0x14, 0x28, 0x9d, 0x2c, 0x48, 0x90,
-	0x8f, 0x3b, 0x57, 0xfb, 0x92, 0x0a, 0xf2, 0x71, 0x77, 0x47, 0xd6, 0xdc, 0x40, 0x3d, 0x4b, 0x9d,
-	0x55, 0x65, 0xfc, 0xa4, 0x6a, 0xf0, 0x66, 0x40, 0x7e, 0x4c, 0x4f, 0x8b, 0x9d, 0x42, 0x5e, 0x3b,
-	0xcd, 0x6a, 0xb6, 0x14, 0xf6, 0xfe, 0x33, 0x32, 0xab, 0x7b, 0x3b, 0x44, 0x71, 0x09, 0xe5, 0x8f,
-	0xab, 0x64, 0x0d, 0x02, 0xb3, 0x8e, 0x9a, 0x2c, 0xb3, 0x4b, 0x65, 0x23, 0xa8, 0x7e, 0x1d, 0x98,
-	0x75, 0xe8, 0xd4, 0xc1, 0xfb, 0x33, 0x5b, 0x87, 0x20, 0xe9, 0xc5, 0xc3, 0xd6, 0x43, 0x53, 0xff,
-	0x85, 0xbe, 0x14, 0xfd, 0x25, 0xfa, 0xe7, 0x4b, 0x8a, 0xae, 0xa4, 0x10, 0x05, 0xfd, 0x07, 0x2e,
-	0xde, 0x03, 0x00, 0x00, 0xff, 0xff, 0x63, 0xdf, 0xf4, 0xca, 0x2b, 0x03, 0x00, 0x00,
+	// 368 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x53, 0x4d, 0x4f, 0x02, 0x31,
+	0x10, 0xcd, 0xa2, 0x7c, 0x0d, 0x62, 0xa0, 0x82, 0xc0, 0x9e, 0xc8, 0x9e, 0x38, 0xe0, 0x92, 0xe0,
+	0xc5, 0xc4, 0x93, 0xc4, 0x28, 0x1c, 0x34, 0x66, 0x37, 0xc4, 0xc4, 0xcb, 0xa6, 0x95, 0x11, 0x89,
+	0xd0, 0x2d, 0xdb, 0x45, 0xb2, 0xff, 0xcc, 0x9f, 0x67, 0xda, 0x6d, 0x14, 0x91, 0xc4, 0x84, 0x78,
+	0xea, 0x4c, 0x5f, 0xfb, 0xe6, 0xbd, 0x4e, 0x07, 0x4a, 0xaf, 0x38, 0x9f, 0x87, 0xae, 0x88, 0xc2,
+	0x38, 0x24, 0x19, 0xc1, 0xec, 0x93, 0xe7, 0x70, 0xb1, 0x08, 0x79, 0x2f, 0x5d, 0x52, 0xc0, 0x79,
+	0x80, 0x23, 0x9f, 0x26, 0xc3, 0x99, 0x87, 0xcb, 0x15, 0xca, 0x98, 0x74, 0xa1, 0xc0, 0xa8, 0xc4,
+	0x20, 0xc2, 0x65, 0xd3, 0x6a, 0x5b, 0x9d, 0x52, 0xbf, 0xea, 0x0a, 0x66, 0xae, 0x0c, 0xa8, 0x44,
+	0x0f, 0x97, 0x5e, 0x9e, 0xa5, 0x01, 0x21, 0x70, 0xc8, 0xe9, 0x02, 0x9b, 0x99, 0xb6, 0xd5, 0x29,
+	0x7a, 0x3a, 0x76, 0x7c, 0x28, 0x1b, 0x46, 0x29, 0x42, 0x2e, 0xf1, 0x9b, 0x52, 0x0a, 0x7d, 0xf0,
+	0x37, 0xa5, 0x14, 0x86, 0x52, 0x0a, 0x52, 0x83, 0x6c, 0x84, 0x62, 0x9e, 0xe8, 0xea, 0x45, 0x2f,
+	0x4d, 0x9c, 0x77, 0xa8, 0xdc, 0xd1, 0x37, 0xbc, 0xba, 0xa6, 0x31, 0xee, 0x27, 0xb5, 0x05, 0x85,
+	0x09, 0x8d, 0x31, 0x90, 0x71, 0x64, 0xe4, 0xe6, 0x55, 0xee, 0xc7, 0x91, 0x82, 0xd6, 0x94, 0xc7,
+	0x81, 0xa4, 0x49, 0xf3, 0x20, 0x85, 0x54, 0xee, 0xd3, 0xc4, 0x79, 0x84, 0xea, 0x46, 0xdd, 0x7f,
+	0x34, 0x94, 0x40, 0x7d, 0x2c, 0x94, 0x80, 0xb1, 0xc4, 0x68, 0xc4, 0x5f, 0xc2, 0xfd, 0x5c, 0x35,
+	0x20, 0xbf, 0x92, 0x18, 0x05, 0xb3, 0x89, 0x56, 0x52, 0xf6, 0x72, 0x2a, 0x1d, 0x4d, 0x94, 0x27,
+	0x8e, 0xeb, 0x40, 0x77, 0xc7, 0x78, 0xe2, 0xb8, 0xbe, 0x57, 0x0d, 0xba, 0x81, 0xd3, 0xed, 0xd2,
+	0x3b, 0x8c, 0x59, 0x7f, 0x19, 0xeb, 0x7f, 0x58, 0x90, 0x1d, 0xaa, 0x3f, 0x46, 0xba, 0x90, 0xd5,
+	0x2d, 0x27, 0x15, 0x57, 0x30, 0x77, 0xf3, 0x3f, 0xd9, 0xd5, 0x8d, 0x1d, 0x53, 0xe5, 0x02, 0x8a,
+	0x5f, 0x6f, 0x4a, 0x6a, 0x0a, 0xdf, 0x6e, 0xad, 0x5d, 0xdf, 0xda, 0x35, 0x37, 0x6f, 0xe1, 0xf8,
+	0xa7, 0x72, 0xd2, 0x52, 0x07, 0x77, 0x3e, 0xa4, 0x6d, 0xef, 0x82, 0x52, 0xa2, 0x41, 0xe3, 0xa9,
+	0xae, 0xa7, 0xa3, 0x27, 0x58, 0x6f, 0x8a, 0xfc, 0x6c, 0xaa, 0xa2, 0x4b, 0xc1, 0x58, 0x4e, 0x4f,
+	0xc5, 0xf9, 0x67, 0x00, 0x00, 0x00, 0xff, 0xff, 0x6b, 0xac, 0xb1, 0x15, 0x3d, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -367,9 +367,9 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type HelloClient interface {
-	SayHi(ctx context.Context, in *SayHiRequest, opts ...grpc.CallOption) (*SayHiReply, error)
-	MakeADate(ctx context.Context, in *MakeADateRequest, opts ...grpc.CallOption) (*MakeADateReply, error)
-	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...grpc.CallOption) (*UpdateUserInfoReply, error)
+	SayHi(ctx context.Context, in *SayHiRequest, opts ...grpc.CallOption) (*SayHiResponse, error)
+	MakeADate(ctx context.Context, in *MakeADateRequest, opts ...grpc.CallOption) (*MakeADateResponse, error)
+	UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...grpc.CallOption) (*UpdateUserInfoResponse, error)
 }
 
 type helloClient struct {
@@ -380,8 +380,8 @@ func NewHelloClient(cc grpc.ClientConnInterface) HelloClient {
 	return &helloClient{cc}
 }
 
-func (c *helloClient) SayHi(ctx context.Context, in *SayHiRequest, opts ...grpc.CallOption) (*SayHiReply, error) {
-	out := new(SayHiReply)
+func (c *helloClient) SayHi(ctx context.Context, in *SayHiRequest, opts ...grpc.CallOption) (*SayHiResponse, error) {
+	out := new(SayHiResponse)
 	err := c.cc.Invoke(ctx, "/pb.Hello/SayHi", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -389,8 +389,8 @@ func (c *helloClient) SayHi(ctx context.Context, in *SayHiRequest, opts ...grpc.
 	return out, nil
 }
 
-func (c *helloClient) MakeADate(ctx context.Context, in *MakeADateRequest, opts ...grpc.CallOption) (*MakeADateReply, error) {
-	out := new(MakeADateReply)
+func (c *helloClient) MakeADate(ctx context.Context, in *MakeADateRequest, opts ...grpc.CallOption) (*MakeADateResponse, error) {
+	out := new(MakeADateResponse)
 	err := c.cc.Invoke(ctx, "/pb.Hello/MakeADate", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -398,8 +398,8 @@ func (c *helloClient) MakeADate(ctx context.Context, in *MakeADateRequest, opts 
 	return out, nil
 }
 
-func (c *helloClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...grpc.CallOption) (*UpdateUserInfoReply, error) {
-	out := new(UpdateUserInfoReply)
+func (c *helloClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequest, opts ...grpc.CallOption) (*UpdateUserInfoResponse, error) {
+	out := new(UpdateUserInfoResponse)
 	err := c.cc.Invoke(ctx, "/pb.Hello/UpdateUserInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -409,22 +409,22 @@ func (c *helloClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInfoRequ
 
 // HelloServer is the server API for Hello service.
 type HelloServer interface {
-	SayHi(context.Context, *SayHiRequest) (*SayHiReply, error)
-	MakeADate(context.Context, *MakeADateRequest) (*MakeADateReply, error)
-	UpdateUserInfo(context.Context, *UpdateUserInfoRequest) (*UpdateUserInfoReply, error)
+	SayHi(context.Context, *SayHiRequest) (*SayHiResponse, error)
+	MakeADate(context.Context, *MakeADateRequest) (*MakeADateResponse, error)
+	UpdateUserInfo(context.Context, *UpdateUserInfoRequest) (*UpdateUserInfoResponse, error)
 }
 
 // UnimplementedHelloServer can be embedded to have forward compatible implementations.
 type UnimplementedHelloServer struct {
 }
 
-func (*UnimplementedHelloServer) SayHi(ctx context.Context, req *SayHiRequest) (*SayHiReply, error) {
+func (*UnimplementedHelloServer) SayHi(ctx context.Context, req *SayHiRequest) (*SayHiResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SayHi not implemented")
 }
-func (*UnimplementedHelloServer) MakeADate(ctx context.Context, req *MakeADateRequest) (*MakeADateReply, error) {
+func (*UnimplementedHelloServer) MakeADate(ctx context.Context, req *MakeADateRequest) (*MakeADateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MakeADate not implemented")
 }
-func (*UnimplementedHelloServer) UpdateUserInfo(ctx context.Context, req *UpdateUserInfoRequest) (*UpdateUserInfoReply, error) {
+func (*UnimplementedHelloServer) UpdateUserInfo(ctx context.Context, req *UpdateUserInfoRequest) (*UpdateUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserInfo not implemented")
 }
 

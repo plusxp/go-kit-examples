@@ -9,9 +9,9 @@ option go_package = "hello/pb/gen-go/pb;pb";
 
 //The Hello service definition.
 service Hello {
-    rpc SayHi          (SayHiRequest         ) returns (SayHiReply         );
-    rpc MakeADate      (MakeADateRequest     ) returns (MakeADateReply     );
-    rpc UpdateUserInfo (UpdateUserInfoRequest) returns (UpdateUserInfoReply);
+    rpc SayHi          (SayHiRequest         ) returns (SayHiResponse         );
+    rpc MakeADate      (MakeADateRequest     ) returns (MakeADateResponse     );
+    rpc UpdateUserInfo (UpdateUserInfoRequest) returns (UpdateUserInfoResponse);
 }
 
 message SayHiRequest {
@@ -19,7 +19,7 @@ message SayHiRequest {
     string           name     = 2;
 }
 
-message SayHiReply {
+message SayHiResponse {
     pbcommon.BaseRsp base_rsp = 2;
     string           reply    = 1;
 }
@@ -30,7 +30,7 @@ message MakeADateRequest {
     string           want_say = 3;
 }
 
-message MakeADateReply {
+message MakeADateResponse {
     pbcommon.BaseRsp base_rsp = 2;
     string           reply    = 1;
 }
@@ -41,7 +41,7 @@ message UpdateUserInfoRequest {
     string           new_name = 3;
 }
 
-message UpdateUserInfoReply {
+message UpdateUserInfoResponse {
     pbcommon.BaseRsp base_rsp = 1;
 }
 
