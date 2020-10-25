@@ -14,6 +14,7 @@ require (
 	github.com/gorilla/mux v1.7.3
 	github.com/hashicorp/consul/api v1.6.0
 	github.com/hashicorp/go-version v1.2.0 // indirect
+	github.com/leigg-go/go-util v0.0.3 // indirect
 	github.com/lightstep/lightstep-tracer-go v0.18.1
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	github.com/oklog/oklog v0.3.2
