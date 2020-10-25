@@ -567,6 +567,12 @@ ok      hello/client/grpc       1.118s
 
 [Gateway][gateway] 实现了一个http网关，代理了hello项目中的接口。
 
+### hello/gateway已具备的示例参考
+这里总结hello和gateway两个demo项目目前具有的功能示例代码
+`router`, `grpc`, `trace`, `metrics`, `ratelimit`, `breaker`, 
+`jwt`, `redis`, `timer task`, `distrib lock`
+> 不断新增，敬请期待~  
+
 ### 改进
 文档是花费我的业余时间编写的，因时间紧凑，无法避免一些小的瑕疵，以及更全面的介绍go-kit其他功能，例如
 - 如何接入Etcd（服务发现）
