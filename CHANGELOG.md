@@ -1,3 +1,7 @@
+## 2020年10月?日 Update
+- `demo_project/new_addsvc`优化`main.go`，封装init task，更简明
+- 【优化】改变shell script的import方式
+
 ## 2020年10月25日 Update
 - [kit][1] 现已支持 `go get`命令安装，无需clone后安装
 - [kit][1] 增加 `-v` flag以支持查看version
