@@ -48,7 +48,7 @@ func_get_checked_bgcolor() {
 	echo $_bgcolor_arg
 }
 
-imported_fn_echo_color_msg() {
+fn_echo_color_msg() {
 	# default
 	local color_id=$textcolor_red
 	local bgcolor_id=$bgcolor_default
@@ -96,9 +96,14 @@ imported_fn_echo_color_msg() {
 		exit 1
 	fi
 
-#	echo $color_arg $color_id ${bgcolor_id} ${message}
+	#	echo $color_arg $color_id ${bgcolor_id} ${message}
 	func_display_method      ${color_id} ${bgcolor_id} "$message" # 双引号传参，避免空格导致的参数分割问题
 }
+
+if [ $# -ne 0 ]; then
+	func_name="$1"
+	${func_name} "${@:2}"
+fi
 
 # comment
 <<EOF

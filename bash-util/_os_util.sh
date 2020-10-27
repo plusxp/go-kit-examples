@@ -28,6 +28,11 @@ _fn_convert_to_windows_path() {
 	echo $replace_to_double_slash
 }
 
+if [ $# -ne 0 ]; then
+	func_name="$1"
+	${func_name} "${@:2}"
+fi
+
 __test__fn_is_windows() {
 	echo "====== TEST ONLY ======"
 	_fn_is_windows

@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-source ../../../bash-util/_echo_color.sh
-source ../../../bash-util/_os_util.sh
+#source ../../../bash-util/_echo_color.sh
+#source ../../../bash-util/_os_util.sh
+
+# 下面使用 $script func_name args... 的方式调用外部函数
+sh_echo_color='../../../bash-util/_echo_color.sh'
+sh_os_util='../../../bash-util/_os_util.sh'
+chmod +x $sh_echo_color $sh_os_util
 
 # 执行各种构建、安装、分析等操作的脚本
 # 函数命名习惯：main func内调用的func命名以 fn_ 开头, 其他func内调用的func命名以 _fn_开头
@@ -15,7 +20,9 @@ declare CMD_ARRAY=()
 
 fn_init_cmd() {
 	# ------------------- 所有的CMD选项 ----------------------
-	readonly CMD_ARRAY=("gen" "gofmt" "govet")
+	CMD_ARRAY=("gen" "gofmt" "govet")
+	readonly    CMD_ARRAY # 不能在创建数组的时候使用readonly
+
 	# ...CMD_on_ok后缀的指令 表示 CMD指令执行成功后要继续执行的指令，类似的还有_on_fail,  _on_any
 	# 新增命令，只需在这里定义即可，无需其他操作
 	# 注意：这里定义的变量当做全局变量使用，请不要在此函数外定义xxx_cmd这样的变量，会干扰
@@ -43,7 +50,7 @@ _fn_execute() {
 
 	# 执行cmd对应指令
 	$cmd
-	local result_code=$?
+	local    result_code=$?
 
 	# 下面执行可能需要执行的附加指令
 
@@ -61,15 +68,15 @@ _fn_execute() {
 
 # DO NOT NEED EDIT THIS FUNC
 _fn_concat_if_not_empty() {
-	local old=$1
-	local mid=$2
-	local append=$3
+	local    old=$1
+	local    mid=$2
+	local    append=$3
 
-	if [[ -z "$append" ]]; then
-		echo $old
+	if    [[ -z $append ]]; then
+		echo       $old
 		return
 	fi
-	echo "$old $mid $append\n"
+	echo    "$old $mid $append\n"
 }
 
 # DO NOT NEED EDIT THIS FUNC
@@ -80,14 +87,14 @@ _fn_usage() {
 	for flag in    "${CMD_ARRAY[@]}"; do
 		cmd=$(      eval echo '$'"${flag}_cmd")
 		cmd_on_ok=$(      eval echo '$'"${flag}_cmd_on_ok")
-		cmd_on_fail=$(   eval echo '$'"${flag}_cmd_on_fail")
-		cmd_on_any=$(   eval echo '$'"${flag}_cmd_on_any")
+		cmd_on_fail=$(      eval echo '$'"${flag}_cmd_on_fail")
+		cmd_on_any=$(      eval echo '$'"${flag}_cmd_on_any")
 
 		# 注意双引号传参
-		output=$(_fn_concat_if_not_empty "$output" "${flag} <>" "$cmd")
-		output=$(_fn_concat_if_not_empty "$output" "---${flag}_cmd_on_ok <>" "$cmd_on_ok")
-		output=$(_fn_concat_if_not_empty "$output" "---${flag}_cmd_on_fail <>" "$cmd_on_fail")
-		output=$(_fn_concat_if_not_empty "$output" "---${flag}_cmd_on_any <>" "$cmd_on_any")
+		output=$(      _fn_concat_if_not_empty "$output" "${flag} <>" "$cmd")
+		output=$(      _fn_concat_if_not_empty "$output" "---${flag}_cmd_on_ok <>" "$cmd_on_ok")
+		output=$(      _fn_concat_if_not_empty "$output" "---${flag}_cmd_on_fail <>" "$cmd_on_fail")
+		output=$(      _fn_concat_if_not_empty "$output" "---${flag}_cmd_on_any <>" "$cmd_on_any")
 	done
 
 	echo    -e $output | column -t -s "<>"
@@ -130,26 +137,26 @@ fn_init() {
 		PROJECT_DIR=$project_dir
 	fi
 
-	PROTO_OUTPUT_DIR=$(dirname "$PROJECT_DIR")
+	PROTO_OUTPUT_DIR=$(   dirname "$PROJECT_DIR")
 	# windows上运行需要转换路径为windows路径，d:\\xxx
-	if [[ $(_fn_is_windows) == 'true' ]]; then
-		PROTO_OUTPUT_DIR=$(_fn_convert_to_windows_path $PROTO_OUTPUT_DIR)
+	if    [[ $($sh_os_util _fn_is_windows) == 'true' ]]; then
+		PROTO_OUTPUT_DIR=$(      $sh_os_util _fn_convert_to_windows_path $PROTO_OUTPUT_DIR)
 	fi
 	readonly    PROJECT_DIR
 	readonly    PROTO_OUTPUT_DIR
 
-	imported_fn_echo_color_msg    "> initial vars"
+	$sh_echo_color    fn_echo_color_msg "> initial vars"
 	_echo="
     PROJECT_DIR: $PROJECT_DIR
     PROTO_OUTPUT_DIR: $PROTO_OUTPUT_DIR
     "
-	imported_fn_echo_color_msg    "$_echo"
+	$sh_echo_color    fn_echo_color_msg "$_echo"
 }
 
 main() {
 	#	msg="***main.sh started***" # 问题：传入的前三个*全部丢失
 	msg="---------- main.sh started ----------"
-	imported_fn_echo_color_msg    'textcolor_red' "$msg"
+	$sh_echo_color    fn_echo_color_msg 'textcolor_red' "$msg"
 
 	fn_init
 	fn_init_cmd
@@ -174,7 +181,7 @@ cd /go/go-kit-examples/template/script
 EOF
 
 # 脚本格式化
-# cd go-util/tool
+# cd go-util/tool (如果是win平台，建议将shfmt放到你的全局环境变量PATH中去，当然也可以利用IDE的formatter)
 # ./shfmt.exe -s -w -i 4 -bn -ci -sr -kp ../script/main.sh
 
 # 关于shfmt工具， https://github.com/mvdan/sh
