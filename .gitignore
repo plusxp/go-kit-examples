@@ -1,3 +1,4 @@
 *.exe
+!shfmt.exe
 .idea
 go.sum
