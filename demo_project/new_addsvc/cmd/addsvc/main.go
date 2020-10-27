@@ -51,6 +51,15 @@ new_addsvc服务依赖了一些外部中间件如下：
 	-	prometheus
 */
 
+var (
+	grpcSrv *grpc.Server
+	httpSvr *http.Server
+	logger  log.Logger
+
+	// 创建一个所有后台任务共享的ctx，当进程退出时，所有后台任务都应该监听到ctx.Done()，然后graceful exit
+	shareCtx, cancel = context.WithCancel(context.Background())
+)
+
 func main() {
 	// 服务运行的主机地址，必须能够被你的consul-server访问，否则consul的健康检查会失败
 	svrHost := "192.168.1.15"
@@ -61,24 +70,10 @@ func main() {
 	httpSvrAddr := fmt.Sprintf("%s:%d", svrHost, *httpPort)
 
 	flag.Parse()
+	logger = gokit_foundation.NewKvLogger(nil)
 
-	logger := gokit_foundation.NewKvLogger(nil)
-	addSrv := NewSvr(logger)
-
-	grpcLis, err := net.Listen("tcp", grpcSvrAddr)
-	_util.PanicIfErr(err, nil)
-
-	httpLis, err := net.Listen("tcp", httpSvrAddr)
-	_util.PanicIfErr(err, nil)
-
-	/*
-		初始化grpcSvr和httpSvr
-	*/
-	grpcSrv := grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
-	httpSvr := &http.Server{}
-
-	// 创建一个所有后台任务共享的ctx，当进程退出时，所有后台任务都应该监听到ctx.Done()，然后graceful exit
-	var shareCtx, cancel = context.WithCancel(context.Background())
+	grpcSrv = grpc.NewServer(grpc.UnaryInterceptor(kitgrpc.Interceptor))
+	httpSvr = &http.Server{}
 
 	/*
 		这里使用 NewSafeAsyncTask 完成程序的一系列启动任务
@@ -88,58 +83,77 @@ func main() {
 	// 初始化一个SafeAsyncTask对象
 	ak := _go.NewSafeAsyncTask(shareCtx, cancel)
 
-	// 程序退出时的操作
+	addTaskListenSignal(ak)
+	addTaskSvcRegister(ak, svrHost, *grpcPort)
+	addTaskHttpSvr(ak, httpSvrAddr)
+	addTaskGRPCSvr(ak, grpcSvrAddr)
+
+	logger.Log("main", "started")
+	ak.Run()
+}
+
+// 添加后台任务：监听退出信号（第一个添加）
+func addTaskListenSignal(ak *_go.SafeAsyncTask) {
 	onClose := func() {
 		// 注意，首先应该先从consul删除实例信息，再执行其他操作
 		gokit_foundation.ConsulDeregister()
-
 		// 创建一个用于执行资源释放的ctx，避免时间过长
 		// 这里因为程序要退出了，所以不用再 defer cancel(), 其他时候最好执行 defer cancel() 释放其内部资源
-		closeCtx, _ := context.WithTimeout(context.Background(), time.Second*2)
+		closeCtx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+		defer cancel()
 
 		grpcSrv.GracefulStop()
-		err = httpSvr.Shutdown(closeCtx)
-		_util.PanicIfErr(err, nil)
 
-		logger.Log("onClose", "done")
+		err := httpSvr.Shutdown(closeCtx)
+		logger.Log("onClose", "done", "err", err)
 	}
-
-	// 添加后台任务：监听退出信号（第一个添加）
 	onSignalTask := _util.ListenSignalTask(shareCtx, cancel, logger, onClose)
 	ak.AddTask(onSignalTask)
+}
 
-	// 添加后台任务：service discovery
-	svcRegTask := internal.SvcRegisterTask(shareCtx, logger, config.ServiceName, svrHost, *grpcPort)
+// 添加后台任务：service discovery
+func addTaskSvcRegister(ak *_go.SafeAsyncTask, svrHost string, grpcPort int) {
+	svcRegTask := internal.SvcRegisterTask(shareCtx, logger, config.ServiceName, svrHost, grpcPort)
 	ak.AddTask(svcRegTask)
+}
 
+func addTaskHttpSvr(ak *_go.SafeAsyncTask, httpSvrAddr string) {
 	// http服务监听8080, 目前只提供metric接口给prometheus调用
-	httpSvc := func(_ context.Context, setter _go.Setter) {
-		logger.Log("NewSafeAsyncTask", "httpSvc", "httpSvrAddr", httpSvrAddr)
+	httpSrv := func(_ context.Context, setter _go.Setter) {
+		logger.Log("NewSafeAsyncTask", "httpSrv", "httpSvrAddr", httpSvrAddr)
+
+		httpLis, err := net.Listen("tcp", httpSvrAddr)
+		_util.PanicIfErr(err, nil)
+
 		// default use http.DefaultServeMux as handler
-		err := httpSvr.Serve(httpLis)
+		err = httpSvr.Serve(httpLis)
 		// 调用SetErr后，若err!=nil，会使得所有task立即退出
-		logger.Log("NewSafeAsyncTask", "httpSvc", "err", err)
+		logger.Log("NewSafeAsyncTask", "httpSrv", "err", err)
 		setter.SetErr(err)
 	}
-	ak.AddTask(httpSvc)
+	ak.AddTask(httpSrv)
+}
 
+func addTaskGRPCSvr(ak *_go.SafeAsyncTask, grpcSvrAddr string) {
 	// 添加后台任务：启动rpc-svr
-	startGrpcSvrTask := func(_ context.Context, setter _go.Setter) {
-		logger.Log("NewSafeAsyncTask", "grpcSrv", "grpcSvrAddr", grpcSvrAddr)
-		// 这里注册了AddSvr以及healthSvr
+	grpcSrv := func(_ context.Context, setter _go.Setter) {
+		logger.Log("NewSafeAsyncTask", "grpcSrvgrpcSrv", "grpcSvrAddr", grpcSvrAddr)
+
+		grpcLis, err := net.Listen("tcp", grpcSvrAddr)
+		_util.PanicIfErr(err, nil)
+
+		addSrv := NewSvr(logger)
 		addsvcpb.RegisterAddServer(grpcSrv, addSrv)
 
+		// 这里注册了AddSvr以及healthSvr
 		s := gokit_foundation.NewHealthCheckSvr()
 		grpc_health_v1.RegisterHealthServer(grpcSrv, s)
 
-		err := grpcSrv.Serve(grpcLis)
+		err = grpcSrv.Serve(grpcLis)
 		if err != nil {
 			logger.Log("NewSafeAsyncTask", "grpcSrv", "err", err)
 			setter.SetErr(err)
 		}
 	}
-	ak.AddTask(startGrpcSvrTask)
-
-	logger.Log("main", "started")
-	ak.Run()
+	ak.AddTask(grpcSrv)
 }
