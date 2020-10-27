@@ -29,9 +29,9 @@ func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log
 			logger.Log("ListenSignalTask", "===================== Closing ======================")
 			switch z.(type) {
 			case os.Signal:
-				logger.Log("recv-signal", z, "task", "done")
+				logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", z))
 			case struct{}:
-				logger.Log("ctx.Done", "ok", "task", "done")
+				logger.Log("ListenSignalTask", "ctx.Done")
 			}
 		}
 		var s interface{}
