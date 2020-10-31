@@ -3,7 +3,7 @@
 
 仓库包含以下内容：
 -   Go-kit框架中文介绍（README.md）
--   带中文注释的go-kit官方示例，包含循序渐进的多个[示例项目](https://github.com/chaseSpace/go-kit-examples/tree/master/official_examples)
+-   带中文注释的go-kit官方示例，包含循序渐进的多个[示例项目](https://github.com/chaseSpace/go-kit-examples/tree/master/official_examples)  
     (不过官方的4,5示例仅作功能演示，代码不够简明，新手看起来会有些晦涩，建议关注下面的演示项目)
 -   [完善优化后的new_addsvc(强烈推荐)](#完整可用于实战参考的项目)
 -   [业界常用的Go项目目录结构(推荐了解)](#业界常用的Go项目目录结构)
