@@ -10,7 +10,7 @@ grpc的健康检查接口，提供给consul调用
 */
 type HealthCheckServer struct{}
 
-func NewHealthCheckSvr() *HealthCheckServer {
+func NewHealthCheckSrv() *HealthCheckServer {
 	return &HealthCheckServer{}
 }
 
