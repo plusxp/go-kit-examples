@@ -8,46 +8,42 @@ import (
 	"time"
 )
 
-type AsyncTask struct {
+type Task struct {
 	do    func(context.Context) error
 	clean func(err error)
 	err   error
 }
 
-func (tk *AsyncTask) Valid() bool {
+func (tk *Task) Valid() bool {
 	return tk.clean != nil && tk.do != nil
 }
 
-// AsyncTask用于异步启动N个协程，并可以在当前协程与其同步
-// ctx, ctxCancel用于在外部控制 【所有的task的生命周期】
-type SafeAsyncTask struct {
-	tasks       []*AsyncTask
-	tkBuf       *AsyncTask
-	errs        chan error
-	ctx         context.Context
+// TaskGroup用于同时在后台启动一组同生命周期的多个任务（保证启动顺序与添加顺序一致），“同生共死”
+type TaskGroup struct {
+	tasks       []*Task
+	tkBuf       *Task
+	shareCtx    context.Context
 	cancel      func()
 	canceled    int32
 	wg          sync.WaitGroup
 	isScheduled bool
 }
 
-func NewSafeAsyncTask(ctx context.Context) *SafeAsyncTask {
-	if ctx == nil {
-		ctx, _ = context.WithCancel(context.Background())
-	}
-	return &SafeAsyncTask{
-		ctx:  ctx,
-		wg:   sync.WaitGroup{},
-		errs: make(chan error),
+func NewTaskGroup() *TaskGroup {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &TaskGroup{
+		shareCtx: ctx,
+		cancel:   cancel,
+		wg:       sync.WaitGroup{},
 	}
 }
 
-func (a *SafeAsyncTask) AddDo(do func(context.Context) error) *SafeAsyncTask {
-	a.tkBuf = &AsyncTask{do: do}
+func (a *TaskGroup) AddTask(do func(context.Context) error) *TaskGroup {
+	a.tkBuf = &Task{do: do}
 	return a
 }
 
-func (a *SafeAsyncTask) AddClean(clean func(err error)) {
+func (a *TaskGroup) AddClean(clean func(err error)) {
 	if clean == nil {
 		clean = func(err error) {}
 	}
@@ -58,51 +54,51 @@ func (a *SafeAsyncTask) AddClean(clean func(err error)) {
 	}
 }
 
-func (a *SafeAsyncTask) schedule() {
+func (a *TaskGroup) schedule() {
 	for _, f := range a.tasks {
 		a.wg.Add(1)
 		time.Sleep(time.Millisecond) // Guarantee schedule sequence
-		go func(tk *AsyncTask) {
+		go func(tk *Task) {
 			defer func() {
 				if err := recover(); err != nil {
-					tk.err = fmt.Errorf("panic: %v", err)
+					tk.err = fmt.Errorf("-------------panic: %v", err)
 				}
-				if tk.err != nil && atomic.LoadInt32(&a.canceled) == 0 {
-					a.errs <- tk.err
-					close(a.errs)
+				if tk.err != nil {
+					a.cancelAll()
 				}
 				a.wg.Done() // call in last
 			}()
-			tk.err = tk.do(a.ctx)
+			tk.err = tk.do(a.shareCtx)
 		}(f)
 	}
 }
 
 // Start start all the tasks as one goroutine per task
-func (a *SafeAsyncTask) Start() {
+func (a *TaskGroup) Start() {
 	if a.isScheduled {
 		panic("go-util._go: all task have been scheduled!")
 	}
 	a.tkBuf = nil // clear buf
-	go a.onErr()
 	a.schedule()
 	a.isScheduled = true
 }
 
-func (a *SafeAsyncTask) Wait() {
+func (a *TaskGroup) Wait() {
 	a.wg.Wait()
 }
 
 // Run start all the tasks as one goroutine per task, then return until them done
-func (a *SafeAsyncTask) Run() {
+func (a *TaskGroup) Run() {
 	a.Start()
 	a.wg.Wait()
 }
 
-func (a *SafeAsyncTask) onErr() {
-	err := <-a.errs
+func (a *TaskGroup) cancelAll() {
+	if atomic.LoadInt32(&a.canceled) == 1 {
+		return
+	}
 	atomic.CompareAndSwapInt32(&a.canceled, 0, 1)
-	a.cancel(err)
+	a.cancel()
 	// reverse
 	for i := len(a.tasks) - 1; i >= 0; i-- {
 		tk := a.tasks[i]

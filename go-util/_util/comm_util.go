@@ -14,35 +14,24 @@ import (
 	"time"
 )
 
-func ListenSignalTask(ctx context.Context, logger log.Logger, onClose func()) func(_ context.Context) error {
+func ListenSignalTask(logger log.Logger, onClose func()) (func(context.Context) error, chan os.Signal) {
+	sc := make(chan os.Signal)
 	return func(_ context.Context) error {
-		logger.Log("NewSafeAsyncTask", "ListenSignal")
-		sc := make(chan os.Signal)
+		logger.Log("NewTaskGroup", "ListenSignal")
 		signal.Notify(sc,
 			syscall.SIGINT,  // 键盘中断
 			syscall.SIGTERM, // 软件终止
 		)
-
-		_log := func(z interface{}) {
-			fmt.Fprint(os.Stdout, "\n")
-			logger.Log("ListenSignalTask", "===================== Closing ======================")
-			switch z.(type) {
-			case os.Signal:
-				logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", z))
-			case struct{}:
-				logger.Log("ListenSignalTask", "ctx.Done")
-			}
+		s := <-sc
+		fmt.Fprint(os.Stdout, "\n")
+		logger.Log("ListenSignalTask", "===================== Closing ======================")
+		if s != nil {
+			logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", s))
 		}
-		var s interface{}
-		select {
-		case s = <-sc:
-		case s = <-ctx.Done():
-		}
-		_log(s)
 		signal.Stop(sc)
 		onClose()
 		return fmt.Errorf("recv-signal:%v", s)
-	}
+	}, sc
 }
 
 func InCollection(elem interface{}, coll []interface{}) bool {

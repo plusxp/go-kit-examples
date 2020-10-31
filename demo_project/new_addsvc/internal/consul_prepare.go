@@ -15,9 +15,9 @@ import (
 // protocol-svc_name-addr, e.g. grpc-UserServer-127.0.0.1:8888
 const consulSvcIDFormat = "%s-%s-%s:%d"
 
-func SvcRegisterTask(_ context.Context, logger log.Logger, svcName, svcHost string, port int) func(_ context.Context) error {
+func SvcRegisterTask(logger log.Logger, svcName, svcHost string, port int) func(_ context.Context) error {
 	return func(_ context.Context) error {
-		logger.Log("NewSafeAsyncTask", "SvcRegister")
+		logger.Log("NewTaskGroup", "SvcRegister")
 		// consul agent配置，根据实际的填写
 		reg := &stdconsul.AgentServiceRegistration{
 			ID:                fmt.Sprintf(consulSvcIDFormat, "grpc", svcName, svcHost, port),
