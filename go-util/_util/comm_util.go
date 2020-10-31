@@ -23,9 +23,9 @@ func ListenSignalTask(logger log.Logger, onClose func()) (func(context.Context) 
 			syscall.SIGTERM, // 软件终止
 		)
 		s := <-sc
-		fmt.Fprint(os.Stdout, "\n")
-		logger.Log("ListenSignalTask", "===================== Closing ======================")
 		if s != nil {
+			fmt.Fprint(os.Stdout, "\n")
+			//logger.Log("ListenSignalTask", "===================== Closing ======================")
 			logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", s))
 		}
 		signal.Stop(sc)
