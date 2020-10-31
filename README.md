@@ -5,10 +5,12 @@
 -   Go-kit框架中文介绍（README.md）
 -   带中文注释的Go-kit官方示例，包含循序渐进的多个[示例项目](https://github.com/chaseSpace/go-kit-examples/tree/master/official_examples)
 -   [业界常用的Go项目目录结构](#业界常用的Go项目目录结构)
--   [使用第三方Go-kit代码生成工具快速开发微服务](#使用代码生成工具快速开发Go-kit微服务)
--   [可用于实际项目的API网关](#API网关)
--   [更新日志](#更新日志)
+
+演示项目：
+-   [使用kit代码生成工具快速开发go-kit微服务](#使用代码生成工具快速开发go-kit微服务) 🐦
+-   [go-kit API网关](#API网关) 🐤
 ___
+-   [更新日志](#更新日志)
 -   [Go-kit中文群组](#go-kit中文群组)
 
 ## Go-kit官方介绍
@@ -107,7 +109,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 欢迎提出优化意见！ 
 
-## 使用代码生成工具快速开发Go-kit微服务
+## 使用代码生成工具快速开发go-kit微服务
 
 [GettingStart](https://github.com/chaseSpace/go-kit-examples/blob/master/GettingStart.md)
 
