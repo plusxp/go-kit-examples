@@ -26,6 +26,7 @@ ___
 ```bash
 git clone https://github.com/chaseSpace/go-kit-examples.git
 ```
+后续更新请使用`git pull origin master`命令
 
 ## Go-kit官方介绍
 [![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
