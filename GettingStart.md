@@ -568,7 +568,7 @@ ok      hello/client/grpc       1.118s
 [Gateway][gateway] 实现了一个http网关，代理了hello项目中的接口。
 
 ### hello/gateway已具备的示例参考
-这里总结hello和gateway两个demo项目目前具有的功能示例代码
+这里总结hello和gateway项目目前涉及到的技术关键词: 
 `router`, `grpc`, `trace`, `metrics`, `ratelimit`, `breaker`, 
 `jwt`, `redis`, `timer task`, `distrib lock`
 > 不断新增，敬请期待~  
