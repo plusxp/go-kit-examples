@@ -19,6 +19,14 @@ ___
 -   [更新日志](#更新日志)
 -   [Go-kit中文群组(推送仓库更新)](#go-kit中文群组)
 
+<br/>
+
+## 拉取仓库到本地
+持续跟踪本项目，请先clone此到本地（不要使用goget命令，因为这不是一个go pkg）
+```bash
+git clone https://github.com/chaseSpace/go-kit-examples.git
+```
+
 ## Go-kit官方介绍
 [![](https://img.shields.io/static/v1?label=Github&message=go-kit&color=important)](https://github.com/go-kit/kit)
 ![](https://badgen.net/github/stars/go-kit/kit)
