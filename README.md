@@ -135,8 +135,9 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 ## TODO
 
--   增加定时任务的实战示例（gateway+new_addsvc）
+-   增加定时任务的实战示例（new_addsvc）
 -   gateway增加service discovery(consul)
+-   基于jaeger的trace使用（文档）
 
 ## Go-kit中文群组
 
