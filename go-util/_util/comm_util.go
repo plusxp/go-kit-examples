@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-kit/kit/log"
-	"go-util/_go"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -15,8 +14,8 @@ import (
 	"time"
 )
 
-func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log.Logger, onClose func()) _go.AsyncTask {
-	return func(context.Context, _go.Setter) {
+func ListenSignalTask(ctx context.Context, logger log.Logger, onClose func()) func(_ context.Context) error {
+	return func(_ context.Context) error {
 		logger.Log("NewSafeAsyncTask", "ListenSignal")
 		sc := make(chan os.Signal)
 		signal.Notify(sc,
@@ -40,10 +39,9 @@ func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log
 		case s = <-ctx.Done():
 		}
 		_log(s)
-
-		onClose()
 		signal.Stop(sc)
-		cancel() // 最后调用
+		onClose()
+		return fmt.Errorf("recv-signal:%v", s)
 	}
 }
 
