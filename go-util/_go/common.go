@@ -4,118 +4,104 @@ import (
 	"context"
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
-type Setter interface {
-	SetErr(err error)
-	ClearErr()
-	Err() error
-}
-
-type AsyncTask func(context.Context, Setter)
-
-type setter struct {
-	mutex sync.RWMutex
+type Task struct {
+	do    func(context.Context) error
+	clean func(err error)
 	err   error
 }
 
-func (t *setter) SetErr(err error) {
-	t.mutex.Lock()
-	defer t.mutex.Unlock()
-	if t.err == nil {
-		t.err = err
+func (tk *Task) Valid() bool {
+	return tk.clean != nil && tk.do != nil
+}
+
+// TaskGroup用于同时在后台启动一组同生命周期的多个任务（保证启动顺序与添加顺序一致），“同生共死”
+type TaskGroup struct {
+	tasks       []*Task
+	tkBuf       *Task
+	shareCtx    context.Context
+	cancel      func()
+	canceled    int32
+	wg          sync.WaitGroup
+	isScheduled bool
+}
+
+func NewTaskGroup() *TaskGroup {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &TaskGroup{
+		shareCtx: ctx,
+		cancel:   cancel,
+		wg:       sync.WaitGroup{},
 	}
 }
 
-func (t *setter) ClearErr() {
-	t.mutex.RLock()
-	defer t.mutex.RUnlock()
-	t.err = nil
+func (a *TaskGroup) AddTask(do func(context.Context) error) *TaskGroup {
+	a.tkBuf = &Task{do: do}
+	return a
 }
 
-func (t *setter) Err() error {
-	t.mutex.RLock()
-	defer t.mutex.RUnlock()
-	return t.err
-}
-
-// AsyncTask用于异步启动N个协程，并可以在当前协程与其同步
-// ctx, ctxCancel用于在外部控制 【所有的task的生命周期】
-type SafeAsyncTask struct {
-	tasks         []AsyncTask
-	setter        Setter
-	ctx           context.Context
-	cancelAllTask context.CancelFunc
-	wg            sync.WaitGroup
-	isScheduled   bool
-}
-
-func NewSafeAsyncTask(ctx context.Context, cancelFunc context.CancelFunc) *SafeAsyncTask {
-	if ctx == nil {
-		ctx, cancelFunc = context.WithCancel(context.Background())
+func (a *TaskGroup) AddClean(clean func(err error)) {
+	if clean == nil {
+		clean = func(err error) {}
 	}
-	return &SafeAsyncTask{
-		ctx:           ctx,
-		cancelAllTask: cancelFunc,
-		wg:            sync.WaitGroup{},
-		setter: &setter{
-			mutex: sync.RWMutex{},
-		},
+	a.tkBuf.clean = clean
+	if a.tkBuf.Valid() {
+		a.tasks = append(a.tasks, a.tkBuf)
+		a.tkBuf = nil
 	}
 }
 
-func (a *SafeAsyncTask) AddTask(f ...AsyncTask) {
-	a.tasks = append(a.tasks, f...)
-}
-
-func (a *SafeAsyncTask) schedule() {
+func (a *TaskGroup) schedule() {
 	for _, f := range a.tasks {
 		a.wg.Add(1)
 		time.Sleep(time.Millisecond) // Guarantee schedule sequence
-		go func(f func(ctx context.Context, tgr Setter)) {
+		go func(tk *Task) {
 			defer func() {
 				if err := recover(); err != nil {
-					a.setter.SetErr(fmt.Errorf("panic: %v", err))
+					tk.err = fmt.Errorf("-------------panic: %v", err)
 				}
-				// 当一个goroutine非正常结束，所有任务都应该退出
-				// 如果不希望task结束后，即使发生错误也不要影响其他task，不要调用setter.SetErr()
-				// 但是task发生panic一定会导致所有goroutine退出
-				if a.setter.Err() != nil {
-					a.cancelAllTask()
+				if tk.err != nil {
+					a.cancelAll()
 				}
-				a.wg.Done()
+				a.wg.Done() // call in last
 			}()
-			f(a.ctx, a.setter)
+			tk.err = tk.do(a.shareCtx)
 		}(f)
 	}
 }
 
 // Start start all the tasks as one goroutine per task
-func (a *SafeAsyncTask) Start() {
+func (a *TaskGroup) Start() {
 	if a.isScheduled {
 		panic("go-util._go: all task have been scheduled!")
 	}
+	a.tkBuf = nil // clear buf
 	a.schedule()
 	a.isScheduled = true
 }
 
-func (a *SafeAsyncTask) Wait() {
+func (a *TaskGroup) Wait() {
 	a.wg.Wait()
 }
 
 // Run start all the tasks as one goroutine per task, then return until them done
-func (a *SafeAsyncTask) Run() {
+func (a *TaskGroup) Run() {
 	a.Start()
 	a.wg.Wait()
 }
 
-func (a *SafeAsyncTask) Clear() {
-	a.tasks = nil
-	a.setter.ClearErr()
-	a.isScheduled = false
-}
-
-func (a *SafeAsyncTask) Err() error {
-	return a.setter.Err()
+func (a *TaskGroup) cancelAll() {
+	if atomic.LoadInt32(&a.canceled) == 1 {
+		return
+	}
+	atomic.CompareAndSwapInt32(&a.canceled, 0, 1)
+	a.cancel()
+	// reverse
+	for i := len(a.tasks) - 1; i >= 0; i-- {
+		tk := a.tasks[i]
+		tk.clean(tk.err)
+	}
 }

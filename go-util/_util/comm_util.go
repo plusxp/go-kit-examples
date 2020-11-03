@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/go-kit/kit/log"
-	"go-util/_go"
 	"math/rand"
 	"os"
 	"os/signal"
@@ -15,36 +14,24 @@ import (
 	"time"
 )
 
-func ListenSignalTask(ctx context.Context, cancel context.CancelFunc, logger log.Logger, onClose func()) _go.AsyncTask {
-	return func(context.Context, _go.Setter) {
-		logger.Log("NewSafeAsyncTask", "ListenSignal")
-		sc := make(chan os.Signal)
+func ListenSignalTask(logger log.Logger, onClose func()) (func(context.Context) error, chan os.Signal) {
+	sc := make(chan os.Signal)
+	return func(_ context.Context) error {
+		logger.Log("NewTaskGroup", "ListenSignal")
 		signal.Notify(sc,
 			syscall.SIGINT,  // 键盘中断
 			syscall.SIGTERM, // 软件终止
 		)
-
-		_log := func(z interface{}) {
+		s := <-sc
+		if s != nil {
 			fmt.Fprint(os.Stdout, "\n")
-			logger.Log("ListenSignalTask", "===================== Closing ======================")
-			switch z.(type) {
-			case os.Signal:
-				logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", z))
-			case struct{}:
-				logger.Log("ListenSignalTask", "ctx.Done")
-			}
+			//logger.Log("ListenSignalTask", "===================== Closing ======================")
+			logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", s))
 		}
-		var s interface{}
-		select {
-		case s = <-sc:
-		case s = <-ctx.Done():
-		}
-		_log(s)
-
-		onClose()
 		signal.Stop(sc)
-		cancel() // 最后调用
-	}
+		onClose()
+		return fmt.Errorf("recv-signal:%v", s)
+	}, sc
 }
 
 func InCollection(elem interface{}, coll []interface{}) bool {

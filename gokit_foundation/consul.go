@@ -24,7 +24,7 @@ func RegisterWithConsul(svcRegistration *stdconsul.AgentServiceRegistration) err
 	consulClient, err := stdconsul.NewClient(&stdconsul.Config{
 		Address: consulAddr,
 		HttpClient: &http.Client{
-			Timeout: time.Second * 3,
+			Timeout: time.Second * 2,
 		},
 		Scheme: "http", // default
 	})
