@@ -138,14 +138,11 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 
 ## 更新日志
 
-[CHANGELOG][CHANGELOG] (上次更新于2020年10月25日)
+[CHANGELOG][CHANGELOG] (上次更新于2020年11月8日)
 
 [CHANGELOG]:https://github.com/chaseSpace/go-kit-examples/blob/master/CHANGELOG.md
 
 ## TODO
-
--   增加定时任务的实战示例（new_addsvc）
--   gateway增加service discovery(consul)
 -   基于jaeger的trace使用（文档）
 
 ## Go-kit中文群组

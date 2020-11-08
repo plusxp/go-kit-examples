@@ -1,6 +1,15 @@
-## 2020年10月?日 Update
+## 2020年11月8日 Update
+- `demo_project/hello` 功能新增如下：
+    -   增加服务发现功能（consul），较`demo_project/new_addsvc`有大幅改进
+    -   `client/grpc`部分代码迁移至`pkg/grpc`，简化client目录
+    -   增加`db`目录，dao层代码，可供参考
+    -   `pb`目录增加`pbutil`子目录，重命名`proto/common`为`proto/pbcommon`，compile脚本更新
 - `demo_project/new_addsvc`优化`main.go`，封装init task，更简明
-- 【优化】改变shell script的import方式
+- `demo_project/new_addsvc`添加定时任务示例(与hello项目一致)，封装init task，更简明
+- `demo_project/new_addsvc`提取`SvcRegister`方法到`gokit_foundation`，缩减项目代码量
+- 重写`go-util/_go`的`AsyncTask` => `_go.TaskGroup`（重新设计一组goroutine的启停方式），优化+修复一些问题
+- 【优化】改变shell script的import方式，以一种可读性更高的方式实现外部函数调用
+- 优化`README.md`
 
 ## 2020年10月25日 Update
 - [kit][1] 现已支持 `go get`命令安装，无需clone后安装
