@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pbcommon;
+option go_package = "hello/pb/gen-go/pbcommon;pbcommon";
+
+enum R {
+    // 0-100 保留
+    OK = 0;
+    SYS_ERR = 1;
+    MYSQL_ERR = 2;
+    REDIS_ERR = 3;
+    NETWORK_ERR = 4;
+    UNKNOWN_ERR = 5;
+    RPC_ERR = 6;
+    JSON_UNMARSHAL_ERR = 7;
+    AUTH_ERR = 8;
+
+    // 101...
+    INVALID_ARGS = 101;
+}

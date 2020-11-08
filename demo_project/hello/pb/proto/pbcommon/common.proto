@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package pbcommon;
+
+// 注意import路径的根路径必须是/pb/proto/
+import "pbcommon/resultcode.proto";
+option go_package = "hello/pb/gen-go/pbcommon;pbcommon";
+
+/*
+定义必须的协议
+*/
+
+enum Plat {
+    pc = 0;
+    ios = 1;
+    android = 2;
+}
+
+message BaseReq {
+    Plat plat = 1;
+}
+
+message BaseRsp {
+    R err_code = 1;
+}
+
+message StdReq {
+    BaseReq base_req = 1;
+}
+
+message StdRsp {
+    BaseRsp base_rsp = 1;
+}
