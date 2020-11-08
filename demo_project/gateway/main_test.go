@@ -46,7 +46,7 @@ func TestMyGateWay_MakeADate(t *testing.T) {
 		//buf := bytes.NewBuffer(nil)
 		//_, err = buf.ReadFrom(rsp.Body)
 		//log.Print(111, buf.String())
-		rs := new(pb.MakeADateReply)
+		rs := new(pb.MakeADateResponse)
 		err = json.NewDecoder(rsp.Body).Decode(rs)
 		_util.PanicIfErr(err, nil)
 		if tt.wantReply != rs.Reply {

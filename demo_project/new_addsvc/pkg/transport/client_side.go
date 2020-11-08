@@ -14,14 +14,13 @@ import (
 	"google.golang.org/grpc"
 	"new_addsvc/pb/gen-go/addsvcpb"
 	endpoint2 "new_addsvc/pkg/endpoint"
-	"os"
 	"time"
 )
 
 /*
 RPC-client侧
 	每个接口都会按序安装跟踪、限速、断路器中间件
-	go-kit的写法不是同一给所有接口安装，而是手动的给每一个接口安装，粒度细了，也多了一点代码量
+	go-kit的设计不是同一给所有接口安装，而是手动的给每一个接口安装，粒度细了，也多了一点代码量
 */
 
 // 不是随便定，是由proto文件中的package名和service名组合得到
@@ -37,8 +36,10 @@ func MakeClientEndpoints(instance string, otTracer stdopentracing.Tracer, logger
 	// 这里可以设置dial选项
 	conn, err := grpc.Dial(instance, grpc.WithInsecure(), grpc.WithTimeout(time.Second))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %v", err)
-		os.Exit(1)
+		// 这种情况很少发生，就是从健康中心获得了一个健康的实例地址，却仍然连不上
+		return endpoint2.AddSvcEndpoints{}, fmt.Errorf("failed: grpc.Dial %s %s", instance, err)
+		//fmt.Fprintf(os.Stderr, "error: %v", err)
+		//os.Exit(1)
 	}
 
 	return newGRPCClient(conn, otTracer, logger), nil

@@ -3,7 +3,8 @@ syntax = "proto3";
 package pb;
 
 // import 语句必须在 option xxx之上，否则无法被kit识别，这条语句在下次执行kit命令时会被删除
-import "common/common.proto";
+import "pbcommon/common.proto";
+import "pbcommon/resultcode.proto";
 
 option go_package = "hello/pb/gen-go/pb;pb";
 
@@ -15,13 +16,12 @@ service Hello {
 }
 
 message SayHiRequest {
-    pbcommon.BaseReq base_req = 1;
-    string           name     = 2;
+    string           name     = 1;
 }
 
 message SayHiResponse {
-    pbcommon.BaseRsp base_rsp = 2;
     string           reply    = 1;
+    pbcommon.R       err_code = 2;
 }
 
 message MakeADateRequest {

@@ -38,12 +38,12 @@ func NewTaskGroup() *TaskGroup {
 	}
 }
 
-func (a *TaskGroup) AddTask(do func(context.Context) error) *TaskGroup {
+func (a *TaskGroup) Add(do func(context.Context) error) *TaskGroup {
 	a.tkBuf = &Task{do: do}
 	return a
 }
 
-func (a *TaskGroup) AddClean(clean func(err error)) {
+func (a *TaskGroup) Interrupt(clean func(err error)) {
 	if clean == nil {
 		clean = func(err error) {}
 	}

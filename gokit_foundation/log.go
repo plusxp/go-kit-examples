@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const SimpleLayout = "2006-01-02 15:04:05"
+const TimeCommonLayout = "2006-01-02 15:04:05"
 
 // 项目中使用一种logger即可，不建议同时使用多个不同风格的logger
 type Logger struct {
@@ -21,7 +21,7 @@ type Logger struct {
 func NewLogger(logger log.Logger) *Logger {
 	return &Logger{
 		Logger:          NewKvLogger(logger),
-		CustomizeLogger: &CustomizeLogger{},
+		CustomizeLogger: new(CustomizeLogger),
 	}
 }
 
@@ -31,7 +31,7 @@ func NewKvLogger(logger log.Logger) log.Logger {
 		return logger
 	}
 	var (
-		ts                = log.TimestampFormat(time.Now, SimpleLayout)
+		ts                = log.TimestampFormat(time.Now, TimeCommonLayout)
 		hommizationCaller = log.Valuer(func() interface{} {
 			/*
 			 获得更简洁的caller位置

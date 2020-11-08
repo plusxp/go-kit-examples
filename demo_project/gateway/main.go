@@ -2,28 +2,45 @@ package main
 
 import (
 	"flag"
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
+	"github.com/leigg-go/go-util/_redis"
 	"gokit_foundation"
 	"gokit_foundation/gateway"
 )
 
 type MyGateWay struct {
 	*gateway.Gateway
+
+	// 当前微服务需要的扩展
+	// 最好将此网关用到的外部服务如redis/mysql...统一放在此处，这样方便一眼看出这个服务使用了哪些外部服务
+	// (目前gw没有使用redis，仅做演示)
+	redisCli *redis.Client
+}
+
+func newMyGW(r *mux.Router) *MyGateWay {
+	var httpAddr = flag.String("http.addr", ":8000", "Address for HTTP (JSON) server")
+
+	lgr := gokit_foundation.NewLogger(nil)
+	root := gateway.New(r, *httpAddr, lgr)
+	// Panics if init fail
+	rds := _redis.MustInit(GetRedisConf())
+	gw := MyGateWay{Gateway: root, redisCli: rds}
+
+	gw.BeforeStop(func() {
+		err := _redis.Close()
+		lgr.Log("redis.close", err)
+	})
+	return &gw
 }
 
 func main() {
-	var (
-		httpAddr = flag.String("http.addr", ":8000", "Address for HTTP (JSON) server")
-	)
+	var ()
 	/*
 		这里使用 https://github.com/gorilla/mux 作为路由器
 	*/
 	r := mux.NewRouter()
-
-	lgr := gokit_foundation.NewLogger(nil)
-	root := gateway.New(r, *httpAddr, lgr)
-
-	gw := &MyGateWay{root}
+	gw := newMyGW(r)
 
 	{
 		// 声明一个包含path前缀的子路由器
@@ -48,6 +65,8 @@ func main() {
 
 /*
 如何测试：
+	- 按顺序启动hello、gateway项目
+	- shell下curl调用网关地址进行测试
 	curl http://127.0.0.1:8000/hello/sayhi/Hanmeimei
 	# %20 在URL中表示空格
 	curl http://127.0.0.1:8000/hello/make_a_date/2020-10-01/Do%20you%20willing%20to%20date%20with%20me?

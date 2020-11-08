@@ -12,14 +12,14 @@
 
 @echo off
 set matchExp="*.proto"
-set matchExp2="common/*.proto"
+set matchExp2="pbcommon/*.proto"
 
 for %%i in ("%matchExp%") do (
     protoc %%i --go_out=plugins=grpc:../../../
 )
 
 for %%i in ("%matchExp2%") do (
-    protoc common/%%i --go_out=plugins=grpc:../../../
+    protoc pbcommon/%%i --go_out=plugins=grpc:../../../
 )
 
 echo protoc exec successful!

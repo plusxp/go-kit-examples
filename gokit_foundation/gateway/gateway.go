@@ -43,6 +43,9 @@ type Gateway struct {
 	r *mux.Router
 	*gokit_foundation.Logger
 	addr string
+
+	afterStart func()
+	beforeStop func()
 }
 
 func New(r *mux.Router, addr string, logger *gokit_foundation.Logger) *Gateway {
@@ -53,12 +56,26 @@ func New(r *mux.Router, addr string, logger *gokit_foundation.Logger) *Gateway {
 	}
 }
 
+func (g *Gateway) AfterStart(f func()) {
+	g.afterStart = f
+}
+
 func (g *Gateway) onStart() {
 	g.Log("Gateway.OnStart:http-addr", g.addr)
 	g.setupMW()
+	if g.afterStart != nil {
+		g.afterStart()
+	}
+}
+
+func (g *Gateway) BeforeStop(f func()) {
+	g.beforeStop = f
 }
 
 func (g *Gateway) onStop() {
+	if g.beforeStop != nil {
+		g.beforeStop()
+	}
 	g.Log("Gateway.OnStop:http-addr", g.addr)
 }
 
@@ -143,7 +160,7 @@ func (g *Gateway) JSON(w http.ResponseWriter, rsp interface{}) error {
 	defer func() {
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
-			g.Log("Gateway.JSON: err", err)
+			g.Log("Gateway.JSON->err", err)
 			return
 		}
 		_, _ = w.Write(b)
@@ -182,7 +199,7 @@ func (g *Gateway) Prepare(w http.ResponseWriter, httpReq *http.Request, rpcReq i
 			ok = true
 			return
 		}
-		g.Log("Gateway.Prepare: err", err, "method", httpReq.Method, "path", httpReq.URL.Path)
+		g.Log("Gateway.Prepare->err", err, "method", httpReq.Method, "path", httpReq.URL.Path)
 	}()
 
 	err = g.authenticate(httpReq)
@@ -192,7 +209,7 @@ func (g *Gateway) Prepare(w http.ResponseWriter, httpReq *http.Request, rpcReq i
 	}
 	if rpcReq != nil {
 		if err = g.unmarshalReq(httpReq, rpcReq); err != nil {
-			g.Log("Gateway.Prepare unmarshalReq err", err)
+			g.Log("Gateway.Prepare_unmarshalReq->err", err)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}

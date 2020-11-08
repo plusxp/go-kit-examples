@@ -6,7 +6,8 @@ require (
 	github.com/go-kit/kit v0.10.0
 	github.com/go-redis/redis v6.15.7+incompatible
 	github.com/golang/protobuf v1.4.2
-	github.com/leigg-go/go-util v0.0.3
+	github.com/hashicorp/consul/api v1.7.0
+	github.com/leigg-go/go-util v0.0.4
 	github.com/lightstep/lightstep-tracer-go v0.21.0
 	github.com/oklog/oklog v0.3.2
 	github.com/opentracing/opentracing-go v1.2.0
@@ -21,6 +22,8 @@ require (
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/grpc v1.32.0
+	gorm.io/driver/mysql v1.0.3
+	gorm.io/gorm v1.20.6
 	sourcegraph.com/sourcegraph/appdash v0.0.0-20190731080439-ebfcffb1b5c0
 )
 

@@ -30,9 +30,9 @@ func (gw *MyGateWay) SayHi(w http.ResponseWriter, r *http.Request) {
 	// 像本地调用一样的远程调用
 	reply, code := c.SayHi(context.Background(), name)
 
-	rsp := &pb.SayHiReply{
-		BaseRsp: &pbcommon.BaseRsp{ErrCode: code},
+	rsp := &pb.SayHiResponse{
 		Reply:   reply,
+		ErrCode: code,
 	}
 	// JSON响应
 	gw.JSON(w, rsp)
@@ -47,7 +47,7 @@ func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 	c := helloclient.MustNew(gw.RawLogger())
 
 	var err error
-	var rsp *pb.MakeADateReply
+	var rsp *pb.MakeADateResponse
 
 	rsp, err = c.MakeADate(context.Background(), &pb.MakeADateRequest{
 		BaseReq: &pbcommon.BaseReq{Plat: pbcommon.Plat_pc},
@@ -57,7 +57,7 @@ func (gw *MyGateWay) MakeADate(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		gw.Log("RPC MakeADate err", err)
-		rsp = &pb.MakeADateReply{
+		rsp = &pb.MakeADateResponse{
 			BaseRsp: &pbcommon.BaseRsp{ErrCode: pbcommon.R_RPC_ERR},
 		}
 	}
@@ -87,11 +87,11 @@ func (gw *MyGateWay) UpdateUserInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var err error
-	var rsp *pb.UpdateUserInfoReply
+	var rsp *pb.UpdateUserInfoResponse
 
 	rsp, err = c.UpdateUserInfo(context.Background(), rpcReq)
 	if err != nil {
-		rsp = &pb.UpdateUserInfoReply{
+		rsp = &pb.UpdateUserInfoResponse{
 			BaseRsp: &pbcommon.BaseRsp{ErrCode: pbcommon.R_RPC_ERR},
 		}
 		gw.Log("RPC UpdateUserInfo err", err)

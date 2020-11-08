@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
+	"hello/pb/pbutil"
 	"time"
 
 	"github.com/go-kit/kit/log"
@@ -49,7 +50,7 @@ func (b *basicHelloService) SayHi(ctx context.Context, name string) (Response st
 // c0,p1是kit默认的变量命名规则，暂时认为没必要改
 func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateRequest) (p0 *pb.MakeADateResponse, err error) {
 	p0 = &pb.MakeADateResponse{
-		BaseRsp: &pbcommon.BaseRsp{},
+		BaseRsp: pbutil.DefBaseRsp(),
 	}
 
 	t, err := time.Parse("2006-01-02", p1.DateStr)
@@ -78,8 +79,8 @@ func (b *basicHelloService) MakeADate(c0 context.Context, p1 *pb.MakeADateReques
 
 func (b *basicHelloService) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoRequest) (p0 *pb.UpdateUserInfoResponse, e1 error) {
 	p0 = &pb.UpdateUserInfoResponse{
-		BaseRsp: &pbcommon.BaseRsp{},
+		BaseRsp: pbutil.DefBaseRsp(),
 	}
-	// 不做任何事（请注意一定返回一个非nil的rsp，除非发生严重错误）
+	// 不做任何事（请注意一定返回一个非nil的rsp，除非panic）
 	return p0, e1
 }

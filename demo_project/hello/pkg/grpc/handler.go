@@ -3,7 +3,6 @@ package grpc
 import (
 	"context"
 	"hello/pb/gen-go/pb"
-	"hello/pb/gen-go/pbcommon"
 	endpoint "hello/pkg/endpoint"
 
 	grpc "github.com/go-kit/kit/transport/grpc"
@@ -22,8 +21,7 @@ func decodeSayHiRequest(_ context.Context, r interface{}) (interface{}, error) {
 func encodeSayHiResponse(_ context.Context, r interface{}) (interface{}, error) {
 	rsp := r.(*endpoint.SayHiResponse)
 	return &pb.SayHiResponse{
-		BaseRsp: &pbcommon.BaseRsp{ErrCode: rsp.ErrCode},
-		Reply:   rsp.Reply,
+		Reply: rsp.Reply,
 	}, nil
 }
 

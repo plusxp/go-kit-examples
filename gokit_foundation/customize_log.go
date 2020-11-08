@@ -14,17 +14,18 @@ func (l *CustomizeLogger) tracePanicLine() string {
 	return line
 }
 
-func (l *CustomizeLogger) PanicIfErr(err error, ignore ...error) {
+func (l *CustomizeLogger) PanicIfErr(err error, ignoreErrs []error, printText ...string) {
 	if err != nil {
 		var ig bool
-		for _, e := range ignore {
+		for _, e := range ignoreErrs {
 			if e == err {
 				ig = true
 			}
 		}
+
 		if !ig {
 			trace := l.tracePanicLine()
-			panic(fmt.Sprintf("CustomizeLogger.PanicIfErr TRACE：%s", trace))
+			panic(fmt.Sprintf("CustomizeLogger.PanicIfErr ERR:%s TRACE：%s", printText, trace))
 		}
 	}
 }

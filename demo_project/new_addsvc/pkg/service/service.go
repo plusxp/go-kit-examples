@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/metrics"
+	"github.com/go-redis/redis"
 )
 
 type Service interface {
@@ -13,11 +14,11 @@ type Service interface {
 }
 
 // New returns a basic Service with all of the expected middlewares wired in.
-func New(logger log.Logger, ints, chars metrics.Counter) Service {
+func New(logger log.Logger, redisCli *redis.Client, ints, chars metrics.Counter) Service {
 	var svc Service
 	// 使用洋葱模式封装svc(添加中间件)
 	{
-		svc = NewBasicService()
+		svc = NewBasicService(logger)
 		svc = UnifyMiddleware(logger, ints, chars)(svc)
 	}
 	return svc
@@ -38,11 +39,15 @@ var (
 )
 
 // NewBasicService returns a naïve, stateless implementation of Service.
-func NewBasicService() Service {
-	return basicService{}
+func NewBasicService(lgr log.Logger) Service {
+	return basicService{
+		logger: lgr,
+	}
 }
 
-type basicService struct{}
+type basicService struct {
+	logger log.Logger
+}
 
 const (
 	intMax = 1<<31 - 1

@@ -2,12 +2,17 @@ package grpc
 
 import (
 	"context"
-	"go-util/_util"
+	"fmt"
 	"gokit_foundation"
 	"google.golang.org/grpc"
+	grpctransport "hello/pkg/grpc"
 	"hello/pkg/service"
 	"time"
 )
+
+/*
+不使用服务注册发现的client
+*/
 
 type Client struct {
 	service.HelloService
@@ -15,6 +20,13 @@ type Client struct {
 }
 
 var svcClient *Client
+
+func MustNew(logger *gokit_foundation.Logger) *Client {
+	if svcClient == nil || svcClient.conn == nil {
+		svcClient = newHelloClient(logger)
+	}
+	return svcClient
+}
 
 func newHelloClient(logger *gokit_foundation.Logger) *Client {
 	var grpcOpts = []grpc.DialOption{
@@ -28,24 +40,18 @@ func newHelloClient(logger *gokit_foundation.Logger) *Client {
 	var ctx, cancel = context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 
-	conn, err = grpc.DialContext(ctx, "localhost:8082", grpcOpts...)
+	conn, err = grpc.DialContext(ctx, "localhost:8081", grpcOpts...)
 	// 出错时直接在这一层panic，外面就不需要处理
-	logger.Must(err == nil, "HelloClient is nil")
+	// logger.PanicIfErr 在panic的信息中添加了这一行代码的位置，在外层recover时会打印出来，以便快速定位panic行
+	logger.PanicIfErr(err, nil, fmt.Sprintf("grpc.DialContext err:%v", err))
 
-	sc, err = NewSvc(conn)
-	_util.PanicIfErr(err, nil)
+	sc, err = grpctransport.NewSvc(conn)
+	logger.PanicIfErr(err, nil, fmt.Sprintf("grpctransport.NewSvc err:%v", err))
 
 	return &Client{
 		HelloService: sc,
 		conn:         conn,
 	}
-}
-
-func MustNew(logger *gokit_foundation.Logger) *Client {
-	if svcClient == nil || svcClient.conn == nil {
-		svcClient = newHelloClient(logger)
-	}
-	return svcClient
 }
 
 func (c *Client) Close() {

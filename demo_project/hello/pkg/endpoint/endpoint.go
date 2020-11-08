@@ -2,11 +2,10 @@ package endpoint
 
 import (
 	"context"
+	endpoint "github.com/go-kit/kit/endpoint"
 	"hello/pb/gen-go/pb"
 	"hello/pb/gen-go/pbcommon"
 	service "hello/pkg/service"
-
-	endpoint "github.com/go-kit/kit/endpoint"
 )
 
 type SayHiRequest struct {
@@ -32,6 +31,7 @@ func MakeSayHiEndpoint(s service.HelloService) endpoint.Endpoint {
 func (e Endpoints) SayHi(ctx context.Context, name string) (reply string, errCode pbcommon.R) {
 	request := &SayHiRequest{Name: name}
 	response, err := e.SayHiEndpoint(ctx, request)
+	// 这个err不是svc返回的，而是封装了多个mw的endpoint返回的，属于意料之外的err，此时response可能是nil
 	if err != nil {
 		return "", pbcommon.R_RPC_ERR
 	}
@@ -115,7 +115,7 @@ func (e Endpoints) UpdateUserInfo(c0 context.Context, p1 *pb.UpdateUserInfoReque
 	request := &UpdateUserInfoRequest{P1: p1}
 	response, err := e.UpdateUserInfoEndpoint(c0, request)
 	if err != nil {
-		return
+		return nil, err
 	}
 	return response.(*UpdateUserInfoResponse).P0, response.(*UpdateUserInfoResponse).E1
 }
