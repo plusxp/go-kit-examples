@@ -143,7 +143,7 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 [CHANGELOG]:https://github.com/chaseSpace/go-kit-examples/blob/master/CHANGELOG.md
 
 ## TODO
--   基于jaeger的trace使用（文档）
+-   基于jaeger的trace使用（文档+代码）
 
 ## Go-kit中文群组
 
