@@ -32,9 +32,9 @@ svc = LoggingMiddleware(logger)(svc)
 
 #### endpoint的mw
 
-通过代码但我们发现，endpoint的mw编写方式比较简单，与server的mw截然不同，它只需要写一个mw方法即可安装。
+通过代码但我们发现，endpoint的mw编写方式比较简单，与service的mw截然不同，它只需要写一个mw方法即可安装。
 
-然后我们可以思考一下两个问题：
+然后我们可以思考以下几个问题：
 
 -   service层是否有必要添加mw？
 -   与endpoint层的mw有和不同？

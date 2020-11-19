@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/go-kit/kit/log"
 	kitgrpc "github.com/go-kit/kit/transport/grpc"
-	"github.com/leigg-go/go-util/_redis"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	"go-util/_go"
 	"go-util/_util"
@@ -31,7 +30,7 @@ func NewAddSrv(logger log.Logger) addsvcpb.AddServer {
 	// 在svc和endpoint层以中间件的形式添加【指标上传、api日志】功能
 
 	// service需要的所有对象都通过New传入
-	svc := service.New(logger, _redis.DefClient, metricsObj.Ints, metricsObj.Chars)
+	svc := service.New(logger, metricsObj.Ints, metricsObj.Chars)
 	// 在endpoint层和transport层添加路径追踪功能
 	endpoints := endpoint.New(svc, logger, metricsObj.Duration, tracer)
 	addSrv := transport.NewGRPCServer(endpoints, tracer, logger)
