@@ -44,5 +44,14 @@ __test__fn_convert_to_windows_path() {
 	_fn_convert_to_windows_path '/d/xx/xxxx'
 }
 
-#__test__fn_is_windows
-#__test__fn_convert_to_windows_path
+# ------ If run this script directly, execute following example functions -----
+# shellcheck disable=SC2046
+# shellcheck disable=SC2164
+# Compare absolute path of two file if is same file
+curr_file=$(cd $(dirname "${BASH_SOURCE[0]}");pwd)/$(basename "${BASH_SOURCE[0]}")
+executor=$(pwd)/$(basename "$0")
+#echo $curr_file $executor
+if [ $executor = $curr_file ]; then
+  __test__fn_is_windows
+  __test__fn_convert_to_windows_path
+fi

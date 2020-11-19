@@ -105,15 +105,34 @@ if [ $# -ne 0 ]; then
 	${func_name} "${@:2}"
 fi
 
-# comment
-<<EOF
 # example-1, default print red text, white background
-imported_fn_echo_color_msg xxx
+__example__fn_1() {
+	echo "====== __example__fn_1 ======"
+	fn_echo_color_msg xxx
+}
 
 # example-2, set textcolor, see also "readonly const"
-imported_fn_echo_color_msg 'textcolor_green' xxx
+__example__fn_2() {
+	echo "====== __example__fn_2 ======"
+	fn_echo_color_msg 'textcolor_green' xxx
+}
 
 # example-3, set textcolor, bgcolor
-msg="with space"  # if msg contains space, you must declare msg as a var, then pass it use "$var".
-imported_fn_echo_color_msg 'textcolor_red' 'bgcolor_yellow'  "$msg"
-EOF
+# msg="with space",  if msg contains space, you must declare msg as a var, then pass it use "$var".
+__example__fn_3() {
+	echo "====== __example__fn_3 ======"
+  fn_echo_color_msg 'textcolor_red' 'bgcolor_yellow'  "$msg"
+}
+
+# ------ If run this script directly, execute following example functions -----
+# shellcheck disable=SC2046
+# shellcheck disable=SC2164
+# Compare absolute path of two file if is same file
+curr_file=$(cd $(dirname "${BASH_SOURCE[0]}");pwd)/$(basename "${BASH_SOURCE[0]}")
+executor=$(pwd)/$(basename "$0")
+#echo $curr_file $executor
+if [ $executor = $curr_file ]; then
+    __example__fn_1
+    __example__fn_2
+    __example__fn_3
+fi
