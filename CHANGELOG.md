@@ -1,3 +1,6 @@
+## 2020年12月6日 Update
+-   [OpenTelemetry][4] 中文介绍系列文档发布（主要译自官网）
+
 ## 2020年11月8日 Update
 - `demo_project/hello` 功能新增如下：
     -   增加服务发现功能（consul），较`demo_project/new_addsvc`有大幅改进
@@ -64,3 +67,4 @@
 [1]:https://github.com/chaseSpace/kit
 [2]:https://github.com/chaseSpace/kit/tree/master/examples
 [3]:https://github.com/chaseSpace/kit/blob/master/examples/hellosvc_doc.md
+[4]:https://github.com/chaseSpace/go-kit-examples/tree/master/open_telemetry
