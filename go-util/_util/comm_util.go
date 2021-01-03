@@ -1,38 +1,13 @@
 package _util
 
 import (
-	"context"
 	"fmt"
-	"github.com/go-kit/kit/log"
 	"math/rand"
-	"os"
-	"os/signal"
 	"reflect"
 	"runtime"
 	"strings"
-	"syscall"
 	"time"
 )
-
-func ListenSignalTask(logger log.Logger, onClose func()) (func(context.Context) error, chan os.Signal) {
-	sc := make(chan os.Signal)
-	return func(_ context.Context) error {
-		logger.Log("NewTaskGroup", "ListenSignal")
-		signal.Notify(sc,
-			syscall.SIGINT,  // 键盘中断
-			syscall.SIGTERM, // 软件终止
-		)
-		s := <-sc
-		if s != nil {
-			fmt.Fprint(os.Stdout, "\n")
-			//logger.Log("ListenSignalTask", "===================== Closing ======================")
-			logger.Log("ListenSignalTask", fmt.Sprintf("recv-signal=>%s", s))
-		}
-		signal.Stop(sc)
-		onClose()
-		return fmt.Errorf("recv-signal:%v", s)
-	}, sc
-}
 
 func InCollection(elem interface{}, coll []interface{}) bool {
 	for _, e := range coll {
