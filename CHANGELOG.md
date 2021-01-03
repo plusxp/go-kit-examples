@@ -1,3 +1,6 @@
+## 2021年1月3日 Update
+- `demo_project/new_addsvc/cmd/addsvc`下的main.go重写，丢弃旧的设计，丢弃多余的封装(_go.TaskGroup)，简化代码
+
 ## 2020年12月6日 Update
 -   [OpenTelemetry][4] 中文介绍系列文档发布（主要译自官网）
 
