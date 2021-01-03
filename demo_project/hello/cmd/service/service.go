@@ -85,7 +85,7 @@ func initGRPCHandler(endpoints endpoint.Endpoints, g *group.Group) {
 		}
 		baseServer := grpc1.NewServer()
 		pb.RegisterHelloServer(baseServer, grpcServer)
-		gokit_foundation.RegisterGRPCHealthSrv(baseServer)
+		gokit_foundation.RegistergRPCHealthSrv(baseServer)
 		return baseServer.Serve(grpcListener)
 	}, func(error) {
 		if grpcListener != nil {

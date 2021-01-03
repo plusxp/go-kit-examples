@@ -23,7 +23,7 @@ func (s *HealthCheckServer) Watch(*grpc_health_v1.HealthCheckRequest, grpc_healt
 	return nil
 }
 
-func RegisterGRPCHealthSrv(srv *grpc.Server) {
+func RegistergRPCHealthSrv(srv *grpc.Server) {
 	s := &HealthCheckServer{}
 	grpc_health_v1.RegisterHealthServer(srv, s)
 }
