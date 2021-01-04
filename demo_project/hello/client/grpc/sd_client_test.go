@@ -11,7 +11,7 @@ import (
 
 func TestSDNew(t *testing.T) {
 	lgr := gokit_foundation.NewLogger(nil)
-	svc := MustNewClientWithSD(lgr)
+	svc := MustNewClientWithSd(lgr)
 	//return
 	// 0x01 SayHi
 	reply, errcode := svc.SayHi(context.Background(), "Jack Ma")

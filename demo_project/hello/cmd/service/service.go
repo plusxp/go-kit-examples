@@ -3,12 +3,14 @@ package service
 import (
 	"flag"
 	"fmt"
+	opentracinggo "github.com/opentracing/opentracing-go"
 	"go-util/_str"
 	"gokit_foundation"
 	pb "hello/pb/gen-go/pb"
 	endpoint "hello/pkg/endpoint"
 	grpc "hello/pkg/grpc"
 	service "hello/pkg/service"
+	"io"
 	"net"
 	http1 "net/http"
 	"os"
@@ -20,13 +22,13 @@ import (
 	log "github.com/go-kit/kit/log"
 	prometheus "github.com/go-kit/kit/metrics/prometheus"
 	group "github.com/oklog/oklog/pkg/group"
-	opentracinggo "github.com/opentracing/opentracing-go"
 	prometheus1 "github.com/prometheus/client_golang/prometheus"
 	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
 	grpc1 "google.golang.org/grpc"
 )
 
 var tracer opentracinggo.Tracer
+var tracerCloser io.Closer
 var logger *gokit_foundation.Logger
 
 // Define our flags. Your service probably won't need to bind listeners for
@@ -52,8 +54,8 @@ func Run() {
 	//  Determine which tracer to use. We'll pass the tracer to all the
 	// components that use it, as a dependency
 
-	logger.Log("tracer", "none")
-	tracer = opentracinggo.GlobalTracer()
+	//logger.Log("tracer", "none")
+	//tracer = opentracinggo.GlobalTracer()
 
 	// Init firstly before create service
 	initFirstly(logger, grpcHost, _str.MustToInt(grpcPort))
@@ -112,6 +114,7 @@ func getEndpointMiddleware(logger log.Logger) (mw map[string][]endpoint1.Middlew
 	// Add you endpoint middleware here
 	return
 }
+
 func initMetricsEndpoint(g *group.Group) {
 	http1.DefaultServeMux.Handle("/metrics", promhttp.Handler())
 

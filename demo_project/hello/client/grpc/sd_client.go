@@ -27,17 +27,17 @@ import (
 */
 
 // 带SD功能的client不需要开发者管理底层conn，交由go-kit管理
-var svcSDClient service.HelloService
+var svcSdClient service.HelloService
 
-func MustNewClientWithSD(logger *gokit_foundation.Logger) service.HelloService {
-	if svcSDClient == nil {
-		svcSDClient = newHelloClientWithSD("", logger)
+func MustNewClientWithSd(logger *gokit_foundation.Logger) service.HelloService {
+	if svcSdClient == nil {
+		svcSdClient = newHelloClientWithSd("", logger)
 	}
-	return svcSDClient
+	return svcSdClient
 }
 
 // client从consul获取实例地址
-func newHelloClientWithSD(consulAddr string, logger *gokit_foundation.Logger) service.HelloService {
+func newHelloClientWithSd(consulAddr string, logger *gokit_foundation.Logger) service.HelloService {
 	_str.SetDefault(&consulAddr, consulAddr, ":8500")
 	// 这一步并不会尝试连接consul，仅做连接配置检查
 	apiClient, err := consulapi.NewClient(&consulapi.Config{
