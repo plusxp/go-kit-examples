@@ -2,30 +2,24 @@ package service
 
 import (
 	"fmt"
+	"github.com/opentracing/opentracing-go"
 	"go-util/_util"
 	"gokit_foundation"
 	"hello/config"
 	"hello/db"
 	"hello/pkg/crontask"
-	"time"
 )
 
-func initFirstly(logger *gokit_foundation.Logger, grpcHost string, grpcPort int) {
+func initFirstly(logger *gokit_foundation.Logger) {
 	db.Init(logger) // 先启动db
 	var err error
-	tracer, tracerCloser, err = gokit_foundation.InitTracer(config.SvcName)
+	tracerCloser, err = gokit_foundation.InitTracer(config.SvcName)
+	tracer = opentracing.GlobalTracer()
 	_util.PanicIfErr(err, nil, fmt.Sprintf("InitTracer err %v", err))
-
 	crontask.Init()
-	// 等一下，待所有内部服务准备就绪后再上线服务
-	// 1s表示所有内部服务需在1s内进入就绪状态，任何影响服务正常运行的错误都应该立即报错， 时间可调整
-	time.AfterFunc(time.Second, func() {
-		gokit_foundation.MustRegisterSvc(config.SvcName, grpcHost, grpcPort, []string{"test"})
-	})
 }
 
 func onClose() {
-	gokit_foundation.ConsulDeregister() // 先下线
 	crontask.Stop()
 	tracerCloser.Close()
 	db.Close() // 最后停止db

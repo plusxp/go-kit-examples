@@ -3,14 +3,15 @@ package service
 
 import (
 	endpoint1 "github.com/go-kit/kit/endpoint"
-	log "github.com/go-kit/kit/log"
-	prometheus "github.com/go-kit/kit/metrics/prometheus"
-	opentracing "github.com/go-kit/kit/tracing/opentracing"
-	grpc "github.com/go-kit/kit/transport/grpc"
-	group "github.com/oklog/oklog/pkg/group"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/go-kit/kit/tracing/opentracing"
+	"github.com/go-kit/kit/transport"
+	"github.com/go-kit/kit/transport/grpc"
+	"github.com/oklog/oklog/pkg/group"
 	opentracinggo "github.com/opentracing/opentracing-go"
-	endpoint "hello/pkg/endpoint"
-	service "hello/pkg/service"
+	"hello/pkg/endpoint"
+	"hello/pkg/service"
 )
 
 func createService(endpoints endpoint.Endpoints) (g *group.Group) {
@@ -19,10 +20,11 @@ func createService(endpoints endpoint.Endpoints) (g *group.Group) {
 	return g
 }
 func defaultGRPCOptions(logger log.Logger, tracer opentracinggo.Tracer) map[string][]grpc.ServerOption {
+	optErrHandler := grpc.ServerErrorHandler(transport.NewLogErrorHandler(logger))
 	options := map[string][]grpc.ServerOption{
-		"MakeADate":      {grpc.ServerErrorLogger(logger), grpc.ServerBefore(opentracing.GRPCToContext(tracer, "MakeADate", logger))},
-		"SayHi":          {grpc.ServerErrorLogger(logger), grpc.ServerBefore(opentracing.GRPCToContext(tracer, "SayHi", logger))},
-		"UpdateUserInfo": {grpc.ServerErrorLogger(logger), grpc.ServerBefore(opentracing.GRPCToContext(tracer, "UpdateUserInfo", logger))},
+		"MakeADate":      {optErrHandler, grpc.ServerBefore(opentracing.GRPCToContext(tracer, "MakeADate", logger))},
+		"SayHi":          {optErrHandler, grpc.ServerBefore(opentracing.GRPCToContext(tracer, "SayHi", logger))},
+		"UpdateUserInfo": {optErrHandler, grpc.ServerBefore(opentracing.GRPCToContext(tracer, "UpdateUserInfo", logger))},
 	}
 	return options
 }

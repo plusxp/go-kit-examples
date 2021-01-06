@@ -1,9 +1,8 @@
 module hello
 
-go 1.12
+go 1.15
 
 require (
-	github.com/HdrHistogram/hdrhistogram-go v1.0.1 // indirect
 	github.com/StackExchange/wmi v0.0.0-20190523213315-cbe66965904d // indirect
 	github.com/go-kit/kit v0.10.0
 	github.com/go-ole/go-ole v1.2.4 // indirect
@@ -18,7 +17,6 @@ require (
 	github.com/shirou/gopsutil v2.20.1+incompatible
 	github.com/sony/gobreaker v0.4.1
 	github.com/uber/jaeger-client-go v2.25.0+incompatible
-	github.com/uber/jaeger-lib v2.4.0+incompatible // indirect
 	go-util v0.0.0-00010101000000-000000000000
 	gokit_foundation v0.0.0-00010101000000-000000000000
 	golang.org/x/net v0.0.0-20200904194848-62affa334b73

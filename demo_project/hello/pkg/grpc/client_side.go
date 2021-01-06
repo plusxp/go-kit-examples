@@ -3,18 +3,20 @@ package grpc
 import (
 	"context"
 	"github.com/go-kit/kit/circuitbreaker"
-	endpoint "github.com/go-kit/kit/endpoint"
+	"github.com/go-kit/kit/endpoint"
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/ratelimit"
 	"github.com/go-kit/kit/tracing/opentracing"
 	grpc1 "github.com/go-kit/kit/transport/grpc"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/sony/gobreaker"
+	"gokit_foundation"
 	"golang.org/x/time/rate"
-	grpc "google.golang.org/grpc"
+	"google.golang.org/grpc"
 	"hello/pb/gen-go/pb"
 	endpoint1 "hello/pkg/endpoint"
-	service "hello/pkg/service"
+	"hello/pkg/service"
+	"io"
 	"time"
 )
 
@@ -22,12 +24,17 @@ import (
 //  of the conn. The caller is responsible for constructing the conn, and
 // eventually closing the underlying transport. We bake-in certain middlewares,
 // implementing the client library pattern.
-func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
+func NewSvc(conn *grpc.ClientConn, svc string) (service.HelloService, io.Closer, error) {
 	/*
 		Create some security measures
 	*/
-	var otTracer stdopentracing.Tracer
-	otTracer = stdopentracing.GlobalTracer()
+	closer, err := gokit_foundation.InitTracer(svc)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	otTracer := stdopentracing.GlobalTracer()
+
 	limiter := ratelimit.NewErroringLimiter(rate.NewLimiter(rate.Every(time.Second), 100))
 	breaker := func(method string) endpoint.Middleware {
 		return circuitbreaker.Gobreaker(gobreaker.NewCircuitBreaker(gobreaker.Settings{
@@ -36,6 +43,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 		}))
 	}
 
+	var svcPBName = "pb.Hello"
 	// Create go-kit grpc hooks, e.g.
 	//      - grpctransport.ClientAfter(),
 	//      - grpctransport.ClientFinalizer()
@@ -46,7 +54,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 	*/
 	var SayHiEndpoint endpoint.Endpoint
 	{
-		SayHiEndpoint = grpc1.NewClient(conn, "pb.Hello", "SayHi",
+		SayHiEndpoint = grpc1.NewClient(conn, svcPBName, "SayHi",
 			encodeSayHiRequest, decodeSayHiResponse, pb.SayHiResponse{}, grpcBefore).Endpoint()
 		SayHiEndpoint = opentracing.TraceClient(otTracer, "SayHi")(SayHiEndpoint)
 		SayHiEndpoint = limiter(SayHiEndpoint)
@@ -55,7 +63,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 
 	var MakeADateEndpoint endpoint.Endpoint
 	{
-		MakeADateEndpoint = grpc1.NewClient(conn, "pb.Hello", "MakeADate",
+		MakeADateEndpoint = grpc1.NewClient(conn, svcPBName, "MakeADate",
 			encodeMakeADateRequest, decodeMakeADateResponse, pb.MakeADateResponse{}, grpcBefore).Endpoint()
 		MakeADateEndpoint = opentracing.TraceClient(otTracer, "MakeADate")(MakeADateEndpoint)
 		MakeADateEndpoint = limiter(MakeADateEndpoint)
@@ -64,7 +72,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 
 	var UpdateUserInfoEndpoint endpoint.Endpoint
 	{
-		UpdateUserInfoEndpoint = grpc1.NewClient(conn, "pb.Hello", "UpdateUserInfo",
+		UpdateUserInfoEndpoint = grpc1.NewClient(conn, svcPBName, "UpdateUserInfo",
 			encodeUpdateUserInfoRequest, decodeUpdateUserInfoResponse, pb.UpdateUserInfoResponse{}, grpcBefore).Endpoint()
 		UpdateUserInfoEndpoint = opentracing.TraceClient(otTracer, "UpdateUserInfo")(UpdateUserInfoEndpoint)
 		UpdateUserInfoEndpoint = limiter(UpdateUserInfoEndpoint)
@@ -75,7 +83,7 @@ func NewSvc(conn *grpc.ClientConn) (service.HelloService, error) {
 		SayHiEndpoint:          SayHiEndpoint,
 		MakeADateEndpoint:      MakeADateEndpoint,
 		UpdateUserInfoEndpoint: UpdateUserInfoEndpoint,
-	}, nil
+	}, closer, nil
 }
 
 // encodeSayHiRequest is a transport/grpc.EncodeRequestFunc that converts a

@@ -3,13 +3,15 @@ package service
 import (
 	"flag"
 	"fmt"
-	opentracinggo "github.com/opentracing/opentracing-go"
+	kitOT "github.com/go-kit/kit/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
 	"go-util/_str"
 	"gokit_foundation"
-	pb "hello/pb/gen-go/pb"
-	endpoint "hello/pkg/endpoint"
-	grpc "hello/pkg/grpc"
-	service "hello/pkg/service"
+	"hello/config"
+	"hello/pb/gen-go/pb"
+	"hello/pkg/endpoint"
+	"hello/pkg/grpc"
+	"hello/pkg/service"
 	"io"
 	"net"
 	http1 "net/http"
@@ -19,15 +21,15 @@ import (
 	"syscall"
 
 	endpoint1 "github.com/go-kit/kit/endpoint"
-	log "github.com/go-kit/kit/log"
-	prometheus "github.com/go-kit/kit/metrics/prometheus"
-	group "github.com/oklog/oklog/pkg/group"
+	"github.com/go-kit/kit/log"
+	"github.com/go-kit/kit/metrics/prometheus"
+	"github.com/oklog/oklog/pkg/group"
 	prometheus1 "github.com/prometheus/client_golang/prometheus"
-	promhttp "github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	grpc1 "google.golang.org/grpc"
 )
 
-var tracer opentracinggo.Tracer
+var tracer opentracing.Tracer
 var tracerCloser io.Closer
 var logger *gokit_foundation.Logger
 
@@ -45,20 +47,13 @@ func Run() {
 		panic("Run: wrong grpcAddr")
 	}
 	grpcHost, grpcPort := s[0], s[1]
-	if grpcHost == "" {
-		grpcHost = "localhost"
-	}
+	_str.SetDefault(&grpcHost, grpcHost, "localhost")
+
 	// Create a single logger, which we'll use and give to other components.
 	logger = gokit_foundation.NewLogger(nil)
 
-	//  Determine which tracer to use. We'll pass the tracer to all the
-	// components that use it, as a dependency
-
-	//logger.Log("tracer", "none")
-	//tracer = opentracinggo.GlobalTracer()
-
 	// Init firstly before create service
-	initFirstly(logger, grpcHost, _str.MustToInt(grpcPort))
+	initFirstly(logger)
 	defer onClose()
 
 	svc := service.New(getServiceMiddleware(logger), logger)
@@ -66,6 +61,10 @@ func Run() {
 	g := createService(eps)
 	initMetricsEndpoint(g)
 	initCancelInterrupt(g)
+
+	// 所有都准备好了，上线服务
+	gokit_foundation.MustRegisterSvc(config.SvcName, grpcHost, _str.MustToInt(grpcPort), []string{"test"})
+	defer gokit_foundation.ConsulDeregister() // 先下线
 
 	logger.Log("exit", g.Run())
 }
@@ -112,6 +111,12 @@ func getEndpointMiddleware(logger log.Logger) (mw map[string][]endpoint1.Middlew
 	}, []string{"method", "success"})
 	addDefaultEndpointMiddleware(logger, duration, mw)
 	// Add you endpoint middleware here
+
+	// 添加trace option
+	for method, epMwSlice := range mw {
+		epMwSlice = append(epMwSlice, kitOT.TraceServer(tracer, method))
+		mw[method] = epMwSlice // 注意再次更新map
+	}
 	return
 }
 
