@@ -14,10 +14,15 @@
 `router`, `grpc`, `trace`, `metrics`, `ratelimit`, `breaker`, 
 `jwt`, `redis`, `timer task`, `distrib lock`
 -   [使用kit代码生成工具快速开发go-kit微服务-hellosvc](#使用代码生成工具快速开发go-kit微服务) 🐦
--   [go-kit API网关](#API网关) 🐤
+-   [go-kit API网关示例](#API网关) 🐤
 ___
 -   [更新日志](#更新日志)
 -   [Go-kit中文群组(推送仓库更新)](#go-kit中文群组)
+
+
+## 需要注意
+本项目提供的所有文档及代码都是供开发者参考使用的，相关demo项目严格来说并不是开箱即用的，开发者在引用相关代码
+到实际项目时应确认已完全理解其代码逻辑。
 
 <br/>
 
@@ -141,6 +146,3 @@ go-kit有组件支持现代化的监控系统Prometheus, 同时官方也推荐�
 [CHANGELOG][CHANGELOG] (上次更新于2021年1月6日)
 
 [CHANGELOG]:https://github.com/chaseSpace/go-kit-examples/blob/master/CHANGELOG.md
-
-## TODO
--   基于jaeger的trace使用（文档+代码）

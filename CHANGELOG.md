@@ -1,6 +1,6 @@
 ## 2021年1月6日 Update
 - `demo_project\hello`项目增加链路追踪(trace)功能代码，公共部分存放在`gokit_foundation\jaeger_trace.go`，
-demo代码参考`gokit_foundation\jaeger_trace_test.go`
+快速使用Jaeger的demo代码参考`gokit_foundation\jaeger_trace_test.go`
 - 增加jaeger的文档，位于`docs\jaeger`
 
 ## 2021年1月3日 Update
